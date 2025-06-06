@@ -75,18 +75,6 @@ export const findEmployeeDetails = (employees: any, empCode: string) => {
   }
 };
 
-export const formatTaskStatus = (status: string) => {
-  const statusMapping = {
-    Created: 'New',
-    InProgress: 'In Progress',
-    AwaitingInfo: 'Awaiting Info',
-    Resolved: 'Resolved',
-    Closed: 'Closed',
-  };
-
-  return statusMapping[status] || 'Unknown Status';
-};
-
 export const getPriorityColor = (priority?: string): string => {
   const colors: Record<string, string> = {
     critical: 'font-bold bg-red-50 text-red-600',
@@ -107,13 +95,6 @@ export const getStatusColor = (status?: string): string => {
     closed: 'bg-red-600 text-white text-xs font-bold',
   };
   return colors[status?.toLowerCase()] || 'bg-gray-500 text-gray-300 text-xs font-bold';
-};
-
-export const adjustforUTC = (date) => {
-  const utcDate = new Date(date);
-  const offset = 5.5 * 60 * 60 * 1000; // IST is UTC +5:30
-  const istDate = new Date(utcDate.getTime() + offset);
-  return istDate.toISOString().replace('Z', '+05:30');
 };
 
 // Helper function to extract unique units from employee list
@@ -158,16 +139,15 @@ export const extractUniqueDepartments = (employees) => {
   return uniqueDepartments;
 };
 
-export const getStatusText = (statusId: number): string => {
-  switch (statusId) {
-    case 1:
-      return 'Created';
-    case 2:
-      return 'In Progress';
-    case 3:
-      return 'Closed';
-
-    default:
-      return 'Undefined';
+export function getObjectFromSessionStorage(key) {
+  const item = sessionStorage.getItem(key);
+  if (item) {
+    try {
+      return JSON.parse(item);
+    } catch (e) {
+      console.error('Error parsing JSON from sessionStorage:', e);
+      return null;
+    }
   }
-};
+  return null;
+}

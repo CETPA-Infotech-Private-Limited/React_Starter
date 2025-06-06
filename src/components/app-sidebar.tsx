@@ -15,24 +15,22 @@ import { environment } from '@/config';
 import { Separator } from '@radix-ui/react-separator';
 import { useNavigate } from 'react-router';
 import useUserRoles from '@/hooks/useUserRoles';
-import { removeSessionItem } from '@/lib/helperFunction';
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
   const { state, toggleSidebar } = useSidebar();
-  const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
-  const hasAccess = isNodalOfficer || isSuperAdmin || isAdmin || isUnitCGM;
+  // const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
+  const hasAccess = true;
   const navMainItems = [
     {
       title: 'Dashboard',
-      url: '/dashboard',
+      url: '/',
       icon: LayoutGrid,
     },
   ].filter(Boolean);
 
   const handleLogout = () => {
-    removeSessionItem('token');
-    window.location.href = environment.logoutUrl;
+    window.location.href = environment.exitUrl;
   };
 
   return (

@@ -41,16 +41,17 @@ import { removeSessionItem } from '@/lib/helperFunction';
 import { resetUser } from '@/features/user/userSlice';
 import { environment } from '@/config';
 import { setSelectedWorkspace } from '@/features/workspace/workspaceSlice';
-import useUserRoles from '@/hooks/useUserRoles';
+// import useUserRoles from '@/hooks/useUserRoles';
 
 export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const { unitName, unitId } = useSelector((state: RootState) => state.workspace.selectedWorkspace);
-  const units = useSelector((state: RootState) => state.units.units);
+
   const { state } = useSidebar();
   const navigate = useNavigate();
-  const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
+  // const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
+  const isSuperAdmin = true;
   const data = {
     navMain: [
       {

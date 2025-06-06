@@ -95,7 +95,10 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
+
         const { data } = action.payload;
+
+        // Map API response to existing state structure
         state.EmpCode = data.empCode;
         state.unique_name = data.name;
         state.Designation = data.designation;

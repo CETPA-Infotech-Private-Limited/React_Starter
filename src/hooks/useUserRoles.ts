@@ -1,7 +1,6 @@
 import { RootState } from '@/app/store';
 import { useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import axiosInstance from '@/services/axiosInstance';
 
 interface RoleResponse {

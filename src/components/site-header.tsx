@@ -6,12 +6,13 @@ import { removeSessionItem } from '@/lib/helperFunction';
 import { resetUser } from '@/features/user/userSlice';
 import { environment } from '@/config';
 import { RootState } from '@/app/store';
-import { Button } from './ui/button';
-import { AlignJustify, Power } from 'lucide-react';
+import { AlignJustify } from 'lucide-react';
 import { SidebarTrigger, useSidebar } from './ui/sidebar';
+import LogoutButton from '@/auth/LogoutButton';
 
 const SiteHeader: React.FC<{ showtoggle?: boolean }> = ({ showtoggle = false }) => {
   const user = useSelector((state: RootState) => state.user);
+  console.log('user', user);
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -30,12 +31,9 @@ const SiteHeader: React.FC<{ showtoggle?: boolean }> = ({ showtoggle = false }) 
           </Link>
         </div>
         <div className="flex items-center space-x-4">
-          {showtoggle && (
-            <div className="hidden md:block text-gray-800 text-md md:text-lg font-semibold">{user.unique_name}</div>
-          )}
-          <Button variant="outline" size="icon" onClick={() => (window.location.href = environment.powerOffUrl)}>
-            <Power className="w-5 h-5" />
-          </Button>
+          <div className="hidden md:block text-gray-800 text-md md:text-lg font-semibold">{user.unique_name}</div>
+
+          <LogoutButton />
         </div>
       </div>
     </header>
