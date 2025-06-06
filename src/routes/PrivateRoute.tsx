@@ -8,6 +8,7 @@ import { fetchUserProfile } from '@/features/user/userSlice';
 import { useAppSelector } from '@/app/hooks';
 import { Role } from '@/types/auth'; // Use your Role type if available
 import AppLayout from '@/components/layout/app-layout';
+import { useSessionChecker } from '@/hooks/useSessionChecker';
 
 interface PrivateRouteProps {
   allowedRoles?: Role[];
@@ -18,6 +19,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  useSessionChecker();
   const profile = {
     roles: ['Admin', 'Employee'],
   };

@@ -24,7 +24,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navMainItems = [
     {
       title: 'Dashboard',
-      url: '/',
+      url: '/dashboard',
       icon: LayoutGrid,
     },
   ].filter(Boolean);
