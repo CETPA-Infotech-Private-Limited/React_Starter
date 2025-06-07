@@ -16,7 +16,7 @@ const AdminPrivateRoute: React.FC = () => {
     return <Loader />;
   }
 
-  return isAuthenticated && hasAccess ? (
+  return isAuthenticated ? (
     <AdminLayout>
       <Outlet />
     </AdminLayout>

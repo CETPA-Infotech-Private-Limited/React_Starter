@@ -27,6 +27,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       url: '/dashboard',
       icon: LayoutGrid,
     },
+    {
+      title: 'Work Flow',
+      url: '/work-flow',
+      icon: LayoutGrid,
+    },
   ].filter(Boolean);
 
   const handleLogout = () => {

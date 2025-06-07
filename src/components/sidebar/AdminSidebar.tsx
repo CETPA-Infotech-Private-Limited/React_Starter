@@ -10,6 +10,8 @@ import {
   LogOut,
   BadgeAlert,
   UserRoundCog,
+  ChevronsRight,
+  ChevronsLeft,
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import {
@@ -46,9 +48,8 @@ import { setSelectedWorkspace } from '@/features/workspace/workspaceSlice';
 export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const user = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
-  const { unitName, unitId } = useSelector((state: RootState) => state.workspace.selectedWorkspace);
-
-  const { state } = useSidebar();
+  // const { unitName, unitId } = useSelector((state: RootState) => state.workspace.selectedWorkspace);
+  const { state, toggleSidebar } = useSidebar();
   const navigate = useNavigate();
   // const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
   const isSuperAdmin = true;
@@ -59,21 +60,13 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
         url: '/admin-dashboard',
         icon: LayoutGrid,
       },
-      // {
-      //   title: 'My Grievances',
-      //   url: '/admin-grievances',
-      //   icon: BadgeAlert,
-      // },
-      // {
-      //   title: 'Manage Services',
-      //   url: '/admin-manage-services',
-      //   icon: Users,
-      // },
+
       {
-        title: 'Grievance Organization',
-        url: '/admin-org',
-        icon: Users,
+        title: 'Role Mapping',
+        url: '/admin-role-mapping',
+        icon: UserRoundCog,
       },
+
       ...(isSuperAdmin
         ? [
             {
@@ -101,12 +94,14 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props} className="">
-      <SidebarHeader className="flex flex-row justify-between items-center py-4 px-4">
-        <img
-          src={logo}
-          className={`transition-all  object-contain ${state === 'collapsed' ? 'w-14 h-10' : 'w-full h-12'}`}
-        />
-      </SidebarHeader>
+      <div className="flex justify-end md:pt-[90px] ">
+        {state === 'collapsed' ? (
+          <ChevronsRight onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
+        ) : (
+          <ChevronsLeft onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
+        )}
+      </div>
+      <SidebarSeparator />
       <SidebarSeparator />
       <SidebarMenu>
         {/* <SidebarMenuItem className="mt-4">
