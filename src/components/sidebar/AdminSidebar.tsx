@@ -39,10 +39,9 @@ import { RootState, AppDispatch } from '@/app/store';
 import { logo } from '@/assets/image/images';
 import { Separator } from '@radix-ui/react-separator';
 import { useNavigate } from 'react-router';
-import { removeSessionItem } from '@/lib/helperFunction';
-import { resetUser } from '@/features/user/userSlice';
 import { environment } from '@/config';
 import { setSelectedWorkspace } from '@/features/workspace/workspaceSlice';
+import { clearAllStorage } from '@/lib/helperFunction';
 // import useUserRoles from '@/hooks/useUserRoles';
 
 export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
@@ -79,16 +78,12 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
     ],
   };
 
-  const handleWorkspaceChange = (workspaceName: string, workspaceId: number) => {
-    dispatch(setSelectedWorkspace({ unitName: workspaceName, unitId: workspaceId }));
-  };
   React.useEffect(() => {
     dispatch(setSelectedWorkspace({ unitName: user.Unit, unitId: Number(user.unitId) }));
   }, []);
 
   const handleLogout = () => {
-    removeSessionItem('token');
-    dispatch(resetUser());
+    clearAllStorage();
     window.location.href = environment.logoutUrl;
   };
 
@@ -103,36 +98,6 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
       </div>
       <SidebarSeparator />
       <SidebarSeparator />
-      <SidebarMenu>
-        {/* <SidebarMenuItem className="mt-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger disabled={!isSuperAdmin} asChild>
-              <SidebarMenuButton className="flex items-center justify-between border h-12 border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:border-primary capitalize">
-                {unitName?.toLowerCase()}
-                <ChevronDown className="ml-2 w-4 h-4 text-gray-500" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="mt-1 w-56 border border-gray-300 shadow-lg rounded-md bg-white">
-              <DropdownMenuLabel>Unit Name</DropdownMenuLabel>
-              <DropdownMenuItem
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleWorkspaceChange('All', 0)}
-              >
-                <span>All</span>
-              </DropdownMenuItem>
-              {units.map((unit) => (
-                <DropdownMenuItem
-                  key={unit.unitId}
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleWorkspaceChange(unit.unitName, unit.unitId)}
-                >
-                  <span className="capitalize">{unit.unitName.toLowerCase()}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </SidebarMenuItem> */}
-      </SidebarMenu>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>

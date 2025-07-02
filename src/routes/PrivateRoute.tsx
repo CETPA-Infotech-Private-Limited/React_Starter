@@ -1,33 +1,27 @@
-// At the top of PrivateRoute.tsx
 import React, { useEffect, useRef } from 'react';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAuth } from 'react-oidc-context';
 import Loader from '@/components/ui/loader';
-import { useDispatch } from 'react-redux';
 import { fetchUserProfile } from '@/features/user/userSlice';
-import { useAppSelector } from '@/app/hooks';
-import { Role } from '@/types/auth'; // Use your Role type if available
-import AppLayout from '@/components/layout/app-layout';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useSessionChecker } from '@/hooks/useSessionChecker';
+import { UserRole } from '@/types/auth';
 
 interface PrivateRouteProps {
-  allowedRoles?: Role[];
+  allowedRoles?: UserRole[];
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   const auth = useAuth();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   useSessionChecker();
-  const profile = {
-    roles: ['Admin', 'Employee'],
-  };
-  const { loading: userLoading, unique_name } = useAppSelector((state) => state.user);
+
+  const { loading: userLoading, Roles } = useAppSelector((state) => state.user);
   const isAuthenticated = auth.isAuthenticated;
   const isInitializing = auth.isLoading;
   const redirectHandled = useRef(false);
-  console.log('unique_name', unique_name);
 
   useEffect(() => {
     if (!isAuthenticated && !isInitializing && !redirectHandled.current) {
@@ -41,29 +35,28 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   useEffect(() => {
     if (isAuthenticated && auth.user && !redirectHandled.current) {
       redirectHandled.current = true;
-      if (!unique_name) {
-        dispatch(fetchUserProfile());
-      }
 
-      const returnUrl = auth.user?.state?.returnUrl;
+      dispatch(fetchUserProfile());
+
+      let returnUrl: string | undefined;
+      if (auth.user && auth.user.state && typeof (auth.user.state as any).returnUrl === 'string') {
+        returnUrl = (auth.user.state as any).returnUrl;
+      }
       navigate(returnUrl ?? location.pathname, { replace: true });
     }
   }, [isAuthenticated, auth.user, dispatch, navigate, location.pathname]);
 
-  // // 🔐 Role-based restriction
-  // if (allowedRoles && !allowedRoles.some((r) => profile.roles.includes(r))) {
-  //   return <Navigate to="/unauthorized" />;
-  // }
+  const hasRequiredRole = allowedRoles.length === 0 || Roles?.some((role) => allowedRoles.includes(role as UserRole));
 
-  if (isInitializing || !isAuthenticated || userLoading || !profile) {
+  if (!hasRequiredRole && isAuthenticated) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  if (!isAuthenticated || userLoading) {
     return <Loader />;
   }
 
-  return (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
-  );
+  return <Outlet />;
 };
 
 export default PrivateRoute;

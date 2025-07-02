@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { broadcastLogoutEvent, listenForLogout, isLogoutInProgress } from '../auth/globalLogoutSync';
 import { oidcConfig } from './config';
+import { clearAllStorage } from '@/lib/helperFunction';
 
 export function useGlobalLogout() {
   const auth = useAuth();
@@ -16,7 +17,7 @@ export function useGlobalLogout() {
       }
 
       await auth.removeUser();
-
+      clearAllStorage();
       await auth.signoutRedirect({
         post_logout_redirect_uri: oidcConfig.post_logout_redirect_uri,
       });
@@ -38,6 +39,7 @@ export function useGlobalLogout() {
       if (auth.isAuthenticated) {
         try {
           await auth.removeUser();
+          clearAllStorage();
           window.location.href = oidcConfig.post_logout_redirect_uri;
         } catch (error) {}
       }

@@ -1,33 +1,29 @@
 import { useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { useAppDispatch } from '@/app/hooks';
-import { useNavigate } from 'react-router';
-import { SESSION_CHECK_INTERVAL } from '@/config';
+import { environment, SESSION_CHECK_INTERVAL } from '@/config';
 import toast from 'react-hot-toast';
+import { clearAllStorage } from '@/lib/helperFunction';
 
 export const useSessionChecker = () => {
   const auth = useAuth();
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!auth.isAuthenticated) return;
 
-    const interval = setInterval(async () => {
+    const checkSession = async () => {
       try {
         await auth.signinSilent();
         console.log('[Session] Silent renewal succeeded');
       } catch (error) {
+        console.error('[Session] Silent renewal failed', error);
         toast.error('Session expired. Please log in again.');
-
-        // Destroy everything
-        // dispatch(clearAuthData());
-        // dispatch(clearUserProfile());
-        // auth.removeUser(); // clears stored user from oidc-client
-        // navigate('/session-expired', { replace: true });
+        clearAllStorage();
+        window.location.replace(environment.exitUrl);
       }
-    }, SESSION_CHECK_INTERVAL);
+    };
 
-    return () => clearInterval(interval);
+    const intervalId = setInterval(checkSession, SESSION_CHECK_INTERVAL);
+
+    return () => clearInterval(intervalId);
   }, [auth.isAuthenticated]);
 };

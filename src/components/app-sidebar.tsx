@@ -1,80 +1,66 @@
 import * as React from 'react';
-import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { NavMain } from '@/components/nav-main';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarRail,
-  SidebarSeparator,
-  useSidebar,
-} from '@/components/ui/sidebar';
-import { environment } from '@/config';
-import { Separator } from '@radix-ui/react-separator';
+import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router';
-import useUserRoles from '@/hooks/useUserRoles';
+import { NavMain } from '@/components/nav-main';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
+import { Separator } from '@radix-ui/react-separator';
+import { environment } from '@/config';
+import { clearAllStorage } from '@/lib/helperFunction';
+import { UserRole } from '@/types/auth';
+import { NavItem } from '@/types/types';
+import { useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
+  const { Roles } = useAppSelector((state: RootState) => state.user);
   const { state, toggleSidebar } = useSidebar();
-  // const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
-  const hasAccess = true;
-  const navMainItems = [
+
+  const canAccessAdminDashboard = (['admin', 'superAdmin'] as UserRole[]).some((role) => Roles.includes(role));
+
+  const allNavItems: NavItem[] = [
     {
       title: 'Dashboard',
       url: '/dashboard',
       icon: LayoutGrid,
+      roles: ['user', 'admin', 'superAdmin', 'HR Admin'],
     },
-    {
-      title: 'Work Flow',
-      url: '/work-flow',
-      icon: LayoutGrid,
-    },
-  ].filter(Boolean);
+  ];
+
+  const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
 
   const handleLogout = () => {
+    clearAllStorage();
     window.location.href = environment.exitUrl;
   };
 
+  const ToggleIcon = state === 'collapsed' ? ChevronsRight : ChevronsLeft;
+
+  const menuButtonBaseClass = 'transition-all duration-300 ease-in-out h-full w-full cursor-pointer active:bg-primary hover:bg-primary hover:text-white [&>svg]:size-7';
+
   return (
-    <Sidebar collapsible="icon" {...props} className="">
-      <div className="flex justify-end md:pt-[90px] ">
-        {state === 'collapsed' ? (
-          <ChevronsRight onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
-        ) : (
-          <ChevronsLeft onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
-        )}
+    <Sidebar collapsible="icon" {...props}>
+      <div className="flex justify-end md:pt-[90px] px-2">
+        <ToggleIcon onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
       </div>
       <SidebarSeparator />
       <SidebarContent className="flex justify-between">
         <NavMain items={navMainItems} />
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarMenu>
-          {hasAccess && (
-            <SidebarMenuButton
-              onClick={() => navigate('/admin-dashboard')}
-              asChild
-              tooltip={'Manage Organization'}
-              className={`transition-all text-black cursor-pointer duration-300  active:bg-primary [&>svg]:size-7 ease-in-out hover:bg-primary hover:text-white h-full w-full active:text-white`}
-            >
-              <div className={`flex items-center gap-2`}>
+          {canAccessAdminDashboard && (
+            <SidebarMenuButton onClick={() => navigate('/admin-dashboard')} tooltip="Manage Organization" asChild className={menuButtonBaseClass + ' text-black'}>
+              <div className="flex items-center gap-2">
                 <Hotel size={24} />
                 <span>Manage Organization</span>
               </div>
             </SidebarMenuButton>
           )}
           <Separator />
-
-          <SidebarMenuButton
-            onClick={handleLogout}
-            asChild
-            tooltip={'Exit'}
-            className={`transition-all cursor-pointer duration-300  active:bg-primary [&>svg]:size-7 ease-in-out hover:bg-primary hover:text-white h-full w-full`}
-          >
-            <div className={`flex items-center gap-2`}>
+          <SidebarMenuButton onClick={handleLogout} tooltip="Exit" asChild className={menuButtonBaseClass}>
+            <div className="flex items-center gap-2">
               <LogOut size={24} />
               <span>Exit</span>
             </div>

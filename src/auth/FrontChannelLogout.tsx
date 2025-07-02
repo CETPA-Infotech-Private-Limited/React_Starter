@@ -4,6 +4,7 @@ import { UserManager } from 'oidc-client-ts';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { useSearchParams } from 'react-router';
+import { clearAllStorage } from '@/lib/helperFunction';
 
 const FrontChannelLogout: React.FC = () => {
   const auth = useAuth();
@@ -32,17 +33,14 @@ const FrontChannelLogout: React.FC = () => {
 
         // Create UserManager instance
         const userManager = new UserManager(auth.settings);
-
-        // Check if user is currently authenticated
         const user = await userManager.getUser();
 
         if (user && !user.expired) {
           // Clear authentication data and remove user
-          clearAuthStorage();
+          clearAllStorage();
           await userManager.removeUser();
         } else {
-          // Even if no user is found, clear any remaining auth data
-          clearAuthStorage();
+          clearAllStorage();
         }
 
         // Broadcast logout event to other tabs/windows
@@ -71,22 +69,6 @@ const FrontChannelLogout: React.FC = () => {
 
     performLogout();
   }, [auth]);
-
-  const clearAuthStorage = () => {
-    // Clear localStorage
-    Object.keys(localStorage).forEach((key) => {
-      if (key.includes('oidc') || key.includes('auth') || key.includes('token') || key.startsWith('user:')) {
-        localStorage.removeItem(key);
-      }
-    });
-
-    // Clear sessionStorage
-    Object.keys(sessionStorage).forEach((key) => {
-      if (key.includes('oidc') || key.includes('auth') || key.includes('token') || key.startsWith('user:')) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  };
 
   // Only show visible UI if not running inside an iframe
   const isIframe = window.parent !== window;

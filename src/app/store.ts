@@ -10,7 +10,7 @@ import employeeReducer from '@/features/employee/employeeSlice';
 const sessionPersistConfig = {
   key: 'root',
   storage: sessionStorage,
-  whitelist: ['employee', 'user', 'units', 'applications', 'user'],
+  whitelist: ['employee', 'user', 'units', 'applications'],
 };
 
 const rootReducer = combineReducers({

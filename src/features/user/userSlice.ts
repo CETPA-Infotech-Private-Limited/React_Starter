@@ -2,7 +2,7 @@ import axiosInstance from '@/services/axiosInstance';
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 interface UserState {
-  Roles: string | null;
+  Roles: string[];
   unique_name: string | null;
   EmpCode: string | null;
   Designation: string | null;
@@ -103,7 +103,7 @@ const userSlice = createSlice({
         state.unitId = data.unitId.toString();
         state.Department = data.department;
         state.Lavel = data.level;
-        state.Roles = data.roles.join(',');
+        state.Roles = data.roles;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;

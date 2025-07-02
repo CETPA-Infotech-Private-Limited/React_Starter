@@ -1,12 +1,9 @@
 import axios from 'axios';
 import { environment } from '@/config';
-import { getObjectFromSessionStorage, getSessionItem, removeSessionItem } from '@/lib/helperFunction';
+import { clearAllStorage, getObjectFromSessionStorage } from '@/lib/helperFunction';
 import toast from 'react-hot-toast';
 import logger from '@/lib/logger';
 import { oidcConfig } from '@/auth/config';
-
-// Utility function for getting the token
-const getAccessToken = () => getSessionItem('token');
 
 // Creating Axios instance
 const axiosInstance = axios.create({
@@ -37,7 +34,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.code === 'ERR_NETWORK') {
       toast.error('Your session has expired. Please log in again.');
-      removeSessionItem('token');
+      clearAllStorage();
       setTimeout(() => {
         window.location.href = environment.exitUrl;
       }, 500);
@@ -46,7 +43,7 @@ axiosInstance.interceptors.response.use(
     // Make sure error.response exists before accessing its status
     if (error.response && error.response.status === 401) {
       toast.error('Authorization failed. Your session has expired. Redirecting to login...');
-      removeSessionItem('token');
+      clearAllStorage();
       setTimeout(() => {
         window.location.href = environment.exitUrl;
       }, 500);

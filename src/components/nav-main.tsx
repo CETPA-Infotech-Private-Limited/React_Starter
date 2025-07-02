@@ -9,6 +9,7 @@ export function NavMain({
     title: string;
     url: string;
     icon?: LucideIcon;
+    roles: any;
   }[];
 }) {
   const { setOpenMobile } = useSidebar();
@@ -28,9 +29,7 @@ export function NavMain({
                 >
                   <div
                     className={`flex items-center gap-2 ${
-                      isActive
-                        ? 'bg-primary text-white hover:text-white h-full w-full'
-                        : 'hover:bg-primary hover:text-white active:text-white  h-full'
+                      isActive ? 'bg-primary text-white hover:text-white h-full w-full' : 'hover:bg-primary hover:text-white active:text-white  h-full'
                     }`}
                   >
                     {item.icon && <item.icon size={24} />}

@@ -1,5 +1,5 @@
 const DFCCIL_UAT = {
-  apiUrl: 'https://uattaskmanageapi.dfccil.com/api',
+  apiUrl: 'https://uat.guesthouse.cetpainfotech.com/api',
   orgHierarchy: 'https://uatorganization.dfccil.com/api',
   logoutUrl: 'http://uat.dfccil.com/DfcHome',
   exitUrl: 'http://uatlogin.dfccil.com/applications',

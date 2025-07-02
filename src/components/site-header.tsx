@@ -1,18 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { logo } from '@/assets/image/images';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeSessionItem } from '@/lib/helperFunction';
-import { resetUser } from '@/features/user/userSlice';
-import { environment } from '@/config';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import { AlignJustify } from 'lucide-react';
-import { SidebarTrigger, useSidebar } from './ui/sidebar';
+import { useSidebar } from './ui/sidebar';
 import LogoutButton from '@/auth/LogoutButton';
 
-const SiteHeader: React.FC<{ showtoggle?: boolean }> = ({ showtoggle = false }) => {
+const SiteHeader: React.FC<{ showtoggle?: boolean }> = () => {
   const user = useSelector((state: RootState) => state.user);
-  console.log('user', user);
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -24,9 +20,7 @@ const SiteHeader: React.FC<{ showtoggle?: boolean }> = ({ showtoggle = false }) 
           </div>
           <img src={logo} alt="Company Logo" className="object-contain h-12 w-auto" />
           <Link to="#" className="hidden sm:flex flex-col text-primary">
-            <span className="text-md md:text-lg font-semibold">
-              Dedicated Freight Corridor Corporation of India Limited
-            </span>
+            <span className="text-md md:text-lg font-semibold">Dedicated Freight Corridor Corporation of India Limited</span>
             <span className="text-sm md:text-md text-gray-600">A Govt. of India (Ministry of Railways) Enterprise</span>
           </Link>
         </div>
