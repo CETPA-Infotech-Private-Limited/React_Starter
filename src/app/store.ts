@@ -1,28 +1,28 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
-import sessionStorage from 'redux-persist/lib/storage/session';
+import storageSession from 'redux-persist/lib/storage/session';
 import { combineReducers } from 'redux';
 import userReducer from '@/features/user/userSlice';
 import applicationsReducer from '@/features/applications/applicationSlice';
-import workSpaceReducer from '@/features/workspace/workspaceSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
+import allRoleReducer from '@/features/allRole/allRoleSlice';
 
-const sessionPersistConfig = {
+const persistConfig = {
   key: 'root',
-  storage: sessionStorage,
-  whitelist: ['employee', 'user', 'units', 'applications'],
+  storage: storageSession,
+  whitelist: ['employee', 'user', 'applications', 'allRole'],
 };
 
 const rootReducer = combineReducers({
   employee: employeeReducer,
   user: userReducer,
   applications: applicationsReducer,
-  workspace: workSpaceReducer,
+  allRole: allRoleReducer,
 });
 
-const persistedReducer = persistReducer(sessionPersistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store = configureStore({
+export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -30,7 +30,8 @@ const store = configureStore({
     }),
 });
 
-export default store;
-export const persistor = persistStore(store);
+export const persister = persistStore(store);
+
+// Define types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

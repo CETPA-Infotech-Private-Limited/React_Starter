@@ -1,127 +1,69 @@
 import * as React from 'react';
-import {
-  BellRing,
-  CalendarCheck,
-  Users,
-  ChevronDown,
-  ChevronLeft,
-  LayoutGrid,
-  User,
-  LogOut,
-  BadgeAlert,
-  UserRoundCog,
-  ChevronsRight,
-  ChevronsLeft,
-} from 'lucide-react';
-import { NavMain } from '@/components/nav-main';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  SidebarSeparator,
-  useSidebar,
-} from '@/components/ui/sidebar';
-import { Button } from '../ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '@/app/store';
-import { logo } from '@/assets/image/images';
-import { Separator } from '@radix-ui/react-separator';
+import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { NavMain } from '@/components/nav-main';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
+import { Separator } from '@radix-ui/react-separator';
 import { environment } from '@/config';
-import { setSelectedWorkspace } from '@/features/workspace/workspaceSlice';
 import { clearAllStorage } from '@/lib/helperFunction';
-// import useUserRoles from '@/hooks/useUserRoles';
+import { NavItem } from '@/types/types';
+import { useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
 
 export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const user = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch<AppDispatch>();
-  // const { unitName, unitId } = useSelector((state: RootState) => state.workspace.selectedWorkspace);
-  const { state, toggleSidebar } = useSidebar();
   const navigate = useNavigate();
-  // const { isNodalOfficer, isSuperAdmin, isAdmin, isUnitCGM } = useUserRoles();
-  const isSuperAdmin = true;
-  const data = {
-    navMain: [
-      {
-        title: 'Dashboard',
-        url: '/admin-dashboard',
-        icon: LayoutGrid,
-      },
+  const { Roles } = useAppSelector((state: RootState) => state.user);
+  const { state, toggleSidebar } = useSidebar();
 
-      {
-        title: 'Role Mapping',
-        url: '/admin-role-mapping',
-        icon: UserRoundCog,
-      },
+  const allNavItems: NavItem[] = [
+    {
+      title: 'Dashboard',
+      url: '/admin-dashboard',
+      icon: LayoutGrid,
+      roles: ['admin', 'superAdmin', 'HR Admin'],
+    },
+    {
+      title: 'Manage Admin',
+      url: '/manage-admin',
+      icon: UserRoundCog,
+      roles: ['superAdmin', 'HR Admin'],
+    },
+  ];
 
-      ...(isSuperAdmin
-        ? [
-            {
-              title: 'Manage Admin',
-              url: '/admin-manage-role',
-              icon: UserRoundCog,
-            },
-          ]
-        : []),
-    ],
-  };
-
-  React.useEffect(() => {
-    dispatch(setSelectedWorkspace({ unitName: user.Unit, unitId: Number(user.unitId) }));
-  }, []);
+  const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
 
   const handleLogout = () => {
     clearAllStorage();
-    window.location.href = environment.logoutUrl;
+    window.location.href = environment.exitUrl;
   };
 
+  const ToggleIcon = state === 'collapsed' ? ChevronsRight : ChevronsLeft;
+
+  const menuButtonBaseClass =
+    'transition-all duration-300 ease-in-out h-full w-full cursor-pointer active:bg-primary hover:bg-primary hover:text-white [&>svg]:size-7';
+
   return (
-    <Sidebar collapsible="icon" {...props} className="">
-      <div className="flex justify-end md:pt-[90px] ">
-        {state === 'collapsed' ? (
-          <ChevronsRight onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
-        ) : (
-          <ChevronsLeft onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
-        )}
+    <Sidebar collapsible="icon" {...props}>
+      <div className="flex justify-end md:pt-[90px] px-2">
+        <ToggleIcon onClick={toggleSidebar} className="w-8 h-8 cursor-pointer" />
       </div>
       <SidebarSeparator />
-      <SidebarSeparator />
-      <SidebarContent>
-        <NavMain items={data.navMain} />
+      <SidebarContent className="flex justify-between">
+        <NavMain items={navMainItems} />
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuButton
-            onClick={() => navigate('/dashboard')}
-            asChild
-            tooltip={' Manage Personal View'}
-            className={`transition-all text-black cursor-pointer duration-300  active:bg-primary [&>svg]:size-7 ease-in-out hover:bg-primary hover:text-white h-full w-full active:text-white`}
-          >
-            <div className={`flex items-center gap-2`}>
-              <User size={24} />
+          <SidebarMenuButton onClick={() => navigate('/dashboard')} tooltip={' Manage Personal View'} asChild className={menuButtonBaseClass + ' text-black'}>
+            <div className="flex items-center gap-2">
+              <Hotel size={24} />
               <span> Manage Personal View</span>
             </div>
           </SidebarMenuButton>
+
           <Separator />
-          <SidebarMenuButton
-            onClick={handleLogout}
-            asChild
-            tooltip={'Exit'}
-            className={`transition-all cursor-pointer duration-300  active:bg-primary [&>svg]:size-7 ease-in-out hover:bg-primary hover:text-white h-full w-full`}
-          >
-            <div className={`flex items-center gap-2`}>
+          <SidebarMenuButton onClick={handleLogout} tooltip="Exit" asChild className={menuButtonBaseClass}>
+            <div className="flex items-center gap-2">
               <LogOut size={24} />
               <span>Exit</span>
             </div>

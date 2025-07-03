@@ -16,7 +16,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { Roles } = useAppSelector((state: RootState) => state.user);
   const { state, toggleSidebar } = useSidebar();
 
-  const canAccessAdminDashboard = (['admin', 'superAdmin'] as UserRole[]).some((role) => Roles.includes(role));
+  const canAccessAdminDashboard = (['admin', 'superAdmin', 'HR Admin'] as UserRole[]).some((role) => Roles.includes(role));
 
   const allNavItems: NavItem[] = [
     {
@@ -24,6 +24,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       url: '/dashboard',
       icon: LayoutGrid,
       roles: ['user', 'admin', 'superAdmin', 'HR Admin'],
+    },
+    {
+      title: 'Report',
+      url: '/dashboasssrd',
+      icon: LayoutGrid,
+      roles: ['user', 'admin', 'superAdmin'],
     },
   ];
 
@@ -36,7 +42,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
   const ToggleIcon = state === 'collapsed' ? ChevronsRight : ChevronsLeft;
 
-  const menuButtonBaseClass = 'transition-all duration-300 ease-in-out h-full w-full cursor-pointer active:bg-primary hover:bg-primary hover:text-white [&>svg]:size-7';
+  const menuButtonBaseClass =
+    'transition-all duration-300 ease-in-out h-full w-full cursor-pointer active:bg-primary hover:bg-primary hover:text-white [&>svg]:size-7';
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -51,7 +58,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <SidebarMenu>
           {canAccessAdminDashboard && (
-            <SidebarMenuButton onClick={() => navigate('/admin-dashboard')} tooltip="Manage Organization" asChild className={menuButtonBaseClass + ' text-black'}>
+            <SidebarMenuButton
+              onClick={() => navigate('/admin-dashboard')}
+              tooltip="Manage Organization"
+              asChild
+              className={menuButtonBaseClass + ' text-black'}
+            >
               <div className="flex items-center gap-2">
                 <Hotel size={24} />
                 <span>Manage Organization</span>

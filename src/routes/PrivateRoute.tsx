@@ -6,6 +6,7 @@ import { fetchUserProfile } from '@/features/user/userSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useSessionChecker } from '@/hooks/useSessionChecker';
 import { UserRole } from '@/types/auth';
+import { fetchEmployees } from '@/features/employee/employeeSlice';
 
 interface PrivateRouteProps {
   allowedRoles?: UserRole[];
@@ -19,6 +20,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   useSessionChecker();
 
   const { loading: userLoading, Roles } = useAppSelector((state) => state.user);
+
   const isAuthenticated = auth.isAuthenticated;
   const isInitializing = auth.isLoading;
   const redirectHandled = useRef(false);
@@ -35,8 +37,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   useEffect(() => {
     if (isAuthenticated && auth.user && !redirectHandled.current) {
       redirectHandled.current = true;
-
       dispatch(fetchUserProfile());
+      dispatch(fetchEmployees());
 
       let returnUrl: string | undefined;
       if (auth.user && auth.user.state && typeof (auth.user.state as any).returnUrl === 'string') {
