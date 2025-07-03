@@ -13,11 +13,13 @@ import { RootState } from '@/app/store';
 import { fetchApplications } from '@/features/applications/applicationSlice';
 import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
+import Seo from '@/components/common/Seo';
+import { useAppName } from '@/hooks/useAppName';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
   useGlobalLogout();
-
+  const { fullDescription, description } = useAppName();
   const applications = useAppSelector((state: RootState) => state.applications.applications);
 
   useEffect(() => {
@@ -27,25 +29,27 @@ const AppRoutes = () => {
   }, [applications, dispatch]);
 
   return (
-    <Routes>
-      <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/logout-notification" element={<FrontChannelLogout />} />
-
-      <Route element={<AppLayout isAdmin={false} />}>
-        <Route element={<PrivateRoute allowedRoles={['user', 'HR Admin']} />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+    <>
+      <Seo title={fullDescription} description={description} />
+      <Routes>
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/logout-notification" element={<FrontChannelLogout />} />
+        <Route element={<AppLayout isAdmin={false} />}>
+          <Route element={<PrivateRoute allowedRoles={['user', 'HR Admin']} />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
         </Route>
-      </Route>
 
-      <Route element={<AppLayout isAdmin={true} />}>
-        <Route element={<PrivateRoute allowedRoles={['admin', 'superAdmin', 'HR Admin']} />}>
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/manage-admin" element={<AdminManagement />} />
+        <Route element={<AppLayout isAdmin={true} />}>
+          <Route element={<PrivateRoute allowedRoles={['admin', 'superAdmin', 'HR Admin']} />}>
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/manage-admin" element={<AdminManagement />} />
+          </Route>
         </Route>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 };
 

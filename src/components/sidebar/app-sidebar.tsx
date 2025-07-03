@@ -26,6 +26,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       roles: ['user', 'admin', 'superAdmin', 'HR Admin'],
     },
     {
+      title: 'View Layout',
+      url: '/dashboard',
+      icon: LayoutGrid,
+      roles: ['user', 'admin', 'superAdmin', 'HR Admin'],
+    },
+    {
       title: 'Report',
       url: '/dashboard',
       icon: LayoutGrid,
