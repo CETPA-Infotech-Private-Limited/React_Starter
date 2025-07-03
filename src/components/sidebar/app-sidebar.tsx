@@ -13,10 +13,10 @@ import { RootState } from '@/app/store';
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
-  const { Roles } = useAppSelector((state: RootState) => state.user);
+  const Roles = useAppSelector((state: RootState) => state.user.Roles) || [];
   const { state, toggleSidebar } = useSidebar();
 
-  const canAccessAdminDashboard = (['admin', 'superAdmin', 'HR Admin'] as UserRole[]).some((role) => Roles.includes(role));
+  const canAccessAdminDashboard = Roles.some((role) => ['admin', 'superAdmin', 'HR Admin'].includes(role));
 
   const allNavItems: NavItem[] = [
     {
@@ -33,7 +33,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
   ];
 
-  const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
+  const navMainItems = allNavItems.filter((item) => Array.isArray(item.roles) && item.roles.some((role) => Roles.includes(role)));
 
   const handleLogout = () => {
     clearAllStorage();
@@ -62,7 +62,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               onClick={() => navigate('/admin-dashboard')}
               tooltip="Manage Organization"
               asChild
-              className={menuButtonBaseClass + ' text-black'}
+              className={`${menuButtonBaseClass} text-black`}
             >
               <div className="flex items-center gap-2">
                 <Hotel size={24} />

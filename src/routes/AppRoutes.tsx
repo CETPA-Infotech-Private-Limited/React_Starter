@@ -4,7 +4,7 @@ import PrivateRoute from './PrivateRoute';
 import Unauthorized from '@/pages/unauthorized/Unauthorized';
 import NotFound from '@/pages/notFound/NotFound';
 import HomePage from '@/pages/home/Home';
-import Dashboard from '@/pages/employee/Dashboard';
+import Dashboard from '@/pages/user/Dashboard';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import FrontChannelLogout from '@/auth/FrontChannelLogout';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';

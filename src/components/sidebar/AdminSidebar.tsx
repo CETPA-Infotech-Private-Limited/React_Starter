@@ -12,7 +12,7 @@ import { RootState } from '@/app/store';
 
 export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
-  const { Roles } = useAppSelector((state: RootState) => state.user);
+  const Roles = useAppSelector((state: RootState) => state.user.Roles) || [];
   const { state, toggleSidebar } = useSidebar();
 
   const allNavItems: NavItem[] = [
@@ -30,7 +30,7 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
   ];
 
-  const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
+  const navMainItems = allNavItems.filter((item) => Array.isArray(item.roles) && item.roles.some((role) => Roles.includes(role)));
 
   const handleLogout = () => {
     clearAllStorage();
@@ -54,10 +54,10 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuButton onClick={() => navigate('/dashboard')} tooltip={' Manage Personal View'} asChild className={menuButtonBaseClass + ' text-black'}>
+          <SidebarMenuButton onClick={() => navigate('/dashboard')} tooltip={'Manage Personal View'} asChild className={menuButtonBaseClass + ' text-black'}>
             <div className="flex items-center gap-2">
               <Hotel size={24} />
-              <span> Manage Personal View</span>
+              <span>Manage Personal View</span>
             </div>
           </SidebarMenuButton>
 

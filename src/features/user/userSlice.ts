@@ -45,8 +45,9 @@ interface ProfileResponse {
   errorDetail: null | string;
 }
 
+// ✅ Corrected initial state: Roles is now an empty array
 const initialState: UserState = {
-  Roles: null,
+  Roles: [],
   unique_name: null,
   EmpCode: null,
   Designation: null,
@@ -59,11 +60,9 @@ const initialState: UserState = {
   error: null,
 };
 
-// Create async thunk for fetching user profile
 export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (_, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get<ProfileResponse>('/Account/profile');
-
     const data = response.data;
 
     if (data.error) {
@@ -76,6 +75,7 @@ export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (_, 
   }
 });
 
+// ✅ User slice
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -103,7 +103,7 @@ const userSlice = createSlice({
         state.unitId = data.unitId.toString();
         state.Department = data.department;
         state.Lavel = data.level;
-        state.Roles = data.roles;
+        state.Roles = Array.isArray(data.roles) ? data.roles : []; // Defensive check
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
