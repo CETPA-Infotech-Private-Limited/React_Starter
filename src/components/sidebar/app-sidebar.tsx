@@ -27,7 +27,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: 'Report',
-      url: '/dashboasssrd',
+      url: '/dashboard',
       icon: LayoutGrid,
       roles: ['user', 'admin', 'superAdmin'],
     },
