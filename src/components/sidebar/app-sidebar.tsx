@@ -33,11 +33,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       roles: ['user'],
     },
     {
-      title: 'Manage Family Members',
-      url: '/manage-family-members',
-      icon: UserRoundCog,
-      roles: ['user'],
-    },
+      title:'Request Advance',
+      url:'/request-advance',
+      icon:FileText,
+       roles:['user'],
+    }
   ];
 
   const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));

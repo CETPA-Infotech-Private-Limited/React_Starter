@@ -19,7 +19,7 @@ import RaiseClaim from '@/pages/user/raiseClaim/RaiseClaim';
 import ManageAdmin from '@/pages/user/AdminCreation';
 import AdminCreationMed from '@/pages/user/AdminCreation';
 import AddRoles from '@/pages/user/AddRole';
-
+import RequestAdvanceTable from '@/pages/user/requestAdvance/RequestAdvanceTable';
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
   useGlobalLogout();
@@ -43,6 +43,7 @@ const AppRoutes = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/raise-claim" element={<RaiseClaim />} />
+              <Route path="/request-advance" element={<RequestAdvanceTable />} />
           </Route>
         </Route>
 
