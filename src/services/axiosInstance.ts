@@ -13,6 +13,7 @@ const axiosInstance = axios.create({
   },
 });
 
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const tokenData = getObjectFromSessionStorage(`oidc.user:${oidcConfig.authority}:${oidcConfig.client_id}`);
@@ -32,22 +33,22 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.code === 'ERR_NETWORK') {
-      toast.error('Your session has expired. Please log in again.');
-      clearAllStorage();
-      setTimeout(() => {
-        window.location.href = environment.exitUrl;
-      }, 500);
-    }
+    // if (error.code === 'ERR_NETWORK') {
+    //   toast.error('Your session has expired. Please log in again.');
+    //   clearAllStorage();
+    //   setTimeout(() => {
+    //     window.location.href = environment.exitUrl;
+    //   }, 500);
+    // }
 
     // Make sure error.response exists before accessing its status
-    if (error.response && error.response.status === 401) {
-      toast.error('Authorization failed. Your session has expired. Redirecting to login...');
-      clearAllStorage();
-      setTimeout(() => {
-        window.location.href = environment.exitUrl;
-      }, 500);
-    }
+    // if (error.response && error.response.status === 401) {
+    //   toast.error('Authorization failed. Your session has expired. Redirecting to login...');
+    //   clearAllStorage();
+    //   setTimeout(() => {
+    //     window.location.href = environment.exitUrl;
+    //   }, 500);
+    // }
 
     return Promise.reject(error);
   }

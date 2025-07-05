@@ -15,6 +15,10 @@ import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
 import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
+import RaiseClaim from '@/pages/user/raiseClaim/RaiseClaim';
+import ManageAdmin from '@/pages/user/AdminCreation';
+import AdminCreationMed from '@/pages/user/AdminCreation';
+import AddRoles from '@/pages/user/AddRole';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();

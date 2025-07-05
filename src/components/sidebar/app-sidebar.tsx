@@ -16,18 +16,24 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const Roles = useAppSelector((state: RootState) => state.user.Roles) || [];
   const { state, toggleSidebar } = useSidebar();
 
-  const canAccessAdminDashboard = Roles.some((role) => ['admin', 'superAdmin', 'HR Admin'].includes(role));
+  const canAccessAdminDashboard = (['admin', 'superAdmin'] as UserRole[]).some((role) => Roles?.includes(role));
 
   const allNavItems: NavItem[] = [
     {
       title: 'Dashboard',
       url: '/dashboard',
       icon: LayoutGrid,
-      roles: ['user'],
+      roles: ['user', 'admin', 'superAdmin'],
+    },
+    {
+      title: 'Raise Claim',
+      url: '/raise-claim',
+      icon: LayoutGrid,
+      roles: ['user', 'admin', 'superAdmin'],
     },
   ];
 
-  const navMainItems = allNavItems.filter((item) => Array.isArray(item.roles) && item.roles.some((role) => Roles.includes(role)));
+  const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
 
   const handleLogout = () => {
     clearAllStorage();
