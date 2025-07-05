@@ -10,7 +10,7 @@ const DFCCIL_UAT = {
   applicationId: 8,
 };
 
-const PROD_DFCCIL = {
+const DFCCIL_PROD = {
   apiUrl: 'https://vmsapi.dfccil.com/api',
   orgHierarchy: 'https://orgsvc.dfccil.com/api',
   logoutUrl: 'https://it.dfccil.com/Home/Home',
