@@ -19,6 +19,7 @@ import RaiseClaim from '@/pages/user/raiseClaim/RaiseClaim';
 import ManageAdmin from '@/pages/user/AdminCreation';
 import AdminCreationMed from '@/pages/user/AdminCreation';
 import AddRoles from '@/pages/user/AddRole';
+import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -43,6 +44,7 @@ const AppRoutes = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/raise-claim" element={<RaiseClaim />} />
+            <Route path="/review-claim" element={<ReviewClaim />} />
           </Route>
         </Route>
 

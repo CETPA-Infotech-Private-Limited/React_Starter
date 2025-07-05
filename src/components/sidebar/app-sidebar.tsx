@@ -32,12 +32,19 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: LayoutGrid,
       roles: ['user'],
     },
+
     {
-      title: 'Manage Family Members',
-      url: '/manage-family-members',
-      icon: UserRoundCog,
+      title: 'Review Claim',
+      url: '/review-claim',
+      icon: FileText,
       roles: ['user'],
     },
+    // {
+    //   title: 'My Family Members',
+    //   url: '/manage-family-members',
+    //   icon: UserRoundCog,
+    //   roles: ['user'],
+    // },
   ];
 
   const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
