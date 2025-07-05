@@ -3,26 +3,32 @@ import { RootState } from '@/app/store';
 import axiosInstance from '@/services/axiosInstance';
 
 export interface Role {
-  id: number;
-  value: string;
+  roleId: number;
+  roleName: string;
+}
+
+export interface User {
+  empCode: number;
+  unitId: string;
+  roles: Role[];
 }
 
 interface RoleState {
-  roles: Role[];
+  userList: Role[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: RoleState = {
-  roles: [],
+  userList: [],
   loading: false,
   error: null,
 };
 
-export const fetchMasterRole = createAsyncThunk<Role[], void, { rejectValue: string }>('roles/GetRoleMasterList', async (_, { rejectWithValue }) => {
+export const fetchEmpRoleList = createAsyncThunk<Role[], void, { rejectValue: string }>('roles/GetEmpRoleList', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/User/GetRoleMasterList');
-    console.log(response, 'response in masterRoleSlice.ts');
+    const response = await axiosInstance.get('/User/GetEmpRoleList');
+    console.log(response, 'response in empRoleListSlice');
     return response.data.data as Role[];
   } catch (err: any) {
     const errorMessage = err.response?.data?.message || 'Failed to fetch roles';
@@ -30,25 +36,25 @@ export const fetchMasterRole = createAsyncThunk<Role[], void, { rejectValue: str
   }
 });
 
-export const masterRoleSlice = createSlice({
-  name: 'roles',
+export const empRoleListSlice = createSlice({
+  name: 'empRoleList',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchMasterRole.pending, (state) => {
+      .addCase(fetchEmpRoleList.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchMasterRole.fulfilled, (state, action: PayloadAction<Role[]>) => {
-        state.roles = action.payload;
+      .addCase(fetchEmpRoleList.fulfilled, (state, action: PayloadAction<Role[]>) => {
+        state.userList = action.payload;
         state.loading = false;
       })
-      .addCase(fetchMasterRole.rejected, (state, action) => {
+      .addCase(fetchEmpRoleList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'An unknown error occurred';
       });
   },
 });
 
-export default masterRoleSlice.reducer;
+export default empRoleListSlice.reducer;

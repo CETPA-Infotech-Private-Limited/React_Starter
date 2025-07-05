@@ -30,8 +30,8 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: 'User Mapping',
-      url: '/admin-creation',
-      icon: LayoutGrid,
+      url: '/user-role-mapping',
+      icon: UserRoundCog,
       roles: ['admin', 'superAdmin', 'user'],
     },
     {

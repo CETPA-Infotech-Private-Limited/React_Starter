@@ -20,6 +20,7 @@ import ManageAdmin from '@/pages/user/AdminCreation';
 import AdminCreationMed from '@/pages/user/AdminCreation';
 import AddRoles from '@/pages/user/AddRole';
 import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
+import UserRoleMapping from '@/pages/admin/UserRoleMapping';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -52,6 +53,7 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['admin', 'superAdmin', 'user']} />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/manage-admin" element={<AdminManagement />} />
+            <Route path="/user-role-mapping" element={<UserRoleMapping />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store';
 import axiosInstance from '@/services/axiosInstance';
 import toast from 'react-hot-toast';
-
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { Button } from '@/components/ui/button';
@@ -11,17 +10,11 @@ import AdminTable from '@/components/admin/adminManagement/AdminTable';
 import AddAdminDialog from '@/components/admin/adminManagement/AddAdminDialog';
 import DeleteAdminDialog from '@/components/admin/adminManagement/DeleteAdminDialog';
 import Heading from '@/components/ui/heading';
-import { Trash2, Pencil } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import AddNewRoleDialog from '@/components/admin/adminManagement/roleManagement/AddNewRoleDialog';
-import RoleTable from '@/components/admin/adminManagement/roleManagement/RoleTable';
-import { createRole, fetchRoles } from '@/features/roleManagement/roleSlice';
-import { useAppDispatch } from '@/app/hooks';
+import { Trash2 } from 'lucide-react';
+
+// Helpers
 
 const AdminManagement = () => {
-  const dispatch = useAppDispatch();
-
-  const appple = 'a';
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<any>(null);
@@ -30,16 +23,9 @@ const AdminManagement = () => {
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [roleDialogOpen, setRoleDialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<{ roleId?: number; name: string; description: string } | null>(null);
-
   const { employees: employeesList, units } = useSelector((state: RootState) => state.employee);
-  const { roles: allRoles, loading: roleLoading } = useSelector((state: RootState) => state.roles);
 
-  useEffect(() => {
-    dispatch(fetchRoles());
-  }, [dispatch]);
-
+  // Memoized select options
   const selectOptions = useMemo(
     () =>
       units.map((unit) => ({
@@ -60,39 +46,35 @@ const AdminManagement = () => {
         value: emp.empId ?? '',
         label: emp.empName,
         empName: emp.empName,
-        empCode: emp.empCode, // Needed for API
+        empCode: emp.empCode,
         designation: emp.designation,
         department: emp.department,
       })),
     [filteredEmployeesList]
   );
 
-  // ✅ Updated to use static roleId 3
   const handleAdd = async () => {
-    if (!selectedUnit || !selectedEmployee?.empCode) {
+    if (!selectedUnit || !selectedEmployee) {
       toast.error('Please select unit and employee');
       return;
     }
 
-    const payload = {
-      empCode: selectedEmployee.empCode,
-      empUnitId: selectedUnit.value,
-      userRoles: [{ roleId: 3 }],
-    };
-
     setLoading(true);
     try {
-      const res = await axiosInstance.post('/User/AddUserRoleMapping', payload);
-      const { statusCode, message } = res.data;
+      const res = await axiosInstance.post('/AdminManage/CreateRolesandPermssion', {
+        unitId: selectedUnit.value,
+        portalId: 2,
+        userId: selectedEmployee?.value,
+        isActive: true,
+      });
 
+      const { statusCode, message } = res.data;
       if (statusCode === 200) {
         if (message.includes('already exist')) {
           toast.error('User is already an admin.');
         } else {
           toast.success('Admin added successfully!');
         }
-      } else {
-        toast.error(message || 'Failed to add admin');
       }
     } catch (e) {
       console.error('Add admin error:', e);
@@ -105,34 +87,13 @@ const AdminManagement = () => {
   };
 
   const handleDelete = async () => {
+    // Placeholder for future logic
     try {
-      // Add delete logic
+      // Delete logic here
     } catch (e) {
       toast.error('Error removing admin');
     } finally {
       resetForm();
-    }
-  };
-
-  const handleRoleSubmit = (data: { name: string; description: string }) => {
-    if (selectedRole?.roleId) {
-      toast.error('Edit API not implemented yet');
-    } else {
-      dispatch(
-        createRole({
-          roleName: data.name,
-          description: data.description,
-        }) as any
-      )
-        .unwrap()
-        .then(() => {
-          toast.success('Role added');
-          setRoleDialogOpen(false);
-          setSelectedRole(null);
-        })
-        .catch((err) => {
-          toast.error(err || 'Failed to add role');
-        });
     }
   };
 
@@ -185,15 +146,6 @@ const AdminManagement = () => {
     []
   );
 
-  const roleColumns = useMemo(
-    () => [
-      { accessorKey: 'SrNo', header: 'Sr.No.', cell: ({ row }: any) => row.index + 1 },
-      { accessorKey: 'roleName', header: 'Role Name' },
-      { accessorKey: 'description', header: 'Description' },
-    ],
-    []
-  );
-
   const tableData = useMemo(
     () =>
       roles.map((role, idx) => {
@@ -210,57 +162,24 @@ const AdminManagement = () => {
     [roles, employeesList]
   );
 
-  if (loading || roleLoading) return <Loader />;
+  if (loading) return <Loader />;
 
   return (
     <div className="p-6">
-      <Tabs defaultValue="admin" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="admin">Admin</TabsTrigger>
-          <TabsTrigger value="role">Role</TabsTrigger>
-        </TabsList>
-
-        {/* Admin Tab */}
-        <TabsContent value="admin">
-          <Heading className="my-4">Manage Unit Wise Admin</Heading>
-          <AdminTable data={tableData} columns={columns} onAddClick={() => setIsAddOpen(true)} />
-          <AddAdminDialog
-            open={isAddOpen}
-            onClose={() => setIsAddOpen(false)}
-            units={selectOptions}
-            employees={employeeOptions}
-            selectedUnit={selectedUnit}
-            selectedEmployee={selectedEmployee}
-            onUnitChange={setSelectedUnit}
-            onEmployeeChange={setSelectedEmployee}
-            onSubmit={handleAdd}
-          />
-          <DeleteAdminDialog open={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDelete} />
-        </TabsContent>
-
-        {/* Role Tab */}
-        <TabsContent value="role">
-          <Heading className="my-4">Manage Roles</Heading>
-          <RoleTable
-            data={allRoles}
-            columns={roleColumns}
-            onAddClick={() => {
-              setSelectedRole(null);
-              setRoleDialogOpen(true);
-            }}
-          />
-
-          <AddNewRoleDialog
-            open={roleDialogOpen}
-            onClose={() => {
-              setRoleDialogOpen(false);
-              setSelectedRole(null);
-            }}
-            onSubmit={handleRoleSubmit}
-            initialData={selectedRole}
-          />
-        </TabsContent>
-      </Tabs>
+      <Heading className="my-4">Manage Unit Wise Admin</Heading>
+      <AdminTable data={tableData} columns={columns} onAddClick={() => setIsAddOpen(true)} />
+      <AddAdminDialog
+        open={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+        units={selectOptions}
+        employees={employeeOptions}
+        selectedUnit={selectedUnit}
+        selectedEmployee={selectedEmployee}
+        onUnitChange={setSelectedUnit}
+        onEmployeeChange={setSelectedEmployee}
+        onSubmit={handleAdd}
+      />
+      <DeleteAdminDialog open={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDelete} />
     </div>
   );
 };
