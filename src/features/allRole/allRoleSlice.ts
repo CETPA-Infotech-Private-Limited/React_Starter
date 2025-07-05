@@ -22,7 +22,8 @@ const initialState: RoleState = {
 
 export const fetchRoles = createAsyncThunk<Role[], void, { rejectValue: string }>('roles/fetchRoles', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/User/GetAllRoles');
+    const response = await axiosInstance.get('/User/GetAllRoles')
+    console.log(response, "response in allRoleSlice.ts");
     return response.data.data as Role[];
   } catch (err: any) {
     const errorMessage = err.response?.data?.message || 'Failed to fetch roles';

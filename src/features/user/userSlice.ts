@@ -46,7 +46,7 @@ interface ProfileResponse {
 }
 
 const initialState: UserState = {
-  Roles: null,
+  Roles: ["user"],
   unique_name: null,
   EmpCode: null,
   Designation: null,
@@ -103,8 +103,9 @@ const userSlice = createSlice({
         state.unitId = data.unitId.toString();
         state.Department = data.department;
         state.Lavel = data.level;
-        state.Roles = data.roles;
-      })
+        const roles = Array.isArray(data.roles) ? data.roles : [];
+        state.Roles = roles.includes('user') ? roles : [...roles, 'user'];
+      })    
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;

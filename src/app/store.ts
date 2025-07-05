@@ -6,11 +6,12 @@ import userReducer from '@/features/user/userSlice';
 import applicationsReducer from '@/features/applications/applicationSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
 import allRoleReducer from '@/features/allRole/allRoleSlice';
+import claimReducer from '@/features/user/claim/claimSlice';
 
 const persistConfig = {
   key: 'root',
   storage: storageSession,
-  whitelist: ['employee', 'user', 'applications', 'allRole'],
+  whitelist: ['employee', 'user', 'applications', 'allRole', 'claim'],
 };
 
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   applications: applicationsReducer,
   allRole: allRoleReducer,
+  claim: claimReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -1,5 +1,5 @@
 const DFCCIL_UAT = {
-  apiUrl: 'https://uat.guesthouse.cetpainfotech.com/api',
+  apiUrl: 'https://uatprmsapi.dfccil.com/api',
   orgHierarchy: 'https://uatorganization.dfccil.com/api',
   logoutUrl: 'http://uat.dfccil.com/DfcHome',
   exitUrl: 'http://uatlogin.dfccil.com/applications',
@@ -7,7 +7,7 @@ const DFCCIL_UAT = {
   clientId: '7ed4c1b7d4c7444eb1762bd74f7f0e5c',
   postLogout: 'https://uatlogin.dfccil.com/signout',
   redirectPath: 'dashboard',
-  applicationId: 8,
+  applicationId: 3,
 };
 
 const PROD_DFCCIL = {
@@ -19,7 +19,7 @@ const PROD_DFCCIL = {
   clientId: '7ed4c1b7d4c7444eb1762bd74f7f0e5c',
   postLogout: 'https://uatlogin.dfccil.com/signout',
   redirectPath: 'dashboard',
-  applicationId: 8,
+  applicationId: 3,
 };
 
 export const environment = DFCCIL_UAT;

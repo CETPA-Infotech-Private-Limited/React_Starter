@@ -47,7 +47,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
       <Comp
         {...(href ? { to: href } : {})}
         className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref as unknown}
+        ref={ref as React.Ref<HTMLButtonElement & HTMLAnchorElement>}
         {...(Comp === 'button' ? { disabled: loading || props.disabled } : {})}
         {...props}
       >

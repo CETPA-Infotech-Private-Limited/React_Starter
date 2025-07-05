@@ -1,4 +1,4 @@
-import Heading from "@/components/ui/heading";
+import Heading from '@/components/ui/heading';
 
 const Dashboard = () => {
   return (

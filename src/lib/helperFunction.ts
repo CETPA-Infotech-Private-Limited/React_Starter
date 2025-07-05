@@ -13,6 +13,24 @@ export const findEmployeeDetails = (employees: any, empCode: string) => {
     return null;
   }
 };
+export const extractUniqueUnits = (employees) => {
+  // Create a Map to track unique units by unitId
+  const uniqueUnitsMap = new Map();
+
+  // Process each employee
+  employees.forEach((employee) => {
+    // Only add if both unitId and unitName exist
+    if (employee.unitId && employee.unitName) {
+      uniqueUnitsMap.set(employee.unitId, {
+        unitId: employee.unitId,
+        unitName: employee.unitName?.trim(),
+      });
+    }
+  });
+
+  // Convert Map values to array
+  return Array.from(uniqueUnitsMap.values());
+};
 
 export function getObjectFromSessionStorage(key) {
   const item = sessionStorage.getItem(key);

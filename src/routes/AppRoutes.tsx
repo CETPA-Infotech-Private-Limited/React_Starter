@@ -4,7 +4,7 @@ import PrivateRoute from './PrivateRoute';
 import Unauthorized from '@/pages/unauthorized/Unauthorized';
 import NotFound from '@/pages/notFound/NotFound';
 import HomePage from '@/pages/home/Home';
-import Dashboard from '@/pages/employee/Dashboard';
+import Dashboard from '@/pages/user/Dashboard';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import FrontChannelLogout from '@/auth/FrontChannelLogout';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -13,6 +13,10 @@ import { RootState } from '@/app/store';
 import { fetchApplications } from '@/features/applications/applicationSlice';
 import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
+import RaiseClaim from '@/pages/user/raiseClaim/RaiseClaim';
+import ManageAdmin from '@/pages/user/AdminCreation';
+import AdminCreationMed from '@/pages/user/AdminCreation';
+import AddRoles from '@/pages/user/AddRole';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -32,9 +36,10 @@ const AppRoutes = () => {
       <Route path="/logout-notification" element={<FrontChannelLogout />} />
 
       <Route element={<AppLayout isAdmin={false} />}>
-        <Route element={<PrivateRoute allowedRoles={['user', 'HR Admin']} />}>
+        <Route element={<PrivateRoute allowedRoles={['user', 'HR Admin', 'superAdmin','admin']} />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/raise-claim" element={<RaiseClaim/>}/>
         </Route>
       </Route>
 
@@ -42,6 +47,8 @@ const AppRoutes = () => {
         <Route element={<PrivateRoute allowedRoles={['admin', 'superAdmin', 'HR Admin']} />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/manage-admin" element={<AdminManagement />} />
+          <Route path="/admin-creation" element={<AdminCreationMed/>} />
+          <Route path="/add-role" element={<AddRoles />} />
         </Route>
       </Route>
       <Route path="*" element={<NotFound />} />

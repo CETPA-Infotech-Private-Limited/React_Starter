@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog } from 'lucide-react';
+import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog, Layout } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -20,14 +20,26 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
       title: 'Dashboard',
       url: '/admin-dashboard',
       icon: LayoutGrid,
-      roles: ['admin', 'superAdmin', 'HR Admin'],
+      roles: ['admin', 'superAdmin'],
     },
     {
       title: 'Manage Admin',
       url: '/manage-admin',
       icon: UserRoundCog,
-      roles: ['superAdmin', 'HR Admin'],
+      roles: ['superAdmin'],
     },
+     {
+          title: 'User Mapping',
+          url: '/admin-creation',
+          icon: LayoutGrid,
+          roles: [ 'admin', 'superAdmin'],
+        },
+        {
+          title:'addRole',
+          url: '/add-role',
+          icon: LayoutGrid,
+          roles: ['admin', 'superAdmin'],
+        }
   ];
 
   const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
