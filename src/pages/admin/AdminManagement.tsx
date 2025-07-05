@@ -21,6 +21,7 @@ import { useAppDispatch } from '@/app/hooks';
 const AdminManagement = () => {
   const dispatch = useAppDispatch();
 
+  const appple = 'a';
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<any>(null);
@@ -76,7 +77,7 @@ const AdminManagement = () => {
     const payload = {
       empCode: selectedEmployee.empCode,
       empUnitId: selectedUnit.value,
-      userRoles: [{ roleId: 3 }], // Static roleId
+      userRoles: [{ roleId: 3 }],
     };
 
     setLoading(true);
