@@ -20,26 +20,26 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
       title: 'Dashboard',
       url: '/admin-dashboard',
       icon: LayoutGrid,
-      roles: ['admin', 'superAdmin'],
+      roles: ['admin', 'superAdmin', 'user'],
     },
     {
       title: 'Manage Admin',
       url: '/manage-admin',
       icon: UserRoundCog,
-      roles: ['superAdmin'],
+      roles: ['superAdmin', 'user'],
     },
-     {
-          title: 'User Mapping',
-          url: '/admin-creation',
-          icon: LayoutGrid,
-          roles: [ 'admin', 'superAdmin'],
-        },
-        {
-          title:'addRole',
-          url: '/add-role',
-          icon: LayoutGrid,
-          roles: ['admin', 'superAdmin'],
-        }
+    {
+      title: 'User Mapping',
+      url: '/admin-creation',
+      icon: LayoutGrid,
+      roles: ['admin', 'superAdmin', 'user'],
+    },
+    {
+      title: 'addRole',
+      url: '/add-role',
+      icon: LayoutGrid,
+      roles: ['admin', 'superAdmin'],
+    },
   ];
 
   const navMainItems = allNavItems.filter((item) => Array.isArray(item.roles) && item.roles.some((role) => Roles.includes(role)));

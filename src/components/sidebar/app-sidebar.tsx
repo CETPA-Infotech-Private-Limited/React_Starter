@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText } from 'lucide-react';
+import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -16,20 +16,27 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const Roles = useAppSelector((state: RootState) => state.user.Roles) || [];
   const { state, toggleSidebar } = useSidebar();
 
-  const canAccessAdminDashboard = (['admin', 'superAdmin'] as UserRole[]).some((role) => Roles?.includes(role));
+  const canAccessAdminDashboard = (['admin', 'superAdmin', 'user'] as UserRole[]).some((role) => Roles?.includes(role));
 
   const allNavItems: NavItem[] = [
     {
       title: 'Dashboard',
       url: '/dashboard',
       icon: LayoutGrid,
-      roles: ['user', 'admin', 'superAdmin'],
+      roles: ['user'],
     },
+
     {
       title: 'Raise Claim',
       url: '/raise-claim',
       icon: LayoutGrid,
-      roles: ['user', 'admin', 'superAdmin'],
+      roles: ['user'],
+    },
+    {
+      title: 'Manage Family Members',
+      url: '/manage-family-members',
+      icon: UserRoundCog,
+      roles: ['user'],
     },
   ];
 
