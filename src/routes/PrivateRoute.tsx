@@ -18,7 +18,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   const location = useLocation();
   const navigate = useNavigate();
   useSessionChecker();
-
+  const employees = useAppSelector((state) => state.employee.employees);
   const { loading: userLoading, Roles } = useAppSelector((state) => state.user);
 
   const isAuthenticated = auth.isAuthenticated;
@@ -38,7 +38,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
     if (isAuthenticated && auth.user && !redirectHandled.current) {
       redirectHandled.current = true;
       dispatch(fetchUserProfile());
-      dispatch(fetchEmployees());
+      {
+        employees.length === 0 && dispatch(fetchEmployees());
+      }
 
       let returnUrl: string | undefined;
       if (auth.user && auth.user.state && typeof (auth.user.state as any).returnUrl === 'string') {
@@ -50,7 +52,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
 
   const hasRequiredRole = allowedRoles.length === 0 || Roles?.some((role) => allowedRoles.includes(role as UserRole));
 
-  if (!hasRequiredRole && isAuthenticated) {
+  if (!hasRequiredRole && isAuthenticated && Roles.length > 0 && !userLoading) {
     return <Navigate to="/unauthorized" replace />;
   }
 

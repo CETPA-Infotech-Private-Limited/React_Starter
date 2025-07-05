@@ -5,7 +5,7 @@ import { combineReducers } from 'redux';
 import userReducer from '@/features/user/userSlice';
 import applicationsReducer from '@/features/applications/applicationSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
-import allRoleReducer from '@/features/allRole/allRoleSlice';
+import allRoleReducer from '@/features/roleManagement/roleSlice';
 
 const persistConfig = {
   key: 'root',
@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
   employee: employeeReducer,
   user: userReducer,
   applications: applicationsReducer,
-  allRole: allRoleReducer,
+  roles: allRoleReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -103,7 +103,8 @@ const userSlice = createSlice({
         state.unitId = data.unitId.toString();
         state.Department = data.department;
         state.Lavel = data.level;
-        state.Roles = Array.isArray(data.roles) ? data.roles : [];
+        const roles = Array.isArray(data.roles) ? data.roles : [];
+        state.Roles = roles.includes('user') ? roles : [...roles, 'user'];
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
