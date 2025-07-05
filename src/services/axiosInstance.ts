@@ -9,7 +9,7 @@ import { oidcConfig } from '@/auth/config';
 const axiosInstance = axios.create({
   baseURL: environment.apiUrl,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'multipart/form-data',
   },
 });
 
