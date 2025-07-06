@@ -165,6 +165,7 @@ const RaiseClaim = () => {
   // String fields
   formData.append('Unit', user.unitId);
   formData.append('PayTo', rawPayload.PayTo || 'Doctor');
+  formData.append('patientId', String(user.EmpCode || 0));
   formData.append('Reason', rawPayload.Reason || 'This is A Reason');
   formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
   formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId);
@@ -240,31 +241,48 @@ const RaiseClaim = () => {
     formData.append('OtherBill.ClaimedAmount', String(rawPayload.OtherBill.ClaimedAmount));
   }
 
-  // Not included bills: add their files to NotFinalBill fields
-  // Not included bills: append billed/claimed amount and files directly
-  console.log('rawPayload.NotIncludes', rawPayload.NotIncluded);
- formData.append('MedicenNotFinalBill.Amount', String(rawPayload.NotIncluded[0]?.billedAmount || 0));
-  formData.append('MedicenNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[0]?.claimedAmount || 0));
-  (rawPayload.NotIncluded[0]?.files || []).forEach((file: File, i: number) => {
-  formData.append(`MedicenNotFinalBill.Files[${i}]`, file);
-});
-   formData.append('ConsultationNotFinalBill.BilledAmount', String(rawPayload.NotIncluded[1]?.billedAmount || 0));
-  formData.append('ConsultationNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[1]?.claimedAmount || 0));
-  (rawPayload.NotIncluded[1]?.files || []).forEach((file: File, i: number) => {
-  formData.append(`ConsultationNotFinalBill.Files[${i}]`, file);
-});
-
-  formData.append('InvestigationNotFinalBill.BilledAmount', String(rawPayload.NotIncluded[2]?.billedAmount || 0));
-  formData.append('InvestigationNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[2]?.claimedAmount || 0));
-   (rawPayload.NotIncluded[2]?.files || []).forEach((file: File, i: number) => {
-  formData.append(`InvestigationNotFinalBill.Files[${i}]`, file);
-});
-
-  formData.append('OtherNotFinalBill.BilledAmount', String(rawPayload.NotIncluded[3]?.billedAmount || 0));
-  formData.append('OtherNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[3]?.claimedAmount || 0));
-  (rawPayload.NotIncluded[3]?.files || []).forEach((file: File, i: number) => {
-    formData.append(`OtherNotFinalBill.Files[${i}]`, file);
-  });
+  // Not included bills: add their files to NotFinalBill fields, safely
+  // Defensive: ensure NotIncluded is an array of length 4 (or fill with empty objects)
+  const notIncludedArr = Array.isArray(rawPayload.NotIncluded) ? rawPayload.NotIncluded : [];
+  // Always work with 4 slots (Medicen, Consultation, Investigation, Other)
+  for (let i = 0; i < 4; i++) {
+    const bill = notIncludedArr[i] || {};
+    // Map index to field names
+    let prefix = '';
+    switch (i) {
+      case 0:
+        prefix = 'MedicenNotFinalBill';
+        break;
+      case 1:
+        prefix = 'ConsultationNotFinalBill';
+        break;
+      case 2:
+        prefix = 'InvestigationNotFinalBill';
+        break;
+      case 3:
+        prefix = 'OtherNotFinalBill';
+        break;
+      default:
+        break;
+    }
+    // Use correct keys for each type
+    // Some use Amount, some BilledAmount, some ClaimedAmount, some AmountCliam
+    // We'll try to support both camelCase and lower-case keys for robustness
+    const billedAmount = bill.billedAmount ?? bill.BilledAmount ?? 0;
+    const claimedAmount = bill.claimedAmount ?? bill.ClaimedAmount ?? 0;
+    // Append amounts
+    if (prefix === 'MedicenNotFinalBill') {
+      formData.append(`${prefix}.Amount`, String(billedAmount));
+      formData.append(`${prefix}.AmountCliam`, String(claimedAmount));
+    } else {
+      formData.append(`${prefix}.BilledAmount`, String(billedAmount));
+      formData.append(`${prefix}.AmountCliam`, String(claimedAmount));
+    }
+    // Append files if any
+    (bill.files || []).forEach((file: File, j: number) => {
+      formData.append(`${prefix}.Files[${j}]`, file);
+    });
+  }
  
 
 
@@ -287,6 +305,11 @@ const RaiseClaim = () => {
 
   console.log('Final FormData Payload:', formData);
   dispatch(submitClaim(formData));
+  // Reset all form sections after submit
+  setPatientDetails({});
+  setBillDetails({});
+  setPreHospDetails({});
+  setPostHospDetails({});
 };
 
   // Helper to ensure claimed amount does not exceed billed amount

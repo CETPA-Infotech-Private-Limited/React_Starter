@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { hospitalList } from '@/constant/static';
+import FamilyMemberSelect from '@/components/common/FamilyMemberSelect';
 
 interface UploadDialogProps {
   title: string;
@@ -53,9 +54,7 @@ const UploadDialog: React.FC<UploadDialogProps> = ({ title, files, onFilesChange
       <DialogContent className="sm:max-w-[560px] text-black text-xs bg-gradient-to-br from-white via-blue-50 to-white shadow-xl border border-blue-300 rounded-2xl p-6 animate-fade-in font-sans">
         <DialogHeader className="relative">
           <DialogTitle className="text-xl text-blue-800 font-extrabold tracking-tight mb-1 drop-shadow text-center font-sans">{title}</DialogTitle>
-          <DialogDescription className="text-xs text-gray-600 italic mb-4 text-center font-sans">
-            Upload relevant documents.
-          </DialogDescription>
+          <DialogDescription className="text-xs text-gray-600 italic mb-4 text-center font-sans">Upload relevant documents.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
           <div className="grid gap-1.5">
@@ -143,27 +142,12 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
             <Label htmlFor="member-select" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
               Select Member
             </Label>
-            <Select onOpenChange={() => patientDetailOnChange({ ...patientDetail, member: 'selected' })}>
-              <SelectTrigger
-                id="member-select"
-                className="border border-blue-200 rounded-lg px-3 py-2 flex-1 shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans"
-              >
-                <SelectValue placeholder="Alok Shankar (Self)" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg shadow-md border border-blue-200 bg-white text-xs font-sans">
-                <SelectItem value="alok-shankar">Alok Shankar (Self)</SelectItem>
-                <SelectItem value="family-member-1">Family Member 1</SelectItem>
-                <SelectItem value="family-member-2">Family Member 2</SelectItem>
-              </SelectContent>
-            </Select>
+            <FamilyMemberSelect onOpenChange={() => patientDetailOnChange({ ...patientDetail, member: 'selected' })}/>
           </div>
-
 
           {/* Hospital Empanelled radio button and conditional fields */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3 w-full">
-            <Label className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
-              Is Hospital Empanelled?
-            </Label>
+            <Label className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">Is Hospital Empanelled?</Label>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-1 text-xs font-sans">
                 <input
@@ -200,14 +184,19 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
                 onValueChange={(value) => patientDetailOnChange({ ...patientDetail, HospitalId: value, HospitalRegNo: '' })}
                 value={patientDetail.HospitalId || ''}
               >
-                <SelectTrigger id="empanelled-hospital" className="border border-blue-200 rounded-lg px-3 py-2 w-full shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans">
-                  <SelectValue placeholder="Select Hospital" />
+                <SelectTrigger
+                  id="empanelled-hospital"
+                  className="border border-blue-200 rounded-lg px-3 py-2 w-full shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans"
+                >
+                  <SelectValue placeholder="Choose hospital" />
                 </SelectTrigger>
-                <SelectContent className="rounded-lg shadow-md border border-blue-200 bg-white text-xs font-sans">
-                  <SelectItem value="apollo">Apollo Hospital</SelectItem>
-                  <SelectItem value="fortis">Fortis Hospital</SelectItem>
-                  <SelectItem value="max">Max Healthcare</SelectItem>
-                  <SelectItem value="aiims">AIIMS</SelectItem>
+
+                <SelectContent>
+                  {hospitalList.map((hospital) => (
+                    <SelectItem key={hospital.id} value={hospital.id}>
+                      {hospital.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -274,20 +263,17 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
             <Label htmlFor="treatment-type" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 focus:placeholder-transparent text-sm font-sans">
               Treatment Type
             </Label>
-            <Select
-              onValueChange={(value) => patientDetailOnChange({ ...patientDetail, TreatmentType: value })}
-              value={patientDetail.TreatmentType || ''}
-            >
+            <Select onValueChange={(value) => patientDetailOnChange({ ...patientDetail, TreatmentType: value })} value={patientDetail.TreatmentType || ''}>
               <SelectTrigger
-              id="treatment-type"
-              className="border border-blue-200 rounded-lg px-3 py-2 flex-1 shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans"
+                id="treatment-type"
+                className="border border-blue-200 rounded-lg px-3 py-2 flex-1 shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans"
               >
-              <SelectValue placeholder="Allopathic" />
+                <SelectValue placeholder="Allopathic" />
               </SelectTrigger>
               <SelectContent className="rounded-lg shadow-md border border-blue-200 bg-white text-xs font-sans">
-              <SelectItem value="allopathic">Allopathic</SelectItem>
-              <SelectItem value="ayurvedic">Ayurvedic</SelectItem>
-              <SelectItem value="homeopathic">Homeopathic</SelectItem>
+                <SelectItem value="allopathic">Allopathic</SelectItem>
+                <SelectItem value="ayurvedic">Ayurvedic</SelectItem>
+                <SelectItem value="homeopathic">Homeopathic</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -308,11 +294,7 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
             <Label className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">Admission Advice</Label>
-            <UploadDialog
-              title="Upload Advice"
-              files={admissionAdviceFiles}
-              onFilesChange={setAdmissionAdviceFiles}
-            />
+            <UploadDialog title="Upload Advice" files={admissionAdviceFiles} onFilesChange={setAdmissionAdviceFiles} />
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
@@ -330,11 +312,7 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
             <Label className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">Discharge Summary</Label>
-            <UploadDialog
-              title="Upload Summary"
-              files={dischargeSummaryFiles}
-              onFilesChange={setDischargeSummaryFiles}
-            />
+            <UploadDialog title="Upload Summary" files={dischargeSummaryFiles} onFilesChange={setDischargeSummaryFiles} />
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
@@ -348,20 +326,12 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
               onChange={(e) => patientDetailOnChange({ ...patientDetail, FinalHospitalBill: e.target.value })}
               className="border border-blue-200 rounded-lg px-3 py-2 flex-1 focus:ring-1 focus:placeholder-transparent focus:ring-blue-400 shadow-sm text-xs font-sans"
             />
-            <UploadDialog
-              title="Upload file"
-              files={finalHospitalBillFiles}
-              onFilesChange={setFinalHospitalBillFiles}
-            />
+            <UploadDialog title="Upload file" files={finalHospitalBillFiles} onFilesChange={setFinalHospitalBillFiles} />
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
             <Label className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">Investigation Reports</Label>
-            <UploadDialog
-              title="Upload Reports"
-              files={investigationReportsFiles}
-              onFilesChange={setInvestigationReportsFiles}
-            />
+            <UploadDialog title="Upload Reports" files={investigationReportsFiles} onFilesChange={setInvestigationReportsFiles} />
           </div>
         </div>
         <p className="text-xxs text-blue-700 mt-4 italic bg-blue-50 p-3 rounded-lg border border-blue-200 shadow-sm font-sans">

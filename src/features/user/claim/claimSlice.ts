@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance';
+import toast from 'react-hot-toast';
 
 // Define the initial state for the claim
 const initialState = {
@@ -11,13 +12,18 @@ const initialState = {
 
 // Async thunk for submitting the claim
 export const submitClaim = createAsyncThunk('claim/submitClaim', async (payload: any, { rejectWithValue }) => {
-  console.log('submitClaim payload:', payload);
   try {
     const response = await axiosInstance.post('/Claim/DirectClaimRequest', payload, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+if(response.data.statusCode == 200 || 201) {
+  toast.success('Claim submitted successfully!');// Show error toast
+}else{
+  toast.error('Failed to submit claim. Please try again.');// Show error toast
+}
+    
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data || error.message);
