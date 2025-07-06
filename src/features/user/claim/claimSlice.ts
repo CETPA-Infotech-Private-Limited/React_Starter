@@ -10,18 +10,19 @@ const initialState = {
 };
 
 // Async thunk for submitting the claim
-export const submitClaim = createAsyncThunk(
-  'claim/submitClaim',
-  async (payload:any, { rejectWithValue }) => {
-    console.log('submitClaim payload:', payload); // Log the payload
-    try {
-      const response = await axiosInstance.post('/Claim/DirectClaimRequest', payload);
-      return response.data.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
-    }
+export const submitClaim = createAsyncThunk('claim/submitClaim', async (payload: any, { rejectWithValue }) => {
+  console.log('submitClaim payload:', payload);
+  try {
+    const response = await axiosInstance.post('/Claim/DirectClaimRequest', payload, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || error.message);
   }
-);
+});
 
 const claimSlice = createSlice({
   name: 'claim',
