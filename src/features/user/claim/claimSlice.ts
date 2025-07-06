@@ -11,7 +11,6 @@ const initialState = {
 
 // Async thunk for submitting the claim
 export const submitClaim = createAsyncThunk('claim/submitClaim', async (payload: any, { rejectWithValue }) => {
-  console.log('submitClaim payload:', payload);
   try {
     const response = await axiosInstance.post('/Claim/DirectClaimRequest', payload, {
       headers: {
