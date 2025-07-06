@@ -274,17 +274,20 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
             <Label htmlFor="treatment-type" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 focus:placeholder-transparent text-sm font-sans">
               Treatment Type
             </Label>
-            <Select onOpenChange={(value) => patientDetailOnChange({ ...patientDetail, TreatmentType: value })}>
+            <Select
+              onValueChange={(value) => patientDetailOnChange({ ...patientDetail, TreatmentType: value })}
+              value={patientDetail.TreatmentType || ''}
+            >
               <SelectTrigger
-                id="treatment-type"
-                className="border border-blue-200 rounded-lg px-3 py-2 flex-1 shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans"
+              id="treatment-type"
+              className="border border-blue-200 rounded-lg px-3 py-2 flex-1 shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans"
               >
-                <SelectValue placeholder="Allopathic" />
+              <SelectValue placeholder="Allopathic" />
               </SelectTrigger>
               <SelectContent className="rounded-lg shadow-md border border-blue-200 bg-white text-xs font-sans">
-                <SelectItem value="allopathic">Allopathic</SelectItem>
-                <SelectItem value="ayurvedic">Ayurvedic</SelectItem>
-                <SelectItem value="homeopathic">Homeopathic</SelectItem>
+              <SelectItem value="allopathic">Allopathic</SelectItem>
+              <SelectItem value="ayurvedic">Ayurvedic</SelectItem>
+              <SelectItem value="homeopathic">Homeopathic</SelectItem>
               </SelectContent>
             </Select>
           </div>

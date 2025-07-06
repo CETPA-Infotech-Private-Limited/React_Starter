@@ -117,6 +117,12 @@ interface ClaimRequest {
   HospitalIncomeTaxFile?: { Files: any[] };
   HospitalRegstrationDetailsFile?: { Files: any[] };
   PaidAmount?: number;
+NotIncluded?: {
+    BilledAmount: number;
+    ClaimedAmount: number;
+    files?: File[];
+  };
+  claimedTotal?: number; // Total claimed amount across all bills
 }
 
 const RaiseClaim = () => {
@@ -142,14 +148,17 @@ const RaiseClaim = () => {
   const dispatch = useAppDispatch();
   const claimState = useAppSelector((state) => state.claim);
 
+
   const handleSubmit = async () => {
+  // Merge all form data
   const rawPayload = {
     ...patientDetails,
     ...billDetails,
     ...preHospDetails,
     ...postHospDetails,
   };
-  console.log("rawPayload.TreatmentType",rawPayload.TreatmentType)
+  console.log('rawPayload in RaiseClaim.tsx', rawPayload);
+  console.log("rawPayload.TreatmentType", rawPayload.TreatmentType);
 
   const formData = new FormData();
 
@@ -158,9 +167,9 @@ const RaiseClaim = () => {
   formData.append('PayTo', rawPayload.PayTo || 'Doctor');
   formData.append('Reason', rawPayload.Reason || 'This is A Reason');
   formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
-  formData.append('HospitalName', rawPayload.HospitalName || '');
-  formData.append('HospitalRegNo', rawPayload.HospitalRegNo || '');
-  formData.append('TreatmentType', 'Hello');
+  formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId);
+  formData.append('HospitalRegNo', rawPayload.HospitalRegNo || rawPayload.HospitalId);
+  formData.append('TreatmentType', rawPayload.TreatmentType || '');
   formData.append('Digonosis', rawPayload.Digonosis || '');
   formData.append('DoctorName', rawPayload.DoctorName || '');
   formData.append('DateOfAdmission', rawPayload.DateOfAdmission || '');
@@ -175,13 +184,8 @@ const RaiseClaim = () => {
   formData.append('ClaimAmount', String(rawPayload.ClaimAmount || 100.0));
   formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
   formData.append('EmpId', String(user.EmpCode || 0));
-  formData.append('PaidAmount', String(rawPayload.PaidAmount || 0));
-
-  formData.append('HospitalId', String(rawPayload.HospitalId || '123')); // fallback non-empty string
-formData.append('HospitalName', String(rawPayload.HospitalName || 'City Hospital'));
-formData.append('HospitalRegNo', String(rawPayload.HospitalRegNo || 'REG-00001'));
-
-
+  formData.append('PaidAmount', String(rawPayload.claimedTotal || 0));
+  formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
 
   // File uploads (use repeated fields)
   rawPayload.AdmissionAdviceUpload?.forEach((file: File) =>
@@ -200,43 +204,75 @@ formData.append('HospitalRegNo', String(rawPayload.HospitalRegNo || 'REG-00001')
     formData.append('PostHospitalTreatmentAdviseUpload', file)
   );
 
-  // Flattened billing fields
-  const medicen = rawPayload.MedicenBill?.[0];
-  if (medicen) {
-    formData.append('MedicenBill.BilledAmount', String(medicen.BilledAmount));
-    formData.append('MedicenBill.ClaimedAmount', String(medicen.ClaimedAmount));
+  // Only include bills where included === true
+  const includedMedicen = (rawPayload.MedicenBill || []).filter((b: any) => b.included !== false);
+  if (includedMedicen[0]) {
+    formData.append('MedicenBill.BilledAmount', String(includedMedicen[0].BilledAmount));
+    formData.append('MedicenBill.ClaimedAmount', String(includedMedicen[0].ClaimedAmount));
   }
 
-  const consultation = rawPayload.Consultation?.[0];
-  if (consultation) {
-    formData.append('Consultation.BilledAmount', String(consultation.BilledAmount));
+  const includedConsultation = (rawPayload.Consultation || []).filter((b: any) => b.included !== false);
+  if (includedConsultation[0]) {
+    formData.append('Consultation.BilledAmount', String(includedConsultation[0].BilledAmount));
+    formData.append('Consultation.ClaimedAmount', String(includedConsultation[0].ClaimedAmount));
   }
 
-  const investigation = rawPayload.Investigation?.[0];
-  if (investigation) {
-    formData.append('Investigation.BilledAmount', String(investigation.BilledAmount));
+  const includedInvestigation = (rawPayload.Investigation || []).filter((b: any) => b.included !== false);
+  if (includedInvestigation[0]) {
+    formData.append('Investigation.BilledAmount', String(includedInvestigation[0].BilledAmount));
+    formData.append('Investigation.ClaimedAmount', String(includedInvestigation[0].ClaimedAmount));
   }
 
-  const procedure = rawPayload.Procedure?.[0];
-  if (procedure) {
-    formData.append('Procedure.BilledAmount', String(procedure.BilledAmount));
-    formData.append('Procedure.ClaimedAmount', String(procedure.ClaimedAmount));
+  const includedProcedure = (rawPayload.Procedure || []).filter((b: any) => b.included !== false);
+  if (includedProcedure[0]) {
+    formData.append('Procedure.BilledAmount', String(includedProcedure[0].BilledAmount));
+    formData.append('Procedure.ClaimedAmount', String(includedProcedure[0].ClaimedAmount));
   }
 
-  const roomRent = rawPayload.RoomRent?.[0];
-  if (roomRent) {
-    formData.append('RoomRent.BilledAmount', String(roomRent.BilledAmount));
+  const includedRoomRent = (rawPayload.RoomRent || []).filter((b: any) => b.included !== false);
+  if (includedRoomRent[0]) {
+    formData.append('RoomRent.BilledAmount', String(includedRoomRent[0].BilledAmount));
+    formData.append('RoomRent.ClaimedAmount', String(includedRoomRent[0].ClaimedAmount));
   }
 
-  if (rawPayload.OtherBill) {
+  if (rawPayload.OtherBill && (rawPayload.OtherBill.included !== false)) {
     formData.append('OtherBill.BilledAmount', String(rawPayload.OtherBill.BilledAmount));
     formData.append('OtherBill.ClaimedAmount', String(rawPayload.OtherBill.ClaimedAmount));
   }
 
+  // Not included bills: add their files to NotFinalBill fields
+  // Not included bills: append billed/claimed amount and files directly
+  console.log('rawPayload.NotIncludes', rawPayload.NotIncluded);
+ formData.append('MedicenNotFinalBill.Amount', String(rawPayload.NotIncluded[0]?.billedAmount || 0));
+  formData.append('MedicenNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[0]?.claimedAmount || 0));
+  (rawPayload.NotIncluded[0]?.files || []).forEach((file: File, i: number) => {
+  formData.append(`MedicenNotFinalBill.Files[${i}]`, file);
+});
+   formData.append('ConsultationNotFinalBill.BilledAmount', String(rawPayload.NotIncluded[1]?.billedAmount || 0));
+  formData.append('ConsultationNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[1]?.claimedAmount || 0));
+  (rawPayload.NotIncluded[1]?.files || []).forEach((file: File, i: number) => {
+  formData.append(`ConsultationNotFinalBill.Files[${i}]`, file);
+});
+
+  formData.append('InvestigationNotFinalBill.BilledAmount', String(rawPayload.NotIncluded[2]?.billedAmount || 0));
+  formData.append('InvestigationNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[2]?.claimedAmount || 0));
+   (rawPayload.NotIncluded[2]?.files || []).forEach((file: File, i: number) => {
+  formData.append(`InvestigationNotFinalBill.Files[${i}]`, file);
+});
+
+  formData.append('OtherNotFinalBill.BilledAmount', String(rawPayload.NotIncluded[3]?.billedAmount || 0));
+  formData.append('OtherNotFinalBill.AmountCliam', String(rawPayload.NotIncluded[3]?.claimedAmount || 0));
+  (rawPayload.NotIncluded[3]?.files || []).forEach((file: File, i: number) => {
+    formData.append(`OtherNotFinalBill.Files[${i}]`, file);
+  });
+ 
+
+
+ 
+
+  
+
   // Additional nested file arrays
-  rawPayload.MedicenNotFinalBill?.Files?.forEach((file: File, i: number) =>
-    formData.append(`MedicenNotFinalBill.Files[${i}]`, file)
-  );
   rawPayload.HospitalIncomeTaxFile?.Files?.forEach((file: File, i: number) =>
     formData.append(`HospitalIncomeTaxFile.Files[${i}]`, file)
   );
@@ -336,6 +372,7 @@ formData.append('HospitalRegNo', String(rawPayload.HospitalRegNo || 'REG-00001')
             preHospDetails?.PreHospitalizationExpensesInvestigation?.BilledAmount || 0,
             preHospDetails?.PreHospitalizationProcedure?.BilledAmount || 0,
             preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
+            
           ].reduce((sum, val) => sum + Number(val), 0)}
         />
       </div>

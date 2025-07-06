@@ -195,6 +195,12 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
     ];
     const [bills, setBills] = useState<BillItem[]>(initialBills);
     const [errors, setErrors] = useState<{ [id: number]: string }>({});
+    const billedTotal = bills.reduce((sum, bill) => sum + Number(bill.billedAmount || '0'), 0);
+    const claimedTotal = bills.reduce((sum, bill) => sum + parseFloat(bill.claimedAmount || '0'), 0);
+    const includedAmount = bills.filter((bill) => bill.included).reduce((sum, bill) => sum + Number(bill.billedAmount || '0'), 0);
+    const notincludes = bills.filter((bill) => !bill.included);
+    const notIncludedAmount = bills.filter((bill) => !bill.included).reduce((sum, bill) => sum + Number(bill.billedAmount || '0'), 0);
+    console.log(notincludes, 'not includes bill'); // Log bills for debugging
 
     const [uploadDialogBillId, setUploadDialogBillId] = useState<number | null>(null);
 
@@ -202,7 +208,27 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
     const [billFileCounts, setBillFileCounts] = useState<{ [key: number]: number }>({});
 
 
+    // Only allow adding a new bill if the previous custom (not default) bill is filled
+    const isBillFilled = (bill: BillItem) => {
+        // Consider a bill filled if type, billedAmount, and claimedAmount are not empty or zero
+        return (
+            bill.type.trim() !== '' &&
+            bill.billedAmount.trim() !== '' && bill.billedAmount !== '0' &&
+            bill.claimedAmount.trim() !== '' && bill.claimedAmount !== '0'
+        );
+    };
+
     const addNewBill = (afterIndex: number) => {
+        // Only allow if there is no unfilled custom bill after this index
+        const nextCustomBill = bills.slice(afterIndex + 1).find(b => !b.isDefault);
+        if (nextCustomBill && !isBillFilled(nextCustomBill)) {
+            // Prevent adding if next custom bill is not filled
+            return;
+        }
+        // Also, only allow if the current custom bill (if not default) is filled
+        if (!bills[afterIndex].isDefault && !isBillFilled(bills[afterIndex])) {
+            return;
+        }
         const newBill: BillItem = {
             id: Date.now(),
             type: bills[afterIndex].type,
@@ -259,6 +285,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                 BilledAmount: Number(updatedBills[5].billedAmount),
                 ClaimedAmount: Number(updatedBills[5].claimedAmount),
             },
+            NotIncluded:notincludes 
         };
         console.log(apiBillDetails, 'API Bill Details'); // Log API bill details for debugging
         onChange(apiBillDetails);
@@ -284,10 +311,6 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
     };
 
     // Calculate summary values
-    const billedTotal = bills.reduce((sum, bill) => sum + parseFloat(bill.billedAmount || '0'), 0);
-    const claimedTotal = bills.reduce((sum, bill) => sum + parseFloat(bill.claimedAmount || '0'), 0);
-    const includedAmount = bills.filter((bill) => bill.included).reduce((sum, bill) => sum + parseFloat(bill.billedAmount || '0'), 0);
-    const notIncludedAmount = bills.filter((bill) => !bill.included).reduce((sum, bill) => sum + parseFloat(bill.billedAmount || '0'), 0);
     
     // For summary section:
     // Pre Hospitalization Expense Amount: passed as prop from parent
@@ -382,6 +405,15 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                                                     onClick={() => addNewBill(index)}
                                                     className="h-8 px-3 py-1.5 flex items-center justify-center border-blue-400 text-blue-700 hover:bg-blue-100"
                                                     title="Add New Bill"
+                                                    disabled={(() => {
+                                                        // Disable if there is any unfilled custom bill
+                                                        const nextCustomBill = bills.slice(index + 1).find(b => !b.isDefault);
+                                                        if (nextCustomBill && !isBillFilled(nextCustomBill)) return true;
+                                                        // Also disable if the last custom bill is not filled
+                                                        const lastCustomBill = bills.filter(b => !b.isDefault).slice(-1)[0];
+                                                        if (lastCustomBill && !isBillFilled(lastCustomBill)) return true;
+                                                        return false;
+                                                    })()}
                                                 >
                                                     <Plus className="w-4 h-4 mr-1" />
                                                     Add Bill
