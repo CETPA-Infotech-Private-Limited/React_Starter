@@ -246,6 +246,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
             return bill;
         });
         setBills(updatedBills);
+        console.log(updatedBills, 'Updated Bills'); // Log updated bills for debugging
         setErrors((prev) => ({ ...prev, [id]: errorMsg }));
         // Map local state to API structure and call onChange
         const apiBillDetails = {
@@ -259,6 +260,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                 ClaimedAmount: Number(updatedBills[5].claimedAmount),
             },
         };
+        console.log(apiBillDetails, 'API Bill Details'); // Log API bill details for debugging
         onChange(apiBillDetails);
     };
 
@@ -286,6 +288,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
     const claimedTotal = bills.reduce((sum, bill) => sum + parseFloat(bill.claimedAmount || '0'), 0);
     const includedAmount = bills.filter((bill) => bill.included).reduce((sum, bill) => sum + parseFloat(bill.billedAmount || '0'), 0);
     const notIncludedAmount = bills.filter((bill) => !bill.included).reduce((sum, bill) => sum + parseFloat(bill.billedAmount || '0'), 0);
+    
     // For summary section:
     // Pre Hospitalization Expense Amount: passed as prop from parent
     // Hospitalization Expense Amount: billedTotal

@@ -158,31 +158,92 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
             </Select>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
-            <Label htmlFor="hospital-name" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
-              Hospital Name
+
+          {/* Hospital Empanelled radio button and conditional fields */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3 w-full">
+            <Label className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
+              Is Hospital Empanelled?
             </Label>
-            <Input
-              id="hospital-name"
-              type="text"
-              onChange={(e) => patientDetailOnChange({ ...patientDetail, HospitalName: e.target.value })}
-              placeholder="Apollo"
-              className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex-1 text-gray-700 focus:ring-1 focus:ring-blue focus:placeholder-transparent text-xs font-sans"
-            />
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-1 text-xs font-sans">
+                <input
+                  type="radio"
+                  name="is-empanelled"
+                  value="yes"
+                  checked={patientDetail.IsHospitialEmpanpanelled === true}
+                  onChange={() => patientDetailOnChange({ ...patientDetail, IsHospitialEmpanpanelled: true, HospitalName: '', HospitalRegNo: '' })}
+                  className="accent-blue-600"
+                />
+                Yes
+              </label>
+              <label className="flex items-center gap-1 text-xs font-sans">
+                <input
+                  type="radio"
+                  name="is-empanelled"
+                  value="no"
+                  checked={patientDetail.IsHospitialEmpanpanelled === false}
+                  onChange={() => patientDetailOnChange({ ...patientDetail, IsHospitialEmpanpanelled: false, HospitalId: '' })}
+                  className="accent-blue-600"
+                />
+                No
+              </label>
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
-            <Label htmlFor="hospital-regd-no" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
-              Hospital Regd. No.
-            </Label>
-            <Input
-              id="hospital-regd-no"
-              type="text"
-              onChange={(e) => patientDetailOnChange({ ...patientDetail, HospitalRegNo: e.target.value })}
-              placeholder="L85110TN1979PLC006944"
-              className="border border-blue-200 rounded-lg px-3 py-2 flex-1 focus:ring-1 focus:placeholder-transparent focus:ring-blue-400 shadow-sm text-xs font-sans"
-            />
-          </div>
+          {/* If empanelled, show select. If not, show hospital name and regd. no. */}
+          {patientDetail.IsHospitialEmpanpanelled === true && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3 w-full">
+              <Label htmlFor="empanelled-hospital" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
+                Select Hospital
+              </Label>
+              <Select
+                onValueChange={(value) => patientDetailOnChange({ ...patientDetail, HospitalId: value, HospitalRegNo: '' })}
+                value={patientDetail.HospitalId || ''}
+              >
+                <SelectTrigger id="empanelled-hospital" className="border border-blue-200 rounded-lg px-3 py-2 w-full shadow-sm focus:ring-1 focus:ring-blue-400 text-xs font-sans">
+                  <SelectValue placeholder="Select Hospital" />
+                </SelectTrigger>
+                <SelectContent className="rounded-lg shadow-md border border-blue-200 bg-white text-xs font-sans">
+                  <SelectItem value="apollo">Apollo Hospital</SelectItem>
+                  <SelectItem value="fortis">Fortis Hospital</SelectItem>
+                  <SelectItem value="max">Max Healthcare</SelectItem>
+                  <SelectItem value="aiims">AIIMS</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {patientDetail.IsHospitialEmpanpanelled === false && (
+            <>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
+                <Label htmlFor="hospital-name" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
+                  Hospital Name
+                </Label>
+                <Input
+                  id="hospital-name"
+                  type="text"
+                  onChange={(e) => patientDetailOnChange({ ...patientDetail, HospitalName: e.target.value, HospitalId: '' })}
+                  placeholder="eg: Apollo"
+                  className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex-1 text-gray-700 focus:ring-1 focus:ring-blue focus:placeholder-transparent text-xs font-sans"
+                  value={patientDetail.HospitalName || ''}
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
+                <Label htmlFor="hospital-regd-no" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
+                  Hospital Regd. No.
+                </Label>
+                <Input
+                  id="hospital-regd-no"
+                  type="text"
+                  onChange={(e) => patientDetailOnChange({ ...patientDetail, HospitalRegNo: e.target.value })}
+                  placeholder="L85110TN1979PLC006944"
+                  className="border border-blue-200 rounded-lg px-3 py-2 flex-1 focus:ring-1 focus:placeholder-transparent focus:ring-blue-400 shadow-sm text-xs font-sans"
+                  value={patientDetail.HospitalRegNo || ''}
+                />
+              </div>
+            </>
+          )}
+
+          {/* Hospital Regd. No. is now conditionally rendered above */}
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-3">
             <Label htmlFor="doctor-name" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
