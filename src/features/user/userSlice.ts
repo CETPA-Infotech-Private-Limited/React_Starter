@@ -3,7 +3,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 
 interface UserState {
   Roles: string[];
-  unique_name: string | null;
+  name: string | null;
   EmpCode: string | null;
   Designation: string | null;
   Unit: string | null;
@@ -48,7 +48,7 @@ interface ProfileResponse {
 // ✅ Corrected initial state: Roles is now an empty array
 const initialState: UserState = {
   Roles: [],
-  unique_name: null,
+  name: null,
   EmpCode: null,
   Designation: null,
   Unit: null,
@@ -97,7 +97,7 @@ const userSlice = createSlice({
         state.loading = false;
         const { data } = action.payload;
         state.EmpCode = data.empCode;
-        state.unique_name = data.name;
+        state.name = data.name;
         state.Designation = data.designation;
         state.Unit = data.unit;
         state.unitId = data.unitId.toString();

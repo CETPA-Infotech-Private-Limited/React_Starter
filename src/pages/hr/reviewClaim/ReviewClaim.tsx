@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import ViewClaimDetails from '@/components/hr/reviewclaim/ViewClaimDetails';
@@ -10,7 +12,7 @@ const ReviewClaim = () => {
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to details when shown
+  // Auto scroll to details when toggled on
   useEffect(() => {
     if (showDetails && detailsRef.current) {
       detailsRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -18,19 +20,14 @@ const ReviewClaim = () => {
   }, [showDetails]);
 
   const handleViewToggle = (rowData: any) => {
-    const isSameRow = selectedClaim?.id === rowData.id;
-
-    if (isSameRow) {
-      // Toggle visibility
-      const newVisibility = !showDetails;
-      setShowDetails(newVisibility);
-
-      // Scroll to top when hiding
-      if (!newVisibility) {
+    const isSame = selectedClaim?.id === rowData.id;
+    if (isSame) {
+      const shouldShow = !showDetails;
+      setShowDetails(shouldShow);
+      if (!shouldShow) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } else {
-      // Select new claim and show details
       setSelectedClaim(rowData);
       setShowDetails(true);
     }
@@ -62,6 +59,7 @@ const ReviewClaim = () => {
       {
         accessorKey: 'claimAmount',
         header: 'Claim Amount (₹)',
+        cell: ({ getValue }: any) => `₹ ${getValue().toLocaleString()}`,
       },
       {
         accessorKey: 'action',
@@ -71,7 +69,11 @@ const ReviewClaim = () => {
           const isSelected = selectedClaim?.id === rowData.id;
 
           return (
-            <Button size="sm" onClick={() => handleViewToggle(rowData)} className="flex items-center gap-1 bg-primary text-white hover:bg-primary/90">
+            <Button
+              size="sm"
+              onClick={() => handleViewToggle(rowData)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+            >
               {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
               {isSelected && showDetails ? 'Hide' : 'View'}
             </Button>
@@ -102,17 +104,20 @@ const ReviewClaim = () => {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-xl shadow p-6 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <FileSearch className="text-primary w-6 h-6" />
-          <h1 className="text-2xl font-semibold text-primary">Review Claim Requests</h1>
+    <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
+      {/* Header & Table */}
+      <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-5">
+          <FileSearch className="text-blue-600 w-6 h-6" />
+          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
         </div>
+
         <ClaimSettlementList columns={columns} claimList={claimList} />
       </div>
 
+      {/* Conditional Claim Detail Section */}
       {selectedClaim && showDetails && (
-        <div ref={detailsRef} className="transition-all duration-300">
+        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
           <HospitalizationBillView />
           <ViewClaimDetails claim={selectedClaim} />
         </div>

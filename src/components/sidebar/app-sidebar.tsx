@@ -39,6 +39,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: FileText,
       roles: ['user'],
     },
+    {
+      title: 'Request Advance',
+      url: '/request-advance',
+      icon: FileText,
+      roles: ['user'],
+    },
+
     // {
     //   title: 'My Family Members',
     //   url: '/manage-family-members',

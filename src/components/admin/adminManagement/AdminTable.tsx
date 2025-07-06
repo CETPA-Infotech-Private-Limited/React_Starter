@@ -2,18 +2,18 @@ import { Button } from '@/components/ui/button';
 import TableList from '@/components/ui/data-table';
 import { Plus } from 'lucide-react';
 
-const AdminTable = ({ data, columns, onAddClick }) => (
+const AdminTable = ({ data, columns, onAddClick, inputPlaceholder }) => (
   <TableList
     data={data}
     columns={columns}
     rightElements={
       <Button onClick={onAddClick}>
-        <Plus /> Add New Admin
+        <Plus /> New Role Map
       </Button>
     }
     isInputEnd={false}
     showFilter={false}
-    inputPlaceholder="Search employee"
+    inputPlaceholder={inputPlaceholder}
   />
 );
 

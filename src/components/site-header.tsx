@@ -25,7 +25,7 @@ const SiteHeader: React.FC<{ showtoggle?: boolean }> = () => {
           </Link>
         </div>
         <div className="flex items-center space-x-4">
-          <div className="hidden md:block text-gray-800 text-md md:text-lg font-semibold">{user.unique_name}</div>
+          <div className="hidden md:block text-gray-800 text-md md:text-lg font-semibold">{user.name}</div>
 
           <LogoutButton />
         </div>

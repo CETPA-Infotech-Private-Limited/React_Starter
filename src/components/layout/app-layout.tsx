@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Outlet } from 'react-router';
 import { useAppName } from '@/hooks/useAppName';
@@ -14,16 +16,24 @@ const AppLayout: React.FC<AppLayoutProps> = ({ isAdmin }) => {
   const { fullName } = useAppName();
 
   return (
-    <SidebarProvider className="flex flex-col w-full h-screen">
-      <SiteHeader />
-      <div className="w-full bg-gray-100 flex-1 overflow-hidden">
-        <div className="flex flex-row h-full">
+    <SidebarProvider>
+      {/* Prevent global horizontal scroll */}
+      <div className="flex flex-col h-screen w-full overflow-hidden">
+        <SiteHeader />
+        <div className="flex flex-1 overflow-hidden bg-gray-100">
           {isAdmin ? <AdminSidebar /> : <AppSidebar />}
 
-          <div className="w-full flex flex-col ">
-            <div className="flex items-center mt-2 gap-0 justify-center text-primary text-center rounded-md font-bold text-3xl">{fullName}</div>
-            <div className="bg-white flex-1 overflow-auto">
-              <Outlet />
+          {/* Main content area */}
+          <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+            {/* Page title */}
+            <div className="p-3 text-primary text-center font-bold text-2xl">{fullName}</div>
+
+            {/* Scrollable content area with horizontal containment */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden w-full min-w-0">
+              {/* If using a table or wide content inside Outlet, wrap it */}
+              <div className="w-full overflow-x-auto">
+                <Outlet />
+              </div>
             </div>
           </div>
         </div>
