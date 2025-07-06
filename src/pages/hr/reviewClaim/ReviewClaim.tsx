@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewclaim/HospitalizationBillView';
 
-const ReviewClaim = () => {
+  const ReviewClaim = () => {
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll to details when toggled on
   useEffect(() => {
-    if (showDetails && detailsRef.current) {
+    if (showDetails && detailsRef.current){
       detailsRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [showDetails]);

@@ -22,6 +22,7 @@ import AddRoles from '@/pages/user/AddRole';
 import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
 import UserRoleMapping from '@/pages/admin/UserRoleMapping';
 import RequestAdvanceTable from '@/pages/user/requestAdvance/RequestAdvanceTable';
+import ApproveClaim from '@/pages/hr/approveClaim/ApproveClaim';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -48,6 +49,8 @@ const AppRoutes = () => {
             <Route path="/raise-claim" element={<RaiseClaim />} />
             <Route path="/review-claim" element={<ReviewClaim />} />
             <Route path="/request-advance" element={<RequestAdvanceTable />} />
+           <Route path="/ClaimAfterDoctorReview" element={<ApproveClaim/>} />
+
           </Route>
         </Route>
 
