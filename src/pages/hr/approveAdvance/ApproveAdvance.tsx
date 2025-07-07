@@ -175,13 +175,28 @@ const handleInputChange = (field, value) => {
                       variant="link"
                       size="sm"
                       className="text-blue-600"
-                      onClick={() => {
-                        setSelectedAdvance(item);
-                        setFormData((prev) => ({
-                          ...prev,
-                          estimatedAmountApproval: item.hospitalizationDetails.estimatedAmount.toString(),
-                        }));
-                      }}
+onClick={() => {
+  if (selectedAdvance?.id === item.id) {
+    // If already selected, toggle it off
+    setSelectedAdvance(null);
+    setFormData(prev => ({
+      ...prev,
+      estimatedAmountApproval: "",
+      approvedAmount: "",
+      declarationChecked: false,
+    }));
+  } else {
+    // Else, show new selection
+    setSelectedAdvance(item);
+    setFormData((prev) => ({
+      ...prev,
+      estimatedAmountApproval: item.hospitalizationDetails.estimatedAmount.toString(),
+      approvedAmount: "",
+      declarationChecked: false,
+    }));
+  }
+}}
+
                     >
                       <Eye className="w-4 h-4 mr-1" />
                       View
