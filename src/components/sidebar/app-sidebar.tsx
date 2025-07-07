@@ -32,14 +32,18 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: LayoutGrid,
       roles: ['user'],
     },
-
     {
       title: 'Request Advance',
       url: '/request-advance',
       icon: FileText,
       roles: ['user'],
     },
-
+    {
+      title: 'Approve Claim',
+      url: '/ClaimAfterDoctorReview',
+      icon: FileText,
+      roles: ['user'],
+    },
     {
       title: 'Review Claim',
       url: '/review-claim',
@@ -47,12 +51,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       roles: ['user'],
     },
 
-    // {
-    //   title: 'My Family Members',
-    //   url: '/manage-family-members',
-    //   icon: UserRoundCog,
-    //   roles: ['user'],
-    // },
+    {
+      title: 'Approve Advance',
+      url: '/approve-advance',
+      icon: FileText,
+      roles: ['user'],
+    },
   ];
 
   const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));

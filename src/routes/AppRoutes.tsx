@@ -15,12 +15,11 @@ import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
 import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
-import RaiseClaim from '@/pages/user/raiseClaim/RaiseClaim';
-import ManageAdmin from '@/pages/user/AdminCreation';
-import AdminCreationMed from '@/pages/user/AdminCreation';
-import AddRoles from '@/pages/user/AddRole';
+
 import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
 import UserRoleMapping from '@/pages/admin/UserRoleMapping';
+import ApproveClaim from '@/pages/hr/approveClaim/ApproveClaim';
+import ApproveAdvance from '@/pages/hr/approveAdvance/ApproveAdvance';
 import RequestAdvanceTable from '@/components/user/RequestAdvanceTable';
 import AdvanceRequestTable from '@/pages/user/raiseClaim/AdvanceRequestTable';
 import AdvanceClaimPage from '@/pages/user/advnceClaim/AdvanceClaimPage';
@@ -50,6 +49,10 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/raise-claim" element={<DirectRequestTable />} />
             <Route path="/review-claim" element={<ReviewClaim />} />
+           <Route path="/ClaimAfterDoctorReview" element={<ApproveClaim/>} />
+           <Route path="/approve-advance" element={<ApproveAdvance/>} />
+
+
             <Route path="/request-advance" element={<AdvanceClaimPage />} />
           </Route>
         </Route>
