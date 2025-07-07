@@ -10,7 +10,7 @@
     import { useAppDispatch, useAppSelector } from '@/app/hooks';
     import { RootState } from '@/app/store';
 
-    const AdvanceRequestTable = () => {
+    const DirectRequestTable = () => {
     const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
     const [showForm, setShowForm] = useState(false);
 
@@ -73,9 +73,14 @@
         ),
         },
     ], []);
+    const filterClaimdata =  useMemo(() => {
+    return (claimdata).filter((claim) => claim.claimTypeName === 'Direct Claim');
+  }, [claimdata]);
 
-    const claimList = Array.isArray(claimdata)
-        ? claimdata
+  console.log(filterClaimdata,'filter data')
+
+    const claimList = Array.isArray(filterClaimdata)
+        ? filterClaimdata
             .slice()
             .sort((a, b) => new Date(b.requestedDate).getTime() - new Date(a.requestedDate).getTime())
             .map((value: any) => ({
@@ -94,7 +99,7 @@
         <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
         {/* Claim Table Section */}
         <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
-            <h1 className="text-2xl font-bold text-blue-800 mb-4">Approved Advance List</h1>
+            <h1 className="text-2xl font-bold text-blue-800 mb-4">Direct Claim List</h1>
             <ClaimSettlementList columns={columns} claimList={claimList} />
         </div>
 
@@ -116,4 +121,4 @@
     );
     };
 
-    export default AdvanceRequestTable;
+    export default DirectRequestTable;

@@ -37,8 +37,8 @@ const AdvanceClaimPage = () => {
         accessorKey: 'sno',
         header: 'Sr. No.',
         enableSorting: false,
-        cell: ({ row }: any) => <div className="text-left">{row.index + 1}</div>,
-        className: 'text-left',
+        cell: ({ row }: any) => <div className="text-center">{row.index + 1}</div>,
+        className: 'text-center',
       },
       {
         accessorKey: 'empId',
@@ -46,9 +46,9 @@ const AdvanceClaimPage = () => {
         enableSorting: false,
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.empId));
-          return <div className="text-left">{result?.employee?.empName || 'Unknown'}</div>;
+          return <div className="text-center">{result?.employee?.empName || 'Unknown'}</div>;
         },
-        className: 'text-left',
+        className: 'text-center',
       },
       {
         accessorKey: 'patientId',
@@ -56,16 +56,16 @@ const AdvanceClaimPage = () => {
         enableSorting: false,
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.patientId));
-          return <div className="text-left">{result?.employee?.empName || ''}</div>;
+          return <div className="text-center">{result?.employee?.empName || ''}</div>;
         },
-        className: 'text-left',
+        className: 'text-center',
       },
       {
         accessorKey: 'claimTypeName',
         header: 'Relation',
         enableSorting: false,
-        cell: ({ row }: any) => <div className="text-left">{row.original.claimTypeName}</div>,
-        className: 'text-left',
+        cell: ({ row }: any) => <div className="text-center">{row.original.claimTypeName}</div>,
+        className: 'text-center',
       },
       {
         accessorKey: 'advanceAmount',
@@ -80,17 +80,16 @@ const AdvanceClaimPage = () => {
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
-        cell: ({ row }: any) => <div className="text-left">{row.original.requestDate}</div>,
-        className: 'text-left',
+        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
+        className: 'text-center',
       },
       {
         accessorKey: 'status',
         header: 'Status',
         enableSorting: true,
-        cell: ({ row }: any) => <div className="text-left">{row.original.status}</div>,
-        className: 'text-left',
+        cell: ({ row }: any) => <div className="text-center">{row.original.status}</div>,
+        className: 'text-center',
       },
-
       {
         accessorKey: 'approvedAmount',
         header: 'Approved Amount',
@@ -101,13 +100,12 @@ const AdvanceClaimPage = () => {
         },
         className: 'text-center',
       },
-
       {
         accessorKey: 'approvedDate',
         header: 'Approved Date',
         enableSorting: false,
-        cell: ({ row }: any) => <div className="text-left">{row.original.approvedDate || '-'}</div>,
-        className: 'text-left',
+        cell: ({ row }: any) => <div className="text-center">{row.original.approvedDate || '-'}</div>,
+        className: 'text-center',
       },
       {
         accessorKey: 'action',
@@ -120,7 +118,7 @@ const AdvanceClaimPage = () => {
             </Button>
           </div>
         ),
-        className: 'text-left',
+        className: 'text-center',
       },
     ],
     [employees]
