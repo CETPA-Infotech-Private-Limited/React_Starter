@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { submitClaim } from '@/features/user/claim/claimSlice';
+import { submitDirectClaim } from '@/features/user/claim/claimSlice';
 import type { RootState } from '@/app/store';
 import PatientDetails from './PatientDetails';
 import BillDetailsForm from './BillDetails';
@@ -233,7 +233,7 @@ const RaiseClaim = () => {
     if (rawPayload.FinalHospitalBillUpload?.[0]) {
       formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
     }
-    dispatch(submitClaim(formData));
+    dispatch(submitDirectClaim(formData));
     setPatientDetails({});
     setBillDetails({});
     setPreHospDetails({});

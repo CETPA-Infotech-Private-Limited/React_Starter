@@ -66,7 +66,8 @@ const RequestAdvanceForm = () => {
 
     const formData = new FormData();
 
-    formData.append('EmplId', parseInt(user.EmpCode));
+    formData.append('EmpCode', parseInt(user.EmpCode));
+    formData.append('UnitId', user.unitId.toString());
     formData.append('PatientId', Number(selectedMemberId || user.EmpCode));
     formData.append('RequestName', 'FirstAdvance');
     formData.append('AdvanceAmount', parseInt(advanceAmount || '0').toString());
