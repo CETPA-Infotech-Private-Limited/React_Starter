@@ -6,9 +6,9 @@ import { useAppSelector } from '@/app/hooks';
 // Define the initial state for the claim
 const initialState = {
   loading: false,
-  error: null,
+  error: null as string | null,
   success: false,
-  data: null,
+  data: [] as any[], // Always an array for table compatibility
 };
 
 // Async thunk for submitting the claim
@@ -36,7 +36,16 @@ export const getMyClaims = createAsyncThunk(
   async (empId: number, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);
-      return response.data;
+      // Defensive: ensure always array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if (Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else if (response.data.data) {
+        return [response.data.data];
+      } else {
+        return [];
+      }
     } catch (error: any) {
       console.error('Error fetching claims:', error);
       return rejectWithValue('Failed to fetch claims');
@@ -67,12 +76,32 @@ const claimSlice = createSlice({
       .addCase(submitClaim.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.data = action.payload;
+        // If submit returns a single object, push to array, else use as array
+        if (Array.isArray(action.payload)) {
+          state.data = action.payload;
+        } else if (action.payload) {
+          state.data = [action.payload];
+        } else {
+          state.data = [];
+        }
       })
       .addCase(submitClaim.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Something went wrong';
         state.success = false;
+      })
+      .addCase(getMyClaims.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getMyClaims.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(getMyClaims.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string || 'Failed to fetch claims';
+        state.data = [];
       });
   },
 });
