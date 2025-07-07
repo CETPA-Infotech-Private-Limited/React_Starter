@@ -16,7 +16,6 @@ const ApproveClaim = () => {
         const [showDetails, setShowDetails] = useState(false);
       const detailsRef = useRef<HTMLDivElement>(null);
       
-      // New state for the added sections
       const [postHospitalizationApplicable, setPostHospitalizationApplicable] = useState<string>('');
       const [totalClaimRequested, setTotalClaimRequested] = useState<string>('10000');
       const [approvedAmount, setApprovedAmount] = useState<string>('10000');
@@ -165,16 +164,16 @@ const ApproveClaim = () => {
      console.log('Confirming with:', {
        postHospitalizationApplicable,
        totalClaimRequested,
-       approvedAmount,
-       sendTo
+       approvedAmount
      });
    };
 
-  return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-              <ClaimSettlementList columns={columns} claimList={claimList} />
-
- <div className=" p-6 bg-white">
+return (
+  <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <ClaimSettlementList columns={columns} claimList={claimList} />
+    {selectedClaim && showDetails && (
+      <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
+      <div className=" p-6 bg-white">
        <div className="mb-8 border-b border-gray-200 pb-6">
          <div className="flex justify-between items-start">
            <div>
@@ -418,8 +417,11 @@ const ApproveClaim = () => {
          </div>
        </div>
      </div>
-    </div>
-  );
+
+      </div>
+    )}
+  </div>
+);
 };
 
 export default ApproveClaim;
