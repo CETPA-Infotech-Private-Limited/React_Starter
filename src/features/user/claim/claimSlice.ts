@@ -1,16 +1,71 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance';
 import toast from 'react-hot-toast';
-import { ClaimState } from '@/types/claim';
+
+// Claim type
+interface Claim {
+  claimId: number;
+  empId: number;
+  patientId: number;
+  advanceAmount: number;
+  claimAmount: number;
+  requestDate: string;
+  approvedAmount: number | null;
+  approvedDate: string | null;
+  statusId: number;
+  status: string;
+  claimTypeName: string;
+  claimTypeId: number;
+}
+
+// Slice state
+interface ClaimState {
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+  data: Claim[] | null;
+
+  advanceLoading: boolean;
+  advanceSuccess: boolean;
+  advanceError: string | null;
+
+  directLoading: boolean;
+  directSuccess: boolean;
+  directError: string | null;
+}
 
 const initialState: ClaimState = {
   loading: false,
   error: null,
   success: false,
   data: null,
+
+  advanceLoading: false,
+  advanceSuccess: false,
+  advanceError: null,
+
+  directLoading: false,
+  directSuccess: false,
+  directError: null,
 };
 
-export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', async (payload: any, { rejectWithValue }) => {
+// ✅ Submit Advance Claim
+export const submitAdvanceClaim = createAsyncThunk('claim/submitAdvanceClaim', async (formData: FormData, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/Claim/AdvanceRequest', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    toast.success('Advance claim submitted successfully!');
+    return response.data;
+  } catch (err: any) {
+    const message = err.response?.data?.message || err.message || 'Submission failed';
+    toast.error(message);
+    return rejectWithValue(message);
+  }
+});
+
+// ✅ Submit Direct Claim
+export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', async (payload: FormData, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post('/Claim/DirectClaimRequest', payload, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -29,6 +84,7 @@ export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', asy
   }
 });
 
+// ✅ Get My Claims
 export const getMyClaims = createAsyncThunk('claim/getMyClaims', async (empId: number, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);
@@ -49,23 +105,50 @@ const claimSlice = createSlice({
       state.success = false;
       state.data = null;
     },
+    resetAdvanceClaimState: (state) => {
+      state.advanceLoading = false;
+      state.advanceSuccess = false;
+      state.advanceError = null;
+    },
+    resetDirectClaimState: (state) => {
+      state.directLoading = false;
+      state.directSuccess = false;
+      state.directError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
+      // 🟩 Direct Claim
       .addCase(submitDirectClaim.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
+        state.directLoading = true;
+        state.directError = null;
+        state.directSuccess = false;
       })
       .addCase(submitDirectClaim.fulfilled, (state) => {
-        state.loading = false;
-        state.success = true;
+        state.directLoading = false;
+        state.directSuccess = true;
       })
       .addCase(submitDirectClaim.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.success = false;
+        state.directLoading = false;
+        state.directError = action.payload as string;
       })
+
+      // 🟦 Advance Claim
+      .addCase(submitAdvanceClaim.pending, (state) => {
+        state.advanceLoading = true;
+        state.advanceError = null;
+        state.advanceSuccess = false;
+      })
+      .addCase(submitAdvanceClaim.fulfilled, (state) => {
+        state.advanceLoading = false;
+        state.advanceSuccess = true;
+      })
+      .addCase(submitAdvanceClaim.rejected, (state, action) => {
+        state.advanceLoading = false;
+        state.advanceError = action.payload as string;
+      })
+
+      // 📦 My Claims
       .addCase(getMyClaims.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -81,5 +164,6 @@ const claimSlice = createSlice({
   },
 });
 
-export const { resetClaimState } = claimSlice.actions;
+export const { resetClaimState, resetAdvanceClaimState, resetDirectClaimState } = claimSlice.actions;
+
 export default claimSlice.reducer;

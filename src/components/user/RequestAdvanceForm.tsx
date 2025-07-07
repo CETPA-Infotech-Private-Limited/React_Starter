@@ -14,8 +14,8 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState, AppDispatch } from '@/app/store';
 
 import FamilyMemberSelect from '@/components/common/FamilyMemberSelect';
-import { resetAdvanceClaimState, submitAdvanceClaim } from '@/features/user/claim/advanceClaimSlice';
 import { hospitalList } from '@/constant/static';
+import { getMyClaims, resetAdvanceClaimState, submitAdvanceClaim } from '@/features/user/claim/claimSlice';
 
 const InputField = ({
   label,
@@ -34,10 +34,10 @@ const InputField = ({
   </div>
 );
 
-const RequestAdvanceForm = () => {
+const RequestAdvanceForm = ({ setShowForm }) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state: RootState) => state.user);
-  const { loading, success, error } = useAppSelector((state: RootState) => state.advanceClaim);
+  const { advanceLoading, advanceSuccess, advanceError } = useAppSelector((state: RootState) => state.claim);
   const [selectedMemberId, setSelectedMemberId] = useState<string | undefined>();
   const [doctorName, setDoctorName] = useState('');
   const [hospitalName, setHospitalName] = useState('');
@@ -107,22 +107,46 @@ const RequestAdvanceForm = () => {
 
     admissionFiles.forEach((file) => formData.append('AdmissionAdviceFile', file));
     estimateFiles.forEach((file) => formData.append('EstimateAmountFile', file));
-
-    console.log('FormData Entries:', [...formData.entries()]);
     dispatch(submitAdvanceClaim(formData));
   };
 
-  // Optional success/error handling
   useEffect(() => {
-    if (success) {
-      alert('Advance claim submitted successfully.');
+    if (advanceSuccess) {
+      // Reset form state after successful submission
+      setSelectedMemberId(undefined);
+      setDoctorName('');
+      setHospitalName('');
+      setHospitalRegNo('');
+      setSelectedHospitalId('');
+      setTreatmentType('');
+      setDiagnosis('');
+      setEstimateAmount('');
+      setAdvanceAmount('');
+      setAdmissionDate(null);
+      setIsEmpanelled('yes');
+      setPayTo('self');
+      setAdmissionFiles([]);
+      setEstimateFiles([]);
+      setBankDetails({
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        beneficiaryName: '',
+        branchName: '',
+        gstNumber: '',
+      });
+
+      dispatch(resetAdvanceClaimState());
+      setShowForm(false);
+      if (user?.EmpCode) {
+        dispatch(getMyClaims(Number(user.EmpCode)));
+      }
+    }
+
+    if (advanceError) {
       dispatch(resetAdvanceClaimState());
     }
-    if (error) {
-      alert('Submission failed: ' + error);
-      dispatch(resetAdvanceClaimState());
-    }
-  }, [success, error, dispatch]);
+  }, [advanceSuccess, advanceError, dispatch]);
 
   return (
     <div className="bg-white text-xs p-8 rounded-2xl shadow-xl border border-blue-300 mt-10 font-sans">
@@ -255,8 +279,8 @@ const RequestAdvanceForm = () => {
         </div>
 
         <div className="mt-6 text-right">
-          <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold text-sm shadow-sm" disabled={loading}>
-            {loading ? 'Submitting...' : 'Submit Request'}
+          <Button type="submit" className="..." disabled={advanceLoading}>
+            {advanceLoading ? 'Submitting...' : 'Submit Request'}
           </Button>
         </div>
       </form>

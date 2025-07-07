@@ -7,7 +7,6 @@ import applicationsReducer from '@/features/applications/applicationSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
 import allRoleReducer from '@/features/roleManagement/roleSlice';
 import claimReducer from '@/features/user/claim/claimSlice';
-import advanceClaimReducer from '@/features/user/claim/advanceClaimSlice';
 import masterRoleReducer from '@/features/allRole/materRoleListSlice';
 import empRoleListReducer from '@/features/allRole/empRoleListSlice';
 
@@ -25,7 +24,6 @@ const rootReducer = combineReducers({
   claim: claimReducer,
   masterRole: masterRoleReducer,
   empRoleList: empRoleListReducer,
-  advanceClaim: advanceClaimReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

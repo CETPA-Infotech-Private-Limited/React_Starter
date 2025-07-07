@@ -1,5 +1,7 @@
-const RequestAdvanceTable = () => {
-  return <div className="p-6 space-y-6 font-sans">Hello</div>;
+import TableList from '../ui/data-table';
+
+const RequestAdvanceTable = ({ columns, data }) => {
+  return <TableList columns={columns} data={data} />;
 };
 
 export default RequestAdvanceTable;

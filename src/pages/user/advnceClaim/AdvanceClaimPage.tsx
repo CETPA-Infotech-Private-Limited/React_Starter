@@ -1,64 +1,138 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
 import RequestAdvanceForm from '@/components/user/RequestAdvanceForm';
+import RequestAdvanceTable from '@/components/user/RequestAdvanceTable';
+import { Button } from '@/components/ui/button';
+import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
+import Loader from '@/components/ui/loader';
 
 const AdvanceClaimPage = () => {
   const [showForm, setShowForm] = useState(false);
-  const user = useAppSelector((state: RootState) => state.user);
-  const { data: claimList } = useAppSelector((state: RootState) => state.claim);
   const dispatch = useAppDispatch();
-  console.log('claimList', claimList);
+  const { employees } = useAppSelector((state: RootState) => state.employee);
+  const user = useAppSelector((state: RootState) => state.user);
+  const { data: claimList, loading } = useAppSelector((state: RootState) => state.claim);
+
+  useEffect(() => {
+    if (user?.EmpCode) {
+      dispatch(getMyClaims(Number(user.EmpCode)));
+    }
+  }, [dispatch, user?.EmpCode]);
 
   const handleCheckboxChange = (checked: boolean) => {
     setShowForm(checked);
   };
 
-  useEffect(() => {
-    dispatch(getMyClaims(Number(user.EmpCode)));
-  }, [dispatch, user.EmpCode]);
+  const advanceClaims = useMemo(() => {
+    return (claimList || []).filter((claim) => claim.claimTypeName === 'Advance');
+  }, [claimList]);
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'sno',
+        header: 'Sr. No.',
+        enableSorting: false,
+        cell: ({ row }: any) => <div className="text-left">{row.index + 1}</div>,
+        className: 'text-left',
+      },
+      {
+        accessorKey: 'empId',
+        header: 'Employee Name',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const result = findEmployeeDetails(employees, String(row.original.empId));
+          return <div className="text-left">{result?.employee?.empName || 'Unknown'}</div>;
+        },
+        className: 'text-left',
+      },
+      {
+        accessorKey: 'patientId',
+        header: 'Patient Name',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const result = findEmployeeDetails(employees, String(row.original.patientId));
+          return <div className="text-left">{result?.employee?.empName || ''}</div>;
+        },
+        className: 'text-left',
+      },
+      {
+        accessorKey: 'claimTypeName',
+        header: 'Relation',
+        enableSorting: false,
+        cell: ({ row }: any) => <div className="text-left">{row.original.claimTypeName}</div>,
+        className: 'text-left',
+      },
+      {
+        accessorKey: 'advanceAmount',
+        header: 'Advance Amount',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const amount = row.original.advanceAmount;
+          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
+        },
+        className: 'text-center',
+      },
+      {
+        accessorKey: 'requestDate',
+        header: 'Request Date',
+        cell: ({ row }: any) => <div className="text-left">{row.original.requestDate}</div>,
+        className: 'text-left',
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        enableSorting: true,
+        cell: ({ row }: any) => <div className="text-left">{row.original.status}</div>,
+        className: 'text-left',
+      },
+
+      {
+        accessorKey: 'approvedAmount',
+        header: 'Approved Amount',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const amount = row.original.approvedAmount;
+          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
+        },
+        className: 'text-center',
+      },
+
+      {
+        accessorKey: 'approvedDate',
+        header: 'Approved Date',
+        enableSorting: false,
+        cell: ({ row }: any) => <div className="text-left">{row.original.approvedDate || '-'}</div>,
+        className: 'text-left',
+      },
+      {
+        accessorKey: 'action',
+        header: 'Action',
+        enableSorting: false,
+        cell: ({ row }: any) => (
+          <div className="flex justify-center gap-2">
+            <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
+              Edit
+            </Button>
+          </div>
+        ),
+        className: 'text-left',
+      },
+    ],
+    [employees]
+  );
+
   return (
     <div className="p-6 space-y-6 font-sans">
-      <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
-        <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Unsettled Advance List</h2>
+      {loading && <Loader />}
 
-        <div className="overflow-x-auto rounded-lg border border-blue-100 shadow-sm ">
-          <table className="min-w-full text-sm text-left text-gray-700">
-            <thead className="bg-gradient-to-r from-blue-500 to-blue-400 text-white font-semibold text-xs">
-              <tr>
-                <th className="px-4 py-2">S.No</th>
-                <th className="px-4 py-2">Employee Name</th>
-                <th className="px-4 py-2">Patient Name</th>
-                <th className="px-4 py-2">Relation</th>
-                <th className="px-4 py-2">Advance Amount</th>
-                <th className="px-4 py-2">Request Date</th>
-                <th className="px-4 py-2">Approved Amount</th>
-                <th className="px-4 py-2">Approved Date</th>
-                <th className="px-4 py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Example row */}
-              <tr className="odd:bg-white even:bg-blue-50 border-b border-blue-100 hover:bg-blue-100 transition-colors duration-200">
-                <td className="px-4 py-2 font-semibold">1</td>
-                <td className="px-4 py-2">Anil Sharma</td>
-                <td className="px-4 py-2">Riya Sharma</td>
-                <td className="px-4 py-2">Daughter</td>
-                <td className="px-4 py-2">₹ 15,000</td>
-                <td className="px-4 py-2">01/07/2025</td>
-                <td className="px-4 py-2">₹ 12,000</td>
-                <td className="px-4 py-2">03/07/2025</td>
-                <td className="px-4 py-2">
-                  <button className="text-blue-600 font-medium hover:underline text-xs">Settle</button>
-                </td>
-              </tr>
-              {/* Add more rows dynamically */}
-            </tbody>
-          </table>
-        </div>
+      <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
+        <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Claim List</h2>
+        <RequestAdvanceTable columns={columns} data={advanceClaims} />
       </Card>
 
       <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-blue-50 rounded-xl">
@@ -67,8 +141,7 @@ const AdvanceClaimPage = () => {
           New Advance Request
         </label>
       </Card>
-
-      {showForm && <RequestAdvanceForm />}
+      {showForm && <RequestAdvanceForm setShowForm={setShowForm} />}
     </div>
   );
 };
