@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { submitClaim } from '@/features/user/claim/claimSlice';
+import { submitDirectClaim, getMyClaims } from '@/features/user/claim/claimSlice'; // ✅ Added getMyClaims
 import type { RootState } from '@/app/store';
 import PatientDetails from './PatientDetails';
 import BillDetailsForm from './BillDetails';
@@ -59,6 +59,7 @@ interface ClaimRequest {
   claimedTotal?: number;
 }
 
+
 type RaiseClaimProps = {
   onCloseForm: () => void;
 };
@@ -68,13 +69,13 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
   const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
   const [postHospDetails, setPostHospDetails] = useState<Partial<ClaimRequest>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ loader state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
   const handleSubmit = async () => {
-    setIsSubmitting(true); // ✅ start loader
+    setIsSubmitting(true);
 
     try {
       const rawPayload = {
@@ -83,6 +84,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...preHospDetails,
         ...postHospDetails,
       };
+
       const formData = new FormData();
 
       formData.append('Unit', user.unitId);
@@ -100,10 +102,9 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
       formData.append('IsSpecailDisease', 'true');
       formData.append('IsTaxAble', String(rawPayload.IsTaxAble ?? true));
       formData.append('IsPreHospitalizationExpenses', String(rawPayload.IsPreHospitalizationExpenses ?? false));
-      formData.append('ClaimAmount', String(rawPayload.claimedTotal || 100.0));
+      formData.append('ClaimAmount', String(netTotal)); // ✅ Fixed: use calculated netTotal
       formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
       formData.append('EmpId', String(user.EmpCode || 0));
-      // formData.append('PaidAmount', String(rawPayload.claimedTotal || 0));
       formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
 
       rawPayload.AdmissionAdviceUpload?.forEach((file: File) => formData.append('AdmissionAdviceUpload', file));
@@ -191,16 +192,18 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
       }
 
-      await dispatch(submitClaim(formData)); // ✅ Submit form
+      await dispatch(submitDirectClaim(formData));
+      await dispatch(getMyClaims(user.EmpCode)); // ✅ Refresh the claim list immediately
+
       setPatientDetails({});
       setBillDetails({});
       setPreHospDetails({});
       setPostHospDetails({});
-      onCloseForm(); // ✅ Close form on success
+      onCloseForm();
     } catch (error) {
       console.error('Submit error:', error);
     } finally {
-      setIsSubmitting(false); // ✅ Stop loader
+      setIsSubmitting(false);
     }
   };
 
@@ -252,11 +255,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
       </div>
       <div className="mt-4">
-        <BillDetailsForm
-          billDetails={billDetails}
-          onChange={setBillDetails}
-          preHospBilledAmount={preHospBilledAmount}
-        />
+        <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
       </div>
       <div className="mt-4">
         <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
@@ -266,7 +265,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
           postHospitalizationAndDeclaration={postHospDetailsWithSummary}
           onChange={setPostHospDetails}
           onSubmit={handleSubmit}
-          isSubmitting={isSubmitting} // ✅ pass loader state
+          isSubmitting={isSubmitting}
         />
       </div>
     </div>

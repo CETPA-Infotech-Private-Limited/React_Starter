@@ -13,7 +13,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { ListFilter, Search } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, ListFilter, Search } from 'lucide-react';
 
 import { Input } from './input';
 import { Button } from './button';
@@ -26,6 +26,7 @@ interface TableListProps {
   showFilter?: boolean;
   inputPlaceholder?: string;
   rightElements?: React.ReactNode;
+  showSearchInput?: boolean;
   onRowClick?: (rowData: any) => void;
 }
 
@@ -34,8 +35,9 @@ export default function TableList({
   columns,
   isInputEnd = false,
   showFilter = false,
+  showSearchInput = false,
   rightElements,
-  inputPlaceholder = 'Search by Grievance Subject',
+  inputPlaceholder = 'Search...',
   onRowClick,
 }: TableListProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -47,14 +49,17 @@ export default function TableList({
   const table = useReactTable({
     data,
     columns,
+    enableSortingRemoval: false,
+    enableColumnFilters: true,
+    enableSorting: true,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     globalFilterFn: 'includesString',
     state: {
       sorting,
@@ -100,15 +105,18 @@ export default function TableList({
   return (
     <div className="w-full font-sans space-y-4">
       {/* Search + Actions */}
-      <div className={`flex ${isInputEnd ? 'justify-end' : 'justify-start'} w-full`}>
+      {(showSearchInput || showFilter || rightElements) && (
         <div className="flex flex-col sm:flex-row w-full mb-4 sm:justify-between sm:items-center gap-2">
-          <Input
-            prefix={<Search className="h-4 w-4 text-muted-foreground" />}
-            placeholder={inputPlaceholder}
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full placeholder:text-gray-400 sm:w-72"
-          />
+          {showSearchInput && (
+            <Input
+              prefix={<Search className="h-4 w-4 text-muted-foreground" />}
+              placeholder={inputPlaceholder}
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full placeholder:text-gray-400 sm:w-72"
+            />
+          )}
+
           <div className="flex gap-2 items-center">
             {showFilter && (
               <Button variant="outline" size="icon" className="p-4">
@@ -118,7 +126,7 @@ export default function TableList({
             {rightElements}
           </div>
         </div>
-      </div>
+      )}
 
       {/* Table */}
       <div className="overflow-auto rounded-2xl border border-blue-200 shadow-lg">
@@ -127,8 +135,27 @@ export default function TableList({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="px-4 py-3 text-left whitespace-nowrap">
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  <th
+                    key={header.id}
+                    className="px-4 py-3 text-left whitespace-nowrap cursor-pointer select-none"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div className="flex items-center gap-1">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getCanSort() && (
+                          <>
+                            {header.column.getIsSorted() === 'asc' ? (
+                              <ArrowUp className="h-4 w-4 " />
+                            ) : header.column.getIsSorted() === 'desc' ? (
+                              <ArrowDown className="h-4 w-4" />
+                            ) : (
+                              <ArrowUpDown className="h-4 w-4 " />
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
