@@ -95,7 +95,7 @@ export function HospitalizationDetailsCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl font-bold">Hospitalization Details</CardTitle>
+        <CardTitle className="text-primary">Hospitalization Details</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

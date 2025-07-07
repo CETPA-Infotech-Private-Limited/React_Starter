@@ -31,7 +31,7 @@ export function BeneficiaryDetailsCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl font-bold">Beneficiary Details (Hospital)</CardTitle>
+        <CardTitle className="text-primary">Beneficiary Details (Hospital)</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

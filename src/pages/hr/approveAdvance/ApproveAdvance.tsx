@@ -35,13 +35,6 @@ const ApproveAdvance = () => {
   const fileLinks: string[] = []; // Replace with actual file URLs if available
   const hasFiles = fileLinks.length;
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
 const beneficiaryDetailsData = {
   beneficiaryName: "Apollo Hospitals Enterprise Ltd.",
   bankName: "HDFC Bank",
@@ -59,9 +52,6 @@ const patientDetails = {
   gender: "Male",
 };
 
-
-
-
 const hospitalizationDetailsData = {
   hospitalName: "Apollo Hospitals",
   admissionDate: "2025-07-05",
@@ -78,6 +68,30 @@ const hospitalizationDetailsData = {
   ],
   admissionAdviceFiles: [],
   incomeProofFiles: ["https://example.com/files/income-proof.pdf"],
+};
+
+// Dummy advance list data
+const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
+const advanceList = [
+  {
+    id: 1,
+    employeeName: "Anil Sharma",
+    patientName: "Anil Singh",
+    relation: "Self",
+    requestedDate: "2025-06-20",
+    requestedAmount: 20000,
+    patientDetails: patientDetails,
+    hospitalizationDetails: hospitalizationDetailsData,
+    beneficiaryDetails: beneficiaryDetailsData,
+  },
+  // Add more objects as needed
+];
+
+const handleInputChange = (field, value) => {
+  setFormData(prev => ({
+    ...prev,
+    [field]: value
+  }));
 };
 
 
@@ -131,116 +145,124 @@ const hospitalizationDetailsData = {
         {/* Advance List */}
          
     <Card>
-      <CardHeader>
-        <CardTitle className="text-primary">Advance List</CardTitle>
-      </CardHeader>
-      <CardContent className="overflow-x-auto">
-        <Table>
-          <TableHeader className="bg-primary text-white">
-            <TableRow>
-              <TableHead className="text-white">Sr No</TableHead>
-              <TableHead className="text-white">Employee Name</TableHead>
-              <TableHead className="text-white">Patient Name</TableHead>
-              <TableHead className="text-white">Relation</TableHead>
-              <TableHead className="text-white">Requested Date</TableHead>
-              <TableHead className="text-white">Advance Requested (₹)</TableHead>
-              <TableHead className="text-white">View</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {/* Sample Row – you can map over your data here */}
-            <TableRow>
-              <TableCell>1</TableCell>
-              <TableCell>John Doe</TableCell>
-              <TableCell>Jane Doe</TableCell>
-              <TableCell>Wife</TableCell>
-              <TableCell>2023-07-07</TableCell>
-              <TableCell>₹ 5,000</TableCell>
-              <TableCell>
-                <Button variant="link" size="sm" className="text-blue-600">
-                  <Eye className="w-4 h-4 mr-1" />
-                  View
-                </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+        <CardHeader>
+          <CardTitle className="text-primary">Advance List</CardTitle>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-primary text-white">
+              <TableRow>
+                <TableHead className="text-white">Sr No</TableHead>
+                <TableHead className="text-white">Employee Name</TableHead>
+                <TableHead className="text-white">Patient Name</TableHead>
+                <TableHead className="text-white">Relation</TableHead>
+                <TableHead className="text-white">Requested Date</TableHead>
+                <TableHead className="text-white">Advance Requested (₹)</TableHead>
+                <TableHead className="text-white">View</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {advanceList.map((item, index) => (
+                <TableRow key={item.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{item.employeeName}</TableCell>
+                  <TableCell>{item.patientName}</TableCell>
+                  <TableCell>{item.relation}</TableCell>
+                  <TableCell>{item.requestedDate}</TableCell>
+                  <TableCell>₹ {item.requestedAmount.toLocaleString()}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="text-blue-600"
+                      onClick={() => {
+                        setSelectedAdvance(item);
+                        setFormData((prev) => ({
+                          ...prev,
+                          estimatedAmountApproval: item.hospitalizationDetails.estimatedAmount.toString(),
+                        }));
+                      }}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
+      {/* Conditional Details Section */}
+      {selectedAdvance && (
+        <div className="space-y-6">
+          {/* Patient Details */}
+          <PatientDetailsCard {...selectedAdvance.patientDetails} />
 
-{/* Patient Details */}
+          {/* Hospitalization Info */}
+          <HospitalizationDetailsCard {...selectedAdvance.hospitalizationDetails} />
 
-<PatientDetailsCard {...patientDetails} />
+          {/* Beneficiary Info */}
+          <BeneficiaryDetailsCard {...selectedAdvance.beneficiaryDetails} />
 
-
-
-{/* Limit Information + Hospital and Treatment Details */}
-
-<HospitalizationDetailsCard {...hospitalizationDetailsData}/>
-
-
-
-{/* Beneficiary Details */}
-<BeneficiaryDetailsCard {...beneficiaryDetailsData} />
-
-
-      
-        {/* Approval Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-primary">Approval Form</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="estimatedAmountApproval" className="text-sm font-medium">
-                  Estimated Amount
-                </Label>
-                <Input
-                  id="estimatedAmountApproval"
-                  value={formData.estimatedAmountApproval}
-                  onChange={(e) => handleInputChange('estimatedAmountApproval', e.target.value)}
-                  className="w-1/2 bg-gray-100"
-                  readOnly
-                />
+          {/* Approval Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Approval Form</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="estimatedAmountApproval" className="text-sm font-medium">
+                    Estimated Amount
+                  </Label>
+                  <Input
+                    id="estimatedAmountApproval"
+                    value={formData.estimatedAmountApproval}
+                    onChange={(e) => handleInputChange("estimatedAmountApproval", e.target.value)}
+                    className="w-1/2 bg-gray-100"
+                    readOnly
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="approvedAmount" className="text-sm font-medium">
+                    Approved Amount
+                  </Label>
+                  <Input
+                    id="approvedAmount"
+                    value={formData.approvedAmount}
+                    onChange={(e) => handleInputChange("approvedAmount", e.target.value)}
+                    className="w-1/2"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="approvedAmount" className="text-sm font-medium">
-                  Approved Amount
-                </Label>
-                <Input
-                  id="approvedAmount"
-                  value={formData.approvedAmount}
-                  onChange={(e) => handleInputChange('approvedAmount', e.target.value)}
-                  className="w-1/2"
-                />
-              </div>
-            </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="declaration"
-                  checked={formData.declarationChecked}
-                  onCheckedChange={(checked) => handleInputChange('declarationChecked', checked)}
-                />
-                <Label htmlFor="declaration" className="text-sm">
-                  I the undersigned hereby declare that the information given in this form is correct and complete to the best of my knowledge and belief.
-                </Label>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="declaration"
+                    checked={formData.declarationChecked}
+                    onCheckedChange={(checked) => handleInputChange("declarationChecked", checked)}
+                  />
+                  <Label htmlFor="declaration" className="text-sm">
+                    I the undersigned hereby declare that the information given in this form is correct and complete to the best of my knowledge and belief.
+                  </Label>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-8"
+                    disabled={!formData.declarationChecked}
+                  >
+                    Submit
+                  </Button>
+                </div>
               </div>
-              
-              <div className="flex justify-end">
-                <Button 
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8"
-                  disabled={!formData.declarationChecked}
-                >
-                  Submit
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )}
       </div>
     </div>
   );
