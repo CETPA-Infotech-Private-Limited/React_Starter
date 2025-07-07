@@ -1,22 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card } from '@/components/ui/card';
-import RequestAdvanceForm from './RequestAdvanceForm';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { getMyClaims } from '@/features/user/claim/claimSlice';
+import RequestAdvanceForm from '@/components/user/RequestAdvanceForm';
 
-const RequestAdvanceTable = () => {
+const AdvanceClaimPage = () => {
   const [showForm, setShowForm] = useState(false);
+  const user = useAppSelector((state: RootState) => state.user);
+  const { data: claimList } = useAppSelector((state: RootState) => state.claim);
+  const dispatch = useAppDispatch();
+  console.log('claimList', claimList);
 
   const handleCheckboxChange = (checked: boolean) => {
     setShowForm(checked);
   };
 
+  useEffect(() => {
+    dispatch(getMyClaims(Number(user.EmpCode)));
+  }, [dispatch, user.EmpCode]);
   return (
     <div className="p-6 space-y-6 font-sans">
-      {/* Table Card */}
       <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Unsettled Advance List</h2>
 
-        <div className="overflow-x-auto rounded-lg border border-blue-100 shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-blue-100 shadow-sm ">
           <table className="min-w-full text-sm text-left text-gray-700">
             <thead className="bg-gradient-to-r from-blue-500 to-blue-400 text-white font-semibold text-xs">
               <tr>
@@ -52,7 +61,6 @@ const RequestAdvanceTable = () => {
         </div>
       </Card>
 
-      {/* Checkbox Section */}
       <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-blue-50 rounded-xl">
         <Checkbox id="new-request" onCheckedChange={handleCheckboxChange} />
         <label htmlFor="new-request" className="text-sm font-medium text-blue-800">
@@ -60,10 +68,9 @@ const RequestAdvanceTable = () => {
         </label>
       </Card>
 
-      {/* Conditional Form */}
       {showForm && <RequestAdvanceForm />}
     </div>
   );
 };
 
-export default RequestAdvanceTable;
+export default AdvanceClaimPage;

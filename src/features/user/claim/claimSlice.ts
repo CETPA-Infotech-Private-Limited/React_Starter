@@ -1,28 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance';
 import toast from 'react-hot-toast';
-
-interface Claim {
-  claimId: number;
-  empId: number;
-  patientId: number;
-  advanceAmount: number;
-  claimAmount: number;
-  requestDate: string;
-  approvedAmount: number | null;
-  approvedDate: string | null;
-  statusId: number;
-  status: string;
-  claimTypeName: string;
-  claimTypeId: number;
-}
-
-interface ClaimState {
-  loading: boolean;
-  error: string | null;
-  success: boolean;
-  data: Claim[] | null;
-}
+import { ClaimState } from '@/types/claim';
 
 const initialState: ClaimState = {
   loading: false,
@@ -50,7 +29,6 @@ export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', asy
   }
 });
 
-// Async thunk to get claims for a specific employee
 export const getMyClaims = createAsyncThunk('claim/getMyClaims', async (empId: number, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);

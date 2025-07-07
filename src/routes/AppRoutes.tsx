@@ -21,8 +21,9 @@ import AdminCreationMed from '@/pages/user/AdminCreation';
 import AddRoles from '@/pages/user/AddRole';
 import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
 import UserRoleMapping from '@/pages/admin/UserRoleMapping';
-import RequestAdvanceTable from '@/pages/user/requestAdvance/RequestAdvanceTable';
+import RequestAdvanceTable from '@/components/user/RequestAdvanceTable';
 import AdvanceRequestTable from '@/pages/user/raiseClaim/AdvanceRequestTable';
+import AdvanceClaimPage from '@/pages/user/advnceClaim/AdvanceClaimPage';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -48,7 +49,7 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/raise-claim" element={<AdvanceRequestTable />} />
             <Route path="/review-claim" element={<ReviewClaim />} />
-            <Route path="/request-advance" element={<RequestAdvanceTable />} />
+            <Route path="/request-advance" element={<AdvanceClaimPage />} />
           </Route>
         </Route>
 
