@@ -24,6 +24,7 @@ import UserRoleMapping from '@/pages/admin/UserRoleMapping';
 import RequestAdvanceTable from '@/components/user/RequestAdvanceTable';
 import AdvanceRequestTable from '@/pages/user/raiseClaim/AdvanceRequestTable';
 import AdvanceClaimPage from '@/pages/user/advnceClaim/AdvanceClaimPage';
+import DirectRequestTable from '@/pages/user/raiseClaim/AdvanceRequestTable';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -47,7 +48,7 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['user']} />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/raise-claim" element={<AdvanceRequestTable />} />
+            <Route path="/raise-claim" element={<DirectRequestTable />} />
             <Route path="/review-claim" element={<ReviewClaim />} />
             <Route path="/request-advance" element={<AdvanceClaimPage />} />
           </Route>

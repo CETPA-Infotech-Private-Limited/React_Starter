@@ -92,9 +92,7 @@ export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', asy
   }
 });
 
-/* The `export const getMyClaims` is a function created using `createAsyncThunk` from Redux Toolkit.
-This function is responsible for making an asynchronous API call to fetch claims for a specific
-employee based on the `empId` provided as a parameter. */
+// ✅ Get My Claims
 export const getMyClaims = createAsyncThunk('claim/getMyClaims', async (empId: number, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);
@@ -105,9 +103,7 @@ export const getMyClaims = createAsyncThunk('claim/getMyClaims', async (empId: n
   }
 });
 
-/* The `export const submitAdvanceTopUpClaim` is a function created using `createAsyncThunk` from Redux
-Toolkit. This function is responsible for making an asynchronous API call to submit an advance
-top-up claim. */
+// ✅ Submit Advance Top-Up Claim
 export const submitAdvanceTopUpClaim = createAsyncThunk('claim/submitAdvanceTopUpClaim', async (formData: FormData, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post('/Claim/AdvanceTop', formData, {
@@ -143,7 +139,6 @@ const claimSlice = createSlice({
       state.directSuccess = false;
       state.directError = null;
     },
-    //advance top rest
     resetAdvanceTopUpClaimState: (state) => {
       state.advanceTopLoading = false;
       state.advanceTopSuccess = false;
@@ -182,8 +177,7 @@ const claimSlice = createSlice({
         state.advanceError = action.payload as string;
       })
 
-      //Advance Claim Top Up
-
+      // 🟨 Advance Top-Up Claim
       .addCase(submitAdvanceTopUpClaim.pending, (state) => {
         state.advanceTopLoading = true;
         state.advanceTopError = null;
@@ -198,22 +192,30 @@ const claimSlice = createSlice({
         state.advanceTopError = action.payload as string;
       })
 
-      // 📦 My Claims
+      // 📦 Get My Claims
       .addCase(getMyClaims.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getMyClaims.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.success = true;
+        if (Array.isArray(action.payload)) {
+          state.data = action.payload;
+        } else if (action.payload) {
+          state.data = [action.payload];
+        } else {
+          state.data = [];
+        }
       })
       .addCase(getMyClaims.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.success = false;
       });
   },
 });
 
-export const { resetClaimState, resetAdvanceTopUpClaimState, resetAdvanceClaimState, resetDirectClaimState } = claimSlice.actions;
+export const { resetClaimState, resetAdvanceClaimState, resetDirectClaimState, resetAdvanceTopUpClaimState } = claimSlice.actions;
 
 export default claimSlice.reducer;
