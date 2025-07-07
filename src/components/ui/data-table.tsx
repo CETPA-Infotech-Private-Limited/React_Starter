@@ -13,11 +13,12 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { ListFilter, Search } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, ListFilter, Search, Eye } from 'lucide-react';
 
 import { Input } from './input';
 import { Button } from './button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import { Checkbox } from './checkbox';
 
 interface TableListProps {
   data: any[];
@@ -26,6 +27,7 @@ interface TableListProps {
   showFilter?: boolean;
   inputPlaceholder?: string;
   rightElements?: React.ReactNode;
+  showSearchInput?: boolean;
   onRowClick?: (rowData: any) => void;
 }
 
@@ -34,8 +36,9 @@ export default function TableList({
   columns,
   isInputEnd = false,
   showFilter = false,
+  showSearchInput = false,
   rightElements,
-  inputPlaceholder = 'Search by Grievance Subject',
+  inputPlaceholder = 'Search...',
   onRowClick,
 }: TableListProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -47,14 +50,17 @@ export default function TableList({
   const table = useReactTable({
     data,
     columns,
+    enableSorting: true,
+    enableColumnFilters: true,
+    enableSortingRemoval: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     globalFilterFn: 'includesString',
     state: {
       sorting,
@@ -100,35 +106,76 @@ export default function TableList({
   return (
     <div className="w-full font-sans space-y-4">
       {/* Search + Actions */}
-      <div className={`flex ${isInputEnd ? 'justify-end' : 'justify-start'} w-full`}>
+      {(showSearchInput || showFilter || rightElements) && (
         <div className="flex flex-col sm:flex-row w-full mb-4 sm:justify-between sm:items-center gap-2">
-          <Input
-            prefix={<Search className="h-4 w-4 text-muted-foreground" />}
-            placeholder={inputPlaceholder}
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="w-full placeholder:text-gray-400 sm:w-72"
-          />
-          <div className="flex gap-2 items-center">
+          {showSearchInput && (
+            <Input
+              prefix={<Search className="h-4 w-4 text-muted-foreground" />}
+              placeholder={inputPlaceholder}
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full placeholder:text-gray-400 sm:w-72"
+            />
+          )}
+
+          <div className="flex gap-2 items-center relative">
             {showFilter && (
-              <Button variant="outline" size="icon" className="p-4">
-                <ListFilter className="h-4 w-4 text-secondary-foreground" />
-              </Button>
+              <div className="relative group">
+                <Button variant="outline" size="sm" className="text-xs flex items-center gap-1">
+                  <ListFilter className="w-4 h-4" />
+                  Columns
+                </Button>
+                <div className="absolute z-10 hidden group-hover:block top-full right-0 mt-1 w-48 bg-white border rounded-md shadow-lg text-xs">
+                  <div className="p-2 space-y-1 max-h-64 overflow-y-auto">
+                    {table.getAllLeafColumns().map((column) => {
+                      if (column.getCanHide()) {
+                        return (
+                          <div key={column.id} className="flex items-center gap-2 px-2 py-1 hover:bg-blue-50 cursor-pointer">
+                            <Checkbox id={`column-toggle-${column.id}`} checked={column.getIsVisible()} onCheckedChange={() => column.toggleVisibility()} />
+                            <label htmlFor={`column-toggle-${column.id}`} className="text-sm text-gray-800 cursor-pointer">
+                              {column.columnDef.header as string}
+                            </label>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                </div>
+              </div>
             )}
             {rightElements}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Table */}
       <div className="overflow-auto rounded-2xl border border-blue-200 shadow-lg">
         <table className="min-w-full text-sm text-left text-gray-800 font-sans">
           <thead className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-semibold uppercase tracking-wider">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="px-4 py-3 text-left whitespace-nowrap">
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  <th
+                    key={header.id}
+                    className="px-4 py-3 text-center whitespace-nowrap cursor-pointer select-none"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div className="flex items-center justify-center gap-1">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getCanSort() && (
+                          <>
+                            {header.column.getIsSorted() === 'asc' ? (
+                              <ArrowUp className="h-4 w-4" strokeWidth={3} />
+                            ) : header.column.getIsSorted() === 'desc' ? (
+                              <ArrowDown className="h-4 w-4" strokeWidth={3} />
+                            ) : (
+                              <ArrowUpDown className="h-4 w-4" strokeWidth={3} />
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
@@ -143,7 +190,7 @@ export default function TableList({
                   className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition-colors duration-200 cursor-pointer border-b border-blue-100"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3 text-sm">
+                    <td key={cell.id} className="px-4 py-3 text-center">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}

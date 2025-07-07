@@ -295,7 +295,7 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
             }}
             className="h-5 w-5 flex-shrink-0 border-blue-400 data-[state=checked]:bg-blue-500 data-[state=checked]:text-white"
           />
-          <span className="text-lg font-bold text-blue-800">Pre Hospitalization Expenses</span>
+          <span className="text-lg font-bold text-primary drop-shadow">Pre Hospitalization Expenses</span>
         </div>
 
         {/* Form Table - Only shows when checkbox is checked */}
@@ -304,7 +304,7 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
             <div className="overflow-x-auto rounded-lg border border-blue-200 shadow-sm">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-blue-500 text-white">
+                  <tr className="bg-primary text-white">
                     <th className="px-4 py-3 text-left text-sm font-semibold rounded-tl-lg">
                       S.No.
                     </th>

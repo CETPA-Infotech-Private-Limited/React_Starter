@@ -22,23 +22,12 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: LayoutGrid,
       roles: ['admin', 'superAdmin', 'user'],
     },
-    {
-      title: 'Manage Admin',
-      url: '/manage-admin',
-      icon: UserRoundCog,
-      roles: ['superAdmin', 'user'],
-    },
+
     {
       title: 'User Mapping',
       url: '/user-role-mapping',
       icon: UserRoundCog,
       roles: ['admin', 'superAdmin', 'user'],
-    },
-    {
-      title: 'addRole',
-      url: '/add-role',
-      icon: LayoutGrid,
-      roles: ['admin', 'superAdmin'],
     },
   ];
 

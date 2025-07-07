@@ -5,14 +5,12 @@ import toast from 'react-hot-toast';
 import logger from '@/lib/logger';
 import { oidcConfig } from '@/auth/config';
 
-// Creating Axios instance
 const axiosInstance = axios.create({
   baseURL: environment.apiUrl,
   headers: {
     'Content-Type': 'application/json',
   },
 });
-
 
 axiosInstance.interceptors.request.use(
   (config) => {
