@@ -9,6 +9,7 @@ import RequestAdvanceTable from '@/components/user/RequestAdvanceTable';
 import { Button } from '@/components/ui/button';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import Loader from '@/components/ui/loader';
+import RequestAdvanceTopUpForm from '@/components/user/RequestAdvanceTopUpForm';
 
 const AdvanceClaimPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -132,7 +133,6 @@ const AdvanceClaimPage = () => {
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Claim List</h2>
         <RequestAdvanceTable columns={columns} data={advanceClaims} />
       </Card>
-
       <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-blue-50 rounded-xl">
         <Checkbox id="new-request" onCheckedChange={handleCheckboxChange} />
         <label htmlFor="new-request" className="text-sm font-medium text-blue-800">
@@ -140,6 +140,7 @@ const AdvanceClaimPage = () => {
         </label>
       </Card>
       {showForm && <RequestAdvanceForm setShowForm={setShowForm} />}
+      <RequestAdvanceTopUpForm />
     </div>
   );
 };

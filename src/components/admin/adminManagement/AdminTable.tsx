@@ -6,12 +6,12 @@ const AdminTable = ({ data, columns, onAddClick, inputPlaceholder }) => (
   <TableList
     data={data}
     columns={columns}
+    showSearchInput
     rightElements={
       <Button onClick={onAddClick}>
         <Plus /> New Role Map
       </Button>
     }
-    isInputEnd={false}
     showFilter={false}
     inputPlaceholder={inputPlaceholder}
   />
