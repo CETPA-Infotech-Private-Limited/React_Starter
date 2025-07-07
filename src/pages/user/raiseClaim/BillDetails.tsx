@@ -285,7 +285,8 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                 BilledAmount: Number(updatedBills[5].billedAmount),
                 ClaimedAmount: Number(updatedBills[5].claimedAmount),
             },
-            NotIncluded:notincludes 
+            NotIncluded:notincludes,
+            claimedTotal:claimedTotal
         };
         console.log(apiBillDetails, 'API Bill Details'); // Log API bill details for debugging
         onChange(apiBillDetails);
