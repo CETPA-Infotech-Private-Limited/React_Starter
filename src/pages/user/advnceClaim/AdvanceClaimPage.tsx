@@ -114,9 +114,7 @@ const AdvanceClaimPage = () => {
         enableSorting: false,
         cell: ({ row }: any) => (
           <div className="flex justify-center gap-2">
-            <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
-              Edit
-            </Button>
+            <Button size="sm">Top Up</Button>
           </div>
         ),
         className: 'text-center',

@@ -92,7 +92,6 @@ const RequestAdvanceTopUpForm = () => {
       <h2 className="text-2xl font-extrabold mb-6 text-center text-primary tracking-tight drop-shadow font-sans">Advance Top-Up Request Form</h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputField label="Advance ID" value={advanceId} onChange={(e) => setAdvanceId(e.target.value)} />
         <InputField label="Revised Estimated Amount" value={reviseEstimatedAmount} onChange={(e) => setReviseEstimatedAmount(e.target.value)} />
         <InputField label="Top-up Required Amount" value={topRequiredAmount} onChange={(e) => setTopRequiredAmount(e.target.value)} />
 

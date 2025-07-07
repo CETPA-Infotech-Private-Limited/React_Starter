@@ -34,14 +34,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
 
     {
-      title: 'Review Claim',
-      url: '/review-claim',
+      title: 'Request Advance',
+      url: '/request-advance',
       icon: FileText,
       roles: ['user'],
     },
+
     {
-      title: 'Request Advance',
-      url: '/request-advance',
+      title: 'Review Claim',
+      url: '/review-claim',
       icon: FileText,
       roles: ['user'],
     },
