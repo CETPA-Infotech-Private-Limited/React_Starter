@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance';
 import toast from 'react-hot-toast';
+import { useAppSelector } from '@/app/hooks';
 
 // Define the initial state for the claim
 const initialState = {
@@ -29,6 +30,21 @@ if(response.data.statusCode == 200 || 201) {
     return rejectWithValue(error.response?.data || error.message);
   }
 });
+
+export const getMyClaims = createAsyncThunk(
+  'claim/getMyClaims',
+  async (empId: number, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching claims:', error);
+      return rejectWithValue('Failed to fetch claims');
+    }
+  }
+);
+
+
 
 const claimSlice = createSlice({
   name: 'claim',
