@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -5,18 +7,20 @@ import { RootState } from '@/app/store';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
 import RequestAdvanceForm from '@/components/user/RequestAdvanceForm';
 import RequestAdvanceTable from '@/components/user/RequestAdvanceTable';
+import RequestAdvanceTopUpForm from '@/components/user/RequestAdvanceTopUpForm';
 import { Button } from '@/components/ui/button';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import Loader from '@/components/ui/loader';
-import RequestAdvanceTopUpForm from '@/components/user/RequestAdvanceTopUpForm';
 
 const AdvanceClaimPage = () => {
-  const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
   const formRef = useRef<HTMLDivElement | null>(null);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const { data: claimList, loading } = useAppSelector((state: RootState) => state.claim);
+
+  const [activeForm, setActiveForm] = useState<'new' | 'topup' | null>(null);
+  const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
 
   useEffect(() => {
     if (user?.EmpCode) {
@@ -27,6 +31,26 @@ const AdvanceClaimPage = () => {
   const advanceClaims = useMemo(() => {
     return (claimList || []).filter((claim) => claim.claimTypeName === 'Advance');
   }, [claimList]);
+
+  const handleScrollToForm = () => {
+    setTimeout(() => {
+      if (!formRef.current) return;
+      let scrollParent: HTMLElement | null = formRef.current.parentElement;
+      while (scrollParent && scrollParent !== document.body) {
+        const style = getComputedStyle(scrollParent);
+        const canScroll = style.overflowY === 'auto' || style.overflowY === 'scroll';
+        if (canScroll && scrollParent.scrollHeight > scrollParent.clientHeight) {
+          break;
+        }
+        scrollParent = scrollParent.parentElement;
+      }
+
+      if (scrollParent) {
+        const formOffsetTop = formRef.current.offsetTop;
+        scrollParent.scrollTo({ top: formOffsetTop - 130, behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   const columns = useMemo(
     () => [
@@ -110,7 +134,18 @@ const AdvanceClaimPage = () => {
         enableSorting: false,
         cell: ({ row }: any) => (
           <div className="flex justify-center gap-2">
-            <Button size="sm">Top Up</Button>
+            <Button
+              size="sm"
+              variant={row.original.statusId === 2 ? 'default' : 'ghost'}
+              disabled={row.original.statusId !== 2}
+              onClick={() => {
+                setSelectedClaim(row.original);
+                setActiveForm('topup');
+                handleScrollToForm();
+              }}
+            >
+              Top Up
+            </Button>
           </div>
         ),
         className: 'text-center',
@@ -118,26 +153,6 @@ const AdvanceClaimPage = () => {
     ],
     [employees]
   );
-
-  const handleScrollToForm = () => {
-    setTimeout(() => {
-      if (!formRef.current) return;
-      let scrollParent: HTMLElement | null = formRef.current.parentElement;
-      while (scrollParent && scrollParent !== document.body) {
-        const style = getComputedStyle(scrollParent);
-        const canScroll = style.overflowY === 'auto' || style.overflowY === 'scroll';
-        if (canScroll && scrollParent.scrollHeight > scrollParent.clientHeight) {
-          break;
-        }
-        scrollParent = scrollParent.parentElement;
-      }
-
-      if (scrollParent) {
-        const formOffsetTop = formRef.current.offsetTop;
-        scrollParent.scrollTo({ top: formOffsetTop - 130, behavior: 'smooth' });
-      }
-    }, 100);
-  };
 
   return (
     <div className="p-6 space-y-6 font-sans">
@@ -149,19 +164,30 @@ const AdvanceClaimPage = () => {
           columns={columns}
           data={advanceClaims}
           onAddClick={() => {
-            setShowForm(true);
+            setActiveForm('new');
+            setSelectedClaim(null);
             handleScrollToForm();
           }}
         />
       </Card>
 
-      {showForm && (
+      {activeForm === 'new' && (
         <div ref={formRef}>
-          <RequestAdvanceForm setShowForm={setShowForm} />
+          <RequestAdvanceForm setShowForm={() => setActiveForm(null)} />
         </div>
       )}
 
-      <RequestAdvanceTopUpForm />
+      {activeForm === 'topup' && selectedClaim && (
+        <div ref={formRef}>
+          <RequestAdvanceTopUpForm
+            claim={selectedClaim}
+            onClose={() => {
+              setActiveForm(null);
+              setSelectedClaim(null);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

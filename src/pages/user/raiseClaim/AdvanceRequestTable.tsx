@@ -96,7 +96,7 @@
         },
     ], []);
     const filterClaimdata =  useMemo(() => {
-    return (claimdata).filter((claim) => claim.claimTypeName === 'Direct Claim');
+    return (claimdata)?.filter((claim) => claim.claimTypeName === 'Direct Claim');
   }, [claimdata]);
 
   console.log(filterClaimdata,'filter data')
@@ -131,15 +131,7 @@
             <ClaimSettlementList columns={columns} claimList={claimList} />
         </div>
 
-        {/* Checkbox to open RaiseClaim form */}
-        {/* <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-white rounded-xl">
-            <Checkbox id="new-request" onCheckedChange={handleCheckboxChange} checked={showForm} />
-            <label htmlFor="new-request" className="text-lg font-medium text-blue-800">
-            Direct Claim Request
-            </label>
-        </Card> */}
-
-        {/* Conditional RaiseClaim Form */}
+       
         {showForm && (
             <div className="mt-6" ref={formRef}>
             <RaiseClaim onCloseForm={() => setShowForm(false)} />
