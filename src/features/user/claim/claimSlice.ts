@@ -32,13 +32,29 @@ interface ClaimState {
   directLoading: boolean;
   directSuccess: boolean;
   directError: string | null;
+
+  advanceTopLoading: boolean;
+  advanceTopSuccess: boolean;
+  advanceTopError: string | null;
 }
 
 const initialState: ClaimState = {
   loading: false,
-  error: null as string | null,
+  error: null,
   success: false,
-  data: [] as any[], // Always an array for table compatibility
+  data: null,
+
+  advanceLoading: false,
+  advanceSuccess: false,
+  advanceError: null,
+
+  directLoading: false,
+  directSuccess: false,
+  directError: null,
+
+  advanceTopLoading: false,
+  advanceTopSuccess: false,
+  advanceTopError: null,
 };
 
 // ✅ Submit Advance Claim
@@ -76,29 +92,32 @@ export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', asy
   }
 });
 
-export const getMyClaims = createAsyncThunk(
-  'claim/getMyClaims',
-  async (empId: number, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);
-      // Defensive: ensure always array
-      if (Array.isArray(response.data)) {
-        return response.data;
-      } else if (Array.isArray(response.data.data)) {
-        return response.data.data;
-      } else if (response.data.data) {
-        return [response.data.data];
-      } else {
-        return [];
-      }
-    } catch (error: any) {
-      console.error('Error fetching claims:', error);
-      return rejectWithValue('Failed to fetch claims');
-    }
+// ✅ Get My Claims
+export const getMyClaims = createAsyncThunk('claim/getMyClaims', async (empId: number, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get(`/Claim/GetMyClaims/${empId}`);
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Error fetching claims:', error);
+    return rejectWithValue('Failed to fetch claims');
   }
-);
+});
 
+// ✅ Submit Advance Top-Up Claim
+export const submitAdvanceTopUpClaim = createAsyncThunk('claim/submitAdvanceTopUpClaim', async (formData: FormData, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/Claim/AdvanceTop', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
 
+    toast.success('Advance Top-Up submitted successfully!');
+    return response.data;
+  } catch (err: any) {
+    const message = err.response?.data?.message || err.message || 'Submission failed';
+    toast.error(message);
+    return rejectWithValue(message);
+  }
+});
 
 const claimSlice = createSlice({
   name: 'claim',
@@ -119,6 +138,11 @@ const claimSlice = createSlice({
       state.directLoading = false;
       state.directSuccess = false;
       state.directError = null;
+    },
+    resetAdvanceTopUpClaimState: (state) => {
+      state.advanceTopLoading = false;
+      state.advanceTopSuccess = false;
+      state.advanceTopError = null;
     },
   },
   extraReducers: (builder) => {
@@ -153,7 +177,22 @@ const claimSlice = createSlice({
         state.advanceError = action.payload as string;
       })
 
-      // 📦 My Claims
+      // 🟨 Advance Top-Up Claim
+      .addCase(submitAdvanceTopUpClaim.pending, (state) => {
+        state.advanceTopLoading = true;
+        state.advanceTopError = null;
+        state.advanceTopSuccess = false;
+      })
+      .addCase(submitAdvanceTopUpClaim.fulfilled, (state) => {
+        state.advanceTopLoading = false;
+        state.advanceTopSuccess = true;
+      })
+      .addCase(submitAdvanceTopUpClaim.rejected, (state, action) => {
+        state.advanceTopLoading = false;
+        state.advanceTopError = action.payload as string;
+      })
+
+      // 📦 Get My Claims
       .addCase(getMyClaims.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -161,7 +200,6 @@ const claimSlice = createSlice({
       .addCase(getMyClaims.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        // If submit returns a single object, push to array, else use as array
         if (Array.isArray(action.payload)) {
           state.data = action.payload;
         } else if (action.payload) {
@@ -172,14 +210,12 @@ const claimSlice = createSlice({
       })
       .addCase(getMyClaims.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Something went wrong';
+        state.error = action.payload as string;
         state.success = false;
-      })
-      
-      
+      });
   },
 });
 
-export const { resetClaimState, resetAdvanceClaimState, resetDirectClaimState } = claimSlice.actions;
+export const { resetClaimState, resetAdvanceClaimState, resetDirectClaimState, resetAdvanceTopUpClaimState } = claimSlice.actions;
 
 export default claimSlice.reducer;

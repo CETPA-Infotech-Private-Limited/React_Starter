@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog, Layout } from 'lucide-react';
+import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog, Layout, Hospital } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -22,11 +22,16 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: LayoutGrid,
       roles: ['admin', 'superAdmin', 'user'],
     },
-
     {
       title: 'User Mapping',
       url: '/user-role-mapping',
       icon: UserRoundCog,
+      roles: ['admin', 'superAdmin', 'user'],
+    },
+    {
+      title: 'Manage Hospital',
+      url: '/manage-hospital',
+      icon: Hospital,
       roles: ['admin', 'superAdmin', 'user'],
     },
   ];
