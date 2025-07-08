@@ -1,6 +1,6 @@
     'use client';
 
-    import { useEffect, useMemo, useState } from 'react';
+    import { useEffect, useMemo, useRef, useState } from 'react';
     import { Checkbox } from '@/components/ui/checkbox';
     import { Card } from '@/components/ui/card';
     import RaiseClaim from './RaiseClaim';
@@ -13,6 +13,7 @@
     const DirectRequestTable = () => {
     const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
     const [showForm, setShowForm] = useState(false);
+     const formRef = useRef<HTMLDivElement | null>(null);
 
     const user = useAppSelector((state) => state.user.EmpCode);
     const userdata = useAppSelector((state: RootState) => state.user);
@@ -29,7 +30,28 @@
     const handleCheckboxChange = (checked: boolean) => {
         setShowForm(checked);
     };
+      const handleButtonClick = () => {
+    setShowForm(true);
+  };
+  const handleScrollToForm = () => {
+    setTimeout(() => {
+      if (!formRef.current) return;
+      let scrollParent: HTMLElement | null = formRef.current.parentElement;
+      while (scrollParent && scrollParent !== document.body) {
+        const style = getComputedStyle(scrollParent);
+        const canScroll = style.overflowY === 'auto' || style.overflowY === 'scroll';
+        if (canScroll && scrollParent.scrollHeight > scrollParent.clientHeight) {
+          break;
+        }
+        scrollParent = scrollParent.parentElement;
+      }
 
+      if (scrollParent) {
+        const formOffsetTop = formRef.current.offsetTop;
+        scrollParent.scrollTo({ top: formOffsetTop - 130, behavior: 'smooth' });
+      }
+    }, 100);
+  };
     const columns = useMemo(() => [
         {
         accessorKey: 'srNo',
@@ -99,21 +121,27 @@
         <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
         {/* Claim Table Section */}
         <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
+            <div className='flex justify-between'>
             <h1 className="text-2xl font-bold text-blue-800 mb-4">Direct Claim List</h1>
+            <Button onClick={()=>{setShowForm(true)
+                handleScrollToForm()
+            }
+            }>+ New Direct Claim Request</Button>
+            </div>
             <ClaimSettlementList columns={columns} claimList={claimList} />
         </div>
 
         {/* Checkbox to open RaiseClaim form */}
-        <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-white rounded-xl">
+        {/* <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-white rounded-xl">
             <Checkbox id="new-request" onCheckedChange={handleCheckboxChange} checked={showForm} />
             <label htmlFor="new-request" className="text-lg font-medium text-blue-800">
             Direct Claim Request
             </label>
-        </Card>
+        </Card> */}
 
         {/* Conditional RaiseClaim Form */}
         {showForm && (
-            <div className="mt-6">
+            <div className="mt-6" ref={formRef}>
             <RaiseClaim onCloseForm={() => setShowForm(false)} />
             </div>
         )}

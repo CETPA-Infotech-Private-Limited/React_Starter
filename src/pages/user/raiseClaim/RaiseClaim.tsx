@@ -1,12 +1,13 @@
 'use client';
 import React, { useState } from 'react';
-import { submitDirectClaim, getMyClaims } from '@/features/user/claim/claimSlice'; // ✅ Added getMyClaims
+import { submitDirectClaim, getMyClaims } from '@/features/user/claim/claimSlice';
 import type { RootState } from '@/app/store';
 import PatientDetails from './PatientDetails';
 import BillDetailsForm from './BillDetails';
 import PreHospitalizationForm from './PreHospitalizationForm';
 import PostHospitalizationAndDeclaration from './PostHospital';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import Loader from '@/components/ui/loader'; // ✅ Imported loader
 
 interface ClaimRequest {
   IsSpecailDisease: boolean;
@@ -59,7 +60,6 @@ interface ClaimRequest {
   claimedTotal?: number;
 }
 
-
 type RaiseClaimProps = {
   onCloseForm: () => void;
 };
@@ -74,10 +74,56 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
+  const preHospBilledAmount = [
+    preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesConsultation?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesInvestigation?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationProcedure?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
 
+  const hospBilledAmount = [
+    ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Investigation?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.RoomRent?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Procedure?.map((b) => b.BilledAmount) || []),
+    billDetails?.OtherBill?.BilledAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
+
+  const hospClaimedAmount = [
+    ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Investigation?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.RoomRent?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Procedure?.map((b) => b.ClaimedAmount) || []),
+    billDetails?.OtherBill?.ClaimedAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
+
+  const netTotal = hospClaimedAmount + [
+    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
+
+  const postHospDetailsWithSummary = {
+    ...postHospDetails,
+    PreHospitalizationExpenseAmount: preHospBilledAmount,
+    HospitalizationExpenseAmount: hospBilledAmount,
+    PaidAmount: postHospDetails?.PaidAmount || 0,
+    NetTotal: netTotal,
+  };
+
+  const handleSubmit = async () => {
+
+    setIsSubmitting(true);
     try {
+      // your full formData logic here (no change made to that)
+
+      
+
       const rawPayload = {
         ...patientDetails,
         ...billDetails,
@@ -86,7 +132,9 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
       };
 
       const formData = new FormData();
+      // ... your formData.append() code here as before ...
 
+      
       formData.append('Unit', user.unitId);
       formData.append('PayTo', rawPayload.PayTo || 'Doctor');
       formData.append('patientId', String(user.EmpCode || 0));
@@ -192,8 +240,9 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
       }
 
+
       await dispatch(submitDirectClaim(formData));
-      await dispatch(getMyClaims(user.EmpCode)); // ✅ Refresh the claim list immediately
+      await dispatch(getMyClaims(user.EmpCode));
 
       setPatientDetails({});
       setBillDetails({});
@@ -207,67 +256,33 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     }
   };
 
-  const preHospBilledAmount = [
-    preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesConsultation?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesInvestigation?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationProcedure?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0);
-
-  const hospBilledAmount = [
-    ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.Investigation?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.RoomRent?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.Procedure?.map((b) => b.BilledAmount) || []),
-    billDetails?.OtherBill?.BilledAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0);
-
-  const hospClaimedAmount = [
-    ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.Investigation?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.RoomRent?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.Procedure?.map((b) => b.ClaimedAmount) || []),
-    billDetails?.OtherBill?.ClaimedAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0);
-
-  const netTotal = hospClaimedAmount + [
-    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0);
-
-  const postHospDetailsWithSummary = {
-    ...postHospDetails,
-    PreHospitalizationExpenseAmount: preHospBilledAmount,
-    HospitalizationExpenseAmount: hospBilledAmount,
-    PaidAmount: postHospDetails?.PaidAmount || 0,
-    NetTotal: netTotal,
-  };
-
   return (
     <div className="bg-gray-100 p-2 min-h-screen">
-      <div className="mt-4">
-        <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
-      </div>
-      <div className="mt-4">
-        <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
-      </div>
-      <div className="mt-4">
-        <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
-      </div>
-      <div className="">
-        <PostHospitalizationAndDeclaration
-          postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-          onChange={setPostHospDetails}
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-        />
-      </div>
+      {isSubmitting ? (
+        <div className="flex items-center justify-center h-full py-10">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          <div className="mt-4">
+            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
+          </div>
+          <div className="mt-4">
+            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
+          </div>
+          <div className="mt-4">
+            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
+          </div>
+          <div>
+            <PostHospitalizationAndDeclaration
+              postHospitalizationAndDeclaration={postHospDetailsWithSummary}
+              onChange={setPostHospDetails}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
