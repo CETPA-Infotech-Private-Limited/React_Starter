@@ -36,6 +36,10 @@ interface ClaimState {
   advanceTopLoading: boolean;
   advanceTopSuccess: boolean;
   advanceTopError: string | null;
+
+  approveAdvanceLoading: boolean;
+  approveAdvanceSuccess: boolean;
+  approveAdvanceError: string | null;
 }
 
 const initialState: ClaimState = {
@@ -55,6 +59,10 @@ const initialState: ClaimState = {
   advanceTopLoading: false,
   advanceTopSuccess: false,
   advanceTopError: null,
+
+  approveAdvanceLoading: false,
+  approveAdvanceSuccess: false,
+  approveAdvanceError: null,
 };
 
 // ✅ Submit Advance Claim
@@ -119,6 +127,22 @@ export const submitAdvanceTopUpClaim = createAsyncThunk('claim/submitAdvanceTopU
   }
 });
 
+// ✅ Approve Advance Claim
+export const approveAdvanceClaim = createAsyncThunk(
+  'claim/approveAdvanceClaim',
+  async (advanceId: number, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(`/Claim/ApproveAdvance/${advanceId}`);
+      toast.success('Advance claim approved successfully!');
+      return response.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || err.message || 'Approval failed';
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
 const claimSlice = createSlice({
   name: 'claim',
   initialState,
@@ -143,6 +167,11 @@ const claimSlice = createSlice({
       state.advanceTopLoading = false;
       state.advanceTopSuccess = false;
       state.advanceTopError = null;
+    },
+    resetApproveAdvanceState: (state) => {
+      state.approveAdvanceLoading = false;
+      state.approveAdvanceSuccess = false;
+      state.approveAdvanceError = null;
     },
   },
   extraReducers: (builder) => {
@@ -212,10 +241,31 @@ const claimSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
         state.success = false;
+      })
+
+      // ✅ Approve Advance Claim
+      .addCase(approveAdvanceClaim.pending, (state) => {
+        state.approveAdvanceLoading = true;
+        state.approveAdvanceError = null;
+        state.approveAdvanceSuccess = false;
+      })
+      .addCase(approveAdvanceClaim.fulfilled, (state) => {
+        state.approveAdvanceLoading = false;
+        state.approveAdvanceSuccess = true;
+      })
+      .addCase(approveAdvanceClaim.rejected, (state, action) => {
+        state.approveAdvanceLoading = false;
+        state.approveAdvanceError = action.payload as string;
       });
   },
 });
 
-export const { resetClaimState, resetAdvanceClaimState, resetDirectClaimState, resetAdvanceTopUpClaimState } = claimSlice.actions;
+export const {
+  resetClaimState,
+  resetAdvanceClaimState,
+  resetDirectClaimState,
+  resetAdvanceTopUpClaimState,
+  resetApproveAdvanceState,
+} = claimSlice.actions;
 
 export default claimSlice.reducer;
