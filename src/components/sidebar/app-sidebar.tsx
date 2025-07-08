@@ -55,6 +55,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: CheckCircle2,
       roles: ['user'],
     },
+     {
+      title: 'Banking',
+      url: '/Banking',
+      icon: IndianRupee,
+      roles: ['user'],
+    },
   ];
 
   const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));
