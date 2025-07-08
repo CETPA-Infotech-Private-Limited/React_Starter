@@ -8,31 +8,21 @@ import { fetchAdvanceData } from '@/features/medicalClaim/getAdvanceClaimSlice';
 import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
+import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 
 const ApproveAdvancePage = () => {
-  const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
   const dispatch = useAppDispatch();
-  const { data, loading, error } = useAppSelector((state: RootState) => state.getAdvanceClaim);
+  const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
+  const { data, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
+  const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
   const user = useAppSelector((state: RootState) => state.user);
   const { employees } = useAppSelector((state: RootState) => state.employee);
-
-  console.log('advance Claim Data', data);
-
-  const [formData, setFormData] = useState({
-    estimatedAmount: '',
-    approvedAmount: '',
-    declarationChecked: false,
-  });
 
   useEffect(() => {
     if (user?.EmpCode) {
       dispatch(fetchAdvanceData(Number(user.EmpCode)));
     }
   }, [dispatch, user?.EmpCode]);
-
-  const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
 
   const columns = useMemo(
     () => [
@@ -67,19 +57,15 @@ const ApproveAdvancePage = () => {
         accessorKey: 'relation',
         header: 'Relation',
         enableSorting: false,
-        cell: ({ row }: any) => {
-          return <div className="text-center">Self</div>;
-        },
+        cell: () => <div className="text-center">Self</div>,
         className: 'text-center',
       },
-
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
         cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
         className: 'text-center',
       },
-
       {
         accessorKey: 'advanceAmount',
         header: 'Claim Amount',
@@ -90,7 +76,6 @@ const ApproveAdvancePage = () => {
         },
         className: 'text-center',
       },
-
       {
         id: 'actions',
         header: 'Actions',
@@ -102,18 +87,8 @@ const ApproveAdvancePage = () => {
             onClick={(e) => {
               e.stopPropagation();
               const item = row.original;
-              const isSame = selectedAdvance?.id === item.id;
-              if (isSame) {
-                setSelectedAdvance(null);
-                setFormData({ estimatedAmount: '', approvedAmount: '', declarationChecked: false });
-              } else {
-                setSelectedAdvance(item);
-                setFormData({
-                  estimatedAmount: item.hospitalizationDetails.estimatedAmount.toString(),
-                  approvedAmount: '',
-                  declarationChecked: false,
-                });
-              }
+              dispatch(fetchClaimDetails(item.advanceId));
+              setSelectedAdvance(item);
             }}
           >
             <Eye className="w-4 h-4 mr-1" />
@@ -122,77 +97,46 @@ const ApproveAdvancePage = () => {
         ),
       },
     ],
-    [employees]
+    [employees, dispatch]
   );
 
   return (
-    <div className="bg-white text-xs p-8 rounded-2xl  font-sans space-y-10">
+    <div className="bg-white text-xs p-8 rounded-2xl font-sans space-y-10">
       <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Request List</h2>
         {loading && <Loader />}
-        <TableList
-          data={data}
-          columns={columns}
-          showSearchInput
-          showFilter
-          onRowClick={(row) => {
-            const isSame = selectedAdvance?.id === row.id;
-            if (isSame) {
-              setSelectedAdvance(null);
-            } else {
-              setSelectedAdvance(row);
-              setFormData({
-                estimatedAmount: row.hospitalizationDetails.estimatedAmount.toString(),
-                approvedAmount: '',
-                declarationChecked: false,
-              });
-            }
-          }}
-        />
+        <TableList data={data} columns={columns} showSearchInput showFilter onRowClick={() => {}} />
       </Card>
 
-      {/* {selectedAdvance && (
-        <div className="space-y-6">
-          <PatientDetailsCard {...selectedAdvance.patientDetails} />
-          <HospitalizationDetailsCard {...selectedAdvance.hospitalizationDetails} />
-          <BeneficiaryDetailsCard {...selectedAdvance.beneficiaryDetails} />
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Approval Form</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InputField label="Estimated Amount" value={formData.estimatedAmount} onChange={() => {}} readOnly />
-                <InputField label="Approved Amount" value={formData.approvedAmount} onChange={(e) => handleInputChange('approvedAmount', e.target.value)} />
-
-                <div className="md:col-span-2 mt-4 flex gap-2 items-start bg-blue-50 p-4 border border-blue-200 rounded-lg">
-                  <Checkbox
-                    id="declaration"
-                    checked={formData.declarationChecked}
-                    onCheckedChange={(checked) => handleInputChange('declarationChecked', checked)}
-                  />
-                  <Label htmlFor="declaration" className="text-sm text-gray-700 leading-relaxed">
-                    I hereby declare that the information given in this form is correct and complete to the best of my knowledge.
-                  </Label>
-                </div>
-
-                <div className="md:col-span-2 text-right">
-                  <Button
-                    className="bg-indigo-600 text-white"
-                    disabled={!formData.declarationChecked || !formData.approvedAmount}
-                    onClick={() => {
-                      // Handle approval logic
-                    }}
-                  >
-                    Approve Request
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )} */}
+      {selectedAdvance && (
+        <Card className="p-4 border border-blue-300 shadow-sm rounded-xl bg-white">
+          <h2 className="text-lg font-bold text-blue-700 mb-4">Advance Details - ID #{selectedAdvance.advanceId}</h2>
+          {detailsLoading && <Loader />}
+          {detailsError && <p className="text-red-500">Error: {detailsError}</p>}
+          {claimDetails && (
+            <div className="space-y-2 text-sm">
+              <p>
+                <strong>Hospital:</strong> {claimDetails.advanceBasicDetails.hospitalName}
+              </p>
+              <p>
+                <strong>Doctor:</strong> {claimDetails.advanceBasicDetails.doctorName}
+              </p>
+              <p>
+                <strong>Treatment Type:</strong> {claimDetails.advanceBasicDetails.treatmentType}
+              </p>
+              <p>
+                <strong>Diagnosis:</strong> {claimDetails.advanceBasicDetails.digonosis}
+              </p>
+              <p>
+                <strong>Estimated Amount:</strong> ₹{claimDetails.advanceBasicDetails.estimatedAmount}
+              </p>
+              <p>
+                <strong>Requested Date:</strong> {new Date(claimDetails.advanceBasicDetails.requestedDate).toLocaleString()}
+              </p>
+            </div>
+          )}
+        </Card>
+      )}
     </div>
   );
 };
