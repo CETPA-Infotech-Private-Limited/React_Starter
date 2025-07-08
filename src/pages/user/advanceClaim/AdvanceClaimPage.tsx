@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
@@ -14,6 +13,7 @@ import RequestAdvanceTopUpForm from '@/components/user/RequestAdvanceTopUpForm';
 const AdvanceClaimPage = () => {
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
+  const formRef = useRef<HTMLDivElement | null>(null);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const { data: claimList, loading } = useAppSelector((state: RootState) => state.claim);
@@ -23,10 +23,6 @@ const AdvanceClaimPage = () => {
       dispatch(getMyClaims(Number(user.EmpCode)));
     }
   }, [dispatch, user?.EmpCode]);
-
-  const handleCheckboxChange = (checked: boolean) => {
-    setShowForm(checked);
-  };
 
   const advanceClaims = useMemo(() => {
     return (claimList || []).filter((claim) => claim.claimTypeName === 'Advance');
@@ -123,21 +119,48 @@ const AdvanceClaimPage = () => {
     [employees]
   );
 
+  const handleScrollToForm = () => {
+    setTimeout(() => {
+      if (!formRef.current) return;
+      let scrollParent: HTMLElement | null = formRef.current.parentElement;
+      while (scrollParent && scrollParent !== document.body) {
+        const style = getComputedStyle(scrollParent);
+        const canScroll = style.overflowY === 'auto' || style.overflowY === 'scroll';
+        if (canScroll && scrollParent.scrollHeight > scrollParent.clientHeight) {
+          break;
+        }
+        scrollParent = scrollParent.parentElement;
+      }
+
+      if (scrollParent) {
+        const formOffsetTop = formRef.current.offsetTop;
+        scrollParent.scrollTo({ top: formOffsetTop - 130, behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   return (
     <div className="p-6 space-y-6 font-sans">
       {loading && <Loader />}
 
       <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Claim List</h2>
-        <RequestAdvanceTable columns={columns} data={advanceClaims} />
+        <RequestAdvanceTable
+          columns={columns}
+          data={advanceClaims}
+          onAddClick={() => {
+            setShowForm(true);
+            handleScrollToForm();
+          }}
+        />
       </Card>
-      <Card className="p-4 flex items-center gap-3 border border-blue-200 shadow-sm bg-blue-50 rounded-xl">
-        <Checkbox id="new-request" onCheckedChange={handleCheckboxChange} />
-        <label htmlFor="new-request" className="text-sm font-medium text-blue-800">
-          New Advance Request
-        </label>
-      </Card>
-      {showForm && <RequestAdvanceForm setShowForm={setShowForm} />}
+
+      {showForm && (
+        <div ref={formRef}>
+          <RequestAdvanceForm setShowForm={setShowForm} />
+        </div>
+      )}
+
       <RequestAdvanceTopUpForm />
     </div>
   );

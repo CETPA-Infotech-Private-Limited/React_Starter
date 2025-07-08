@@ -13,7 +13,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { ArrowUp, ArrowDown, ArrowUpDown, ListFilter, Search, Eye } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, ListFilter, Search, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
 
 import { Input } from './input';
 import { Button } from './button';
@@ -231,6 +231,7 @@ export default function TableList({
         </div>
         <div className="flex items-center gap-1">
           <Button variant="outline" size="sm" disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
+            <ChevronLeft />
             Previous
           </Button>
 
@@ -240,14 +241,14 @@ export default function TableList({
                 …
               </span>
             ) : (
-              <Button key={btn} variant={btn === pageIndex ? 'default' : 'outline'} size="sm" onClick={() => table.setPageIndex(btn)}>
+              <Button key={btn} variant={btn === pageIndex ? 'default' : 'secondary'} size="sm" onClick={() => table.setPageIndex(btn)}>
                 {btn + 1}
               </Button>
             )
           )}
 
           <Button variant="outline" size="sm" disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
-            Next
+            Next <ChevronRight />
           </Button>
         </div>
       </div>

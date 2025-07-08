@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, UserRoundCog } from 'lucide-react';
+import { Home, FilePlus2, IndianRupee, Stamp, SearchCheck, CheckCircle2, LogOut, ChevronsLeft, ChevronsRight, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -22,39 +22,37 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     {
       title: 'Dashboard',
       url: '/dashboard',
-      icon: LayoutGrid,
+      icon: Home,
       roles: ['user'],
     },
-
     {
       title: 'Raise Claim',
       url: '/raise-claim',
-      icon: LayoutGrid,
+      icon: FilePlus2,
       roles: ['user'],
     },
     {
       title: 'Request Advance',
       url: '/request-advance',
-      icon: FileText,
+      icon: IndianRupee,
       roles: ['user'],
     },
     {
-      title: 'Approve Claim',
-      url: '/ClaimAfterDoctorReview',
-      icon: FileText,
+      title: 'Approve Advance',
+      url: '/approve-advance',
+      icon: Stamp,
       roles: ['user'],
     },
     {
       title: 'Review Claim',
       url: '/review-claim',
-      icon: FileText,
+      icon: SearchCheck,
       roles: ['user'],
     },
-
     {
-      title: 'Approve Advance',
-      url: '/approve-advance',
-      icon: FileText,
+      title: 'Approve Claim',
+      url: '/ClaimAfterDoctorReview',
+      icon: CheckCircle2,
       roles: ['user'],
     },
   ];
@@ -91,7 +89,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               className={`${menuButtonBaseClass} text-black`}
             >
               <div className="flex items-center gap-2">
-                <Hotel size={24} />
+                <Building2 size={24} />
                 <span>Manage Organization</span>
               </div>
             </SidebarMenuButton>
