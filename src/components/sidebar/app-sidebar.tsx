@@ -41,19 +41,19 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       title: 'Approve Advance',
       url: '/approve-advance',
       icon: Stamp,
-      roles: ['user'],
+      roles: ['HR1', 'HR2'],
     },
     {
       title: 'Review Claim',
       url: '/review-claim',
       icon: SearchCheck,
-      roles: ['user'],
+      roles: ['HR1', 'HR2'],
     },
     {
       title: 'Approve Claim',
       url: '/ClaimAfterDoctorReview',
       icon: CheckCircle2,
-      roles: ['user'],
+      roles: ['HR1', 'HR2'],
     },
   ];
 

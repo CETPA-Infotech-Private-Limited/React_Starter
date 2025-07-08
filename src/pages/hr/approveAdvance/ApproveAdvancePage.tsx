@@ -9,6 +9,12 @@ import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice'
 import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
+import { PatientDetailsCard } from '@/components/hr/advanceApprove/PatientDetailsTable';
+import { HospitalizationDetailsCard } from '@/components/hr/advanceApprove/HospitalizationDetailsCard';
+import { BeneficiaryDetailsCard } from '@/components/hr/advanceApprove/BeneficiaryDetails';
+import AdvanceApprovalForm from '@/components/hr/advanceApprove/AdvanceApprovalForm';
+import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
+import toast from 'react-hot-toast';
 
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +22,8 @@ const ApproveAdvancePage = () => {
 
   const { data, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
   const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
+  const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
+
   const user = useAppSelector((state: RootState) => state.user);
   const { employees } = useAppSelector((state: RootState) => state.employee);
 
@@ -24,6 +32,19 @@ const ApproveAdvancePage = () => {
       dispatch(fetchAdvanceData(Number(user.EmpCode)));
     }
   }, [dispatch, user?.EmpCode]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success('Advance approved successfully!');
+      dispatch(resetAdvanceApprovalState());
+      dispatch(fetchAdvanceData(Number(user.EmpCode)));
+      setSelectedAdvance(null);
+    }
+    if (error) {
+      toast.error(error);
+      dispatch(resetAdvanceApprovalState());
+    }
+  }, [success, error, dispatch]);
 
   const columns = useMemo(
     () => [
@@ -92,7 +113,7 @@ const ApproveAdvancePage = () => {
               onClick={(e) => {
                 e.stopPropagation();
                 if (isSelected) {
-                  setSelectedAdvance(null); // Hide details
+                  setSelectedAdvance(null);
                 } else {
                   dispatch(fetchClaimDetails(item.advanceId));
                   setSelectedAdvance(item);
@@ -109,8 +130,33 @@ const ApproveAdvancePage = () => {
     [employees, dispatch, selectedAdvance]
   );
 
-  // Add a row class name callback
-  const rowClassName = (row: any) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-yellow-100' : '');
+  const getPatientDetails = () => {
+    if (!selectedAdvance) return null;
+    const result = findEmployeeDetails(employees, String(selectedAdvance.patientId));
+    return {
+      name: result?.employee?.empName || 'Unknown',
+      relation: 'Self',
+      dob: 'Not Available',
+      gender: 'Not Available',
+    };
+  };
+
+  const handleSubmitAdvanceRequest = ({ approvedAmount }: { approvedAmount: number }) => {
+    if (!selectedAdvance || !user.EmpCode) return;
+
+    dispatch(
+      submitAdvanceApproval({
+        AdvanceId: Number(selectedAdvance.advanceId),
+        SenderId: Number(user.EmpCode),
+        RecipientId: 101002,
+        ClaimTypeId: 1,
+        StatusId: 2,
+        ApprovalAmount: approvedAmount,
+      })
+    );
+  };
+
+  const patientDetails = getPatientDetails();
 
   return (
     <div className="bg-white text-xs p-8 rounded-2xl font-sans space-y-10">
@@ -123,38 +169,58 @@ const ApproveAdvancePage = () => {
           showSearchInput
           showFilter
           onRowClick={() => {}}
-          rowClassName={(row) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-primary border-l-2 border-primary' : '')}
+          rowClassName={(row) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-blue-50 border-l-2 border-blue-600' : '')}
         />
       </Card>
 
-      {selectedAdvance && (
-        <Card className="p-4 border border-blue-300 shadow-sm rounded-xl bg-white">
-          <h2 className="text-lg font-bold text-blue-700 mb-4">Advance Details - ID #{selectedAdvance.advanceId}</h2>
+      {selectedAdvance && patientDetails && (
+        <>
           {detailsLoading && <Loader />}
-          {detailsError && <p className="text-red-500">Error: {detailsError}</p>}
-          {claimDetails && (
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>Hospital:</strong> {claimDetails.advanceBasicDetails.hospitalName}
-              </p>
-              <p>
-                <strong>Doctor:</strong> {claimDetails.advanceBasicDetails.doctorName}
-              </p>
-              <p>
-                <strong>Treatment Type:</strong> {claimDetails.advanceBasicDetails.treatmentType}
-              </p>
-              <p>
-                <strong>Diagnosis:</strong> {claimDetails.advanceBasicDetails.digonosis}
-              </p>
-              <p>
-                <strong>Estimated Amount:</strong> ₹{claimDetails.advanceBasicDetails.estimatedAmount}
-              </p>
-              <p>
-                <strong>Requested Date:</strong> {new Date(claimDetails.advanceBasicDetails.requestedDate).toLocaleString()}
-              </p>
-            </div>
+          <h2 className="text-xl font-bold text-blue-700 mb-4">Patient Details & Advance Details</h2>
+          <PatientDetailsCard {...patientDetails} />
+
+          {claimDetails?.advanceBasicDetails && (
+            <HospitalizationDetailsCard
+              hospitalName={claimDetails.advanceBasicDetails.hospitalName || '-'}
+              regdNo={claimDetails.advanceBasicDetails.hospitalRegNo || '-'}
+              admissionDate={claimDetails.advanceBasicDetails.likelyDate || ''}
+              treatmentType={claimDetails.advanceBasicDetails.treatmentType || '-'}
+              diagnosis={claimDetails.advanceBasicDetails.digonosis || '-'}
+              estimatedAmount={claimDetails.advanceBasicDetails.estimatedAmount || 0}
+              advanceRequested={claimDetails.advanceBasicDetails.advanceAmount || 0}
+              doctorName={claimDetails.advanceBasicDetails.doctorName || '-'}
+              payTo={claimDetails.advanceBasicDetails.payTo || '-'}
+              estimateFiles={
+                Array.isArray(claimDetails.documentLists)
+                  ? claimDetails.documentLists.filter((doc) => doc.category === 'EstimateAmount').map((doc) => doc.pathUrl)
+                  : []
+              }
+              admissionAdviceFiles={
+                Array.isArray(claimDetails.documentLists)
+                  ? claimDetails.documentLists.filter((doc) => doc.category === 'AdmissionAdviceUpload').map((doc) => doc.pathUrl)
+                  : []
+              }
+              incomeProofFiles={[]}
+            />
           )}
-        </Card>
+
+          {claimDetails?.hospitalAccoundetail && (
+            <BeneficiaryDetailsCard
+              beneficiaryName={claimDetails.hospitalAccoundetail.beneficiaryName}
+              bankName={claimDetails.hospitalAccoundetail.bankName}
+              accountNumber={claimDetails.hospitalAccoundetail.accountNumber}
+              branchName={claimDetails.hospitalAccoundetail.branchName}
+              ifscCode={claimDetails.hospitalAccoundetail.ifscCode}
+              hospitalGSTNo={claimDetails.hospitalAccoundetail.hospitalGSTNo}
+              utrNo={claimDetails.hospitalAccoundetail.utrNo}
+              transactionDate={claimDetails.hospitalAccoundetail.transactionDate}
+              sapRefNumber={claimDetails.hospitalAccoundetail.sapRefNumber}
+              sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
+            />
+          )}
+
+          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} />
+        </>
       )}
     </div>
   );
