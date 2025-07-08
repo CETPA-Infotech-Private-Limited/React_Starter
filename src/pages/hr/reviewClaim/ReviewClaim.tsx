@@ -6,11 +6,35 @@ import ViewClaimDetails from '@/components/hr/reviewclaim/ViewClaimDetails';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewclaim/HospitalizationBillView';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import { findEmployeeDetails } from '@/lib/helperFunction';
 
   const ReviewClaim = () => {
+    const dispatch = useAppDispatch()
+      
+       const claimHrData = useAppSelector((state:RootState)=>state.getClaimHr.data)
+     
+      console.log(claimHrData,"this is the data")
+       const { employees } = useAppSelector((state: RootState) => state.employee);
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
+
+  const user = useAppSelector((state:RootState)=>state.user)
+  console.log(user, "this is userDetails")
+
+useEffect(() => {
+  if (user?.EmpCode) {
+    dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+  }
+}, [user?.EmpCode]); // ✅ Correct dependencies
+
+
+
+  
+  
 
   // Auto scroll to details when toggled on
   useEffect(() => {
@@ -84,24 +108,37 @@ import HospitalizationBillView from '@/components/hr/reviewclaim/Hospitalization
     [selectedClaim, showDetails]
   );
 
-  const claimList = [
-    {
-      id: 'CLM002',
-      employeeName: 'Alice Smith',
-      patientName: 'Bob Smith',
-      relation: 'Son',
-      requestedDate: '2025-06-25',
-      claimAmount: 1200,
-    },
-    {
-      id: 'CLM003',
-      employeeName: 'Raj Patel',
-      patientName: 'Rina Patel',
-      relation: 'Daughter',
-      requestedDate: '2025-06-15',
-      claimAmount: 800,
-    },
-  ];
+  const empData = findEmployeeDetails(employees, user.EmpCode)
+  console.log(empData,"this is emp data")
+
+  const claimList = Array.isArray(claimHrData)
+  ? claimHrData.map((value, index) => ({
+      id: value.claimId,
+      employeeName: empData.employee.empName,
+      patientName: empData.employee.empName,
+      relation: 'Self', // if not available
+      requestedDate: new Date(value.requestDate).toLocaleDateString(),
+      claimAmount: value.cliamAmount,
+    }))
+  : [];
+
+  //   {
+  //     id: 'CLM002',
+  //     employeeName: 'Alice Smith',
+  //     patientName: 'Bob Smith',
+  //     relation: 'Son',
+  //     requestedDate: '2025-06-25',
+  //     claimAmount: 1200,
+  //   },
+  //   {
+  //     id: 'CLM003',
+  //     employeeName: 'Raj Patel',
+  //     patientName: 'Rina Patel',
+  //     relation: 'Daughter',
+  //     requestedDate: '2025-06-15',
+  //     claimAmount: 800,
+  //   },
+  // ];
 
   return (
     <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">

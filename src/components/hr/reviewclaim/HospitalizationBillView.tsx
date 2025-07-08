@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Eye, FileText, Download, Printer, CheckCircle, XCircle, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader, StatusBadge } from './ReviewComponents';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { findEmployeeDetails } from '@/lib/helperFunction';
+import { getMyClaims } from '@/features/user/claim/claimSlice';
+import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 
-const HospitalizationBillView = () => {
+const HospitalizationBillView = (directClaimid) => {
+
+  const user = useAppSelector((state:RootState)=>state.user)
+  const directIdData= useAppSelector((state:RootState)=>state.getClaimHr.data)
+  console.log(directIdData, 'directids')
+  const { employees } = useAppSelector((state: RootState) => state.employee);
+  const empData = findEmployeeDetails(employees, user.EmpCode)
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (user?.EmpCode) {
+      dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+    }
+  }, [dispatch]);
+  
+  useEffect(()=>{
+    dispatch(getMyClaims(user.EmpCode))
+  },[dispatch])
+
+useEffect(()=>{
+    dispatch(getClaimDataHr())
+  },[dispatch])
+
+  const myClaims = useAppSelector((state:RootState)=>state.user)
+  console.log(myClaims, "these are my claims")
+
+
   const billItems = [
     {
       id: 1,
@@ -31,8 +62,8 @@ const HospitalizationBillView = () => {
 
   const formData = {
     claimNumber: 'CLM-2024-000156',
-    patientName: 'John Doe',
-    employeeId: 'EMP001234',
+    patientName: empData.employee.empName,
+    employeeId: empData.employee.empId,
     hospitalName: 'City General Hospital',
     dateOfAdmission: '2024-12-20',
     dateOfDischarge: '2024-12-25',
@@ -43,7 +74,7 @@ const HospitalizationBillView = () => {
     postHospitalization: 'Yes',
     totalClaimRequested: 98600.0,
     approvedAmount: 95400.0,
-    status: 'Approved',
+    status: "approve",
     clarificationNote: 'All documents verified and claim processed as per company policy.',
   };
 
