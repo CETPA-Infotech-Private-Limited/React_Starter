@@ -275,21 +275,21 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
         console.log(updatedBills, 'Updated Bills'); // Log updated bills for debugging
         setErrors((prev) => ({ ...prev, [id]: errorMsg }));
         // Map local state to API structure and call onChange
-        const apiBillDetails = {
-            MedicenBill: [{ BilledAmount: Number(updatedBills[0].billedAmount), ClaimedAmount: Number(updatedBills[0].claimedAmount) }],
-            Consultation: [{ BilledAmount: Number(updatedBills[1].billedAmount), ClaimedAmount: Number(updatedBills[1].claimedAmount) }],
-            Investigation: [{ BilledAmount: Number(updatedBills[2].billedAmount), ClaimedAmount: Number(updatedBills[2].claimedAmount) }],
-            RoomRent: [{ BilledAmount: Number(updatedBills[3].billedAmount), ClaimedAmount: Number(updatedBills[3].claimedAmount) }],
-            Procedure: [{ BilledAmount: Number(updatedBills[4].billedAmount), ClaimedAmount: Number(updatedBills[4].claimedAmount) }],
-            OtherBill: {
-                BilledAmount: Number(updatedBills[5].billedAmount),
-                ClaimedAmount: Number(updatedBills[5].claimedAmount),
-            },
-            NotIncluded:notincludes,
-            claimedTotal:claimedTotal
-        };
-        console.log(apiBillDetails, 'API Bill Details'); // Log API bill details for debugging
-        onChange(apiBillDetails);
+        // const apiBillDetails = {
+        //     MedicenBill: [{ BilledAmount: Number(updatedBills[0].billedAmount), ClaimedAmount: Number(updatedBills[0].claimedAmount) }],
+        //     Consultation: [{ BilledAmount: Number(updatedBills[1].billedAmount), ClaimedAmount: Number(updatedBills[1].claimedAmount) }],
+        //     Investigation: [{ BilledAmount: Number(updatedBills[2].billedAmount), ClaimedAmount: Number(updatedBills[2].claimedAmount) }],
+        //     RoomRent: [{ BilledAmount: Number(updatedBills[3].billedAmount), ClaimedAmount: Number(updatedBills[3].claimedAmount) }],
+        //     Procedure: [{ BilledAmount: Number(updatedBills[4].billedAmount), ClaimedAmount: Number(updatedBills[4].claimedAmount) }],
+        //     OtherBill: {
+        //         BilledAmount: Number(updatedBills[5].billedAmount),
+        //         ClaimedAmount: Number(updatedBills[5].claimedAmount),
+        //     },
+        //     NotIncluded:notincludes,
+        //     claimedTotal:claimedTotal
+        // };
+        // console.log(apiBillDetails, 'API Bill Details'); // Log API bill details for debugging
+        // onChange(apiBillDetails);
     };
 
     const handleUploadCompleteForBill = (billId: number, uploadedItems: UploadedItem[]) => {
@@ -384,16 +384,39 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                                             {bill.isDefault && (bill.type === 'Room Rent' || bill.type === 'Procedure') ? (
                                                 <span className="italic text-gray-400">Not Applicable</span>
                                             ) : !bill.included ? (
-                                                <UploadDialog
-                                                    files={bill.files}
-                                                    onFilesChange={(files) => {
-                                                        const updatedBills = bills.map((b) =>
-                                                            b.id === bill.id ? { ...b, files } : b
-                                                        );
-                                                        setBills(updatedBills);
-                                                        // Optionally, update parent state here if needed
-                                                    }}
-                                                />
+                                               <UploadDialog
+  files={bill.files}
+  onFilesChange={(files) => {
+    const updatedBills = bills.map((b) =>
+      b.id === bill.id ? { ...b, files } : b
+    );
+    setBills(updatedBills);
+
+    // ✅ also trigger onChange here
+    const notincludes = updatedBills.filter((bill) => !bill.included);
+    const claimedTotal = updatedBills.reduce(
+      (sum, bill) => sum + parseFloat(bill.claimedAmount || '0'),
+      0
+    );
+
+    const apiBillDetails = {
+      MedicenBill: [{ BilledAmount: Number(updatedBills[0].billedAmount), ClaimedAmount: Number(updatedBills[0].claimedAmount) }],
+      Consultation: [{ BilledAmount: Number(updatedBills[1].billedAmount), ClaimedAmount: Number(updatedBills[1].claimedAmount) }],
+      Investigation: [{ BilledAmount: Number(updatedBills[2].billedAmount), ClaimedAmount: Number(updatedBills[2].claimedAmount) }],
+      RoomRent: [{ BilledAmount: Number(updatedBills[3].billedAmount), ClaimedAmount: Number(updatedBills[3].claimedAmount) }],
+      Procedure: [{ BilledAmount: Number(updatedBills[4].billedAmount), ClaimedAmount: Number(updatedBills[4].claimedAmount) }],
+      OtherBill: {
+        BilledAmount: Number(updatedBills[5].billedAmount),
+        ClaimedAmount: Number(updatedBills[5].claimedAmount),
+      },
+      NotIncluded: notincludes,
+      claimedTotal: claimedTotal,
+    };
+
+    onChange(apiBillDetails);
+  }}
+/>
+
                                             ) : (
                                                 <span className="italic text-gray-400">Not Applicable</span>
                                             )}
