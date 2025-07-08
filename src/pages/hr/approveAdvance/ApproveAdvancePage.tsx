@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Eye } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import TableList from '@/components/ui/data-table';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchAdvanceData } from '@/features/medicalClaim/getAdvanceClaimSlice';
+import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
-import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
+
   const { data, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
   const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
   const user = useAppSelector((state: RootState) => state.user);
@@ -79,33 +80,51 @@ const ApproveAdvancePage = () => {
       {
         id: 'actions',
         header: 'Actions',
-        cell: ({ row }: any) => (
-          <Button
-            variant="link"
-            size="sm"
-            className="text-blue-600"
-            onClick={(e) => {
-              e.stopPropagation();
-              const item = row.original;
-              dispatch(fetchClaimDetails(item.advanceId));
-              setSelectedAdvance(item);
-            }}
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            View
-          </Button>
-        ),
+        cell: ({ row }: any) => {
+          const item = row.original;
+          const isSelected = selectedAdvance?.advanceId === item.advanceId;
+
+          return (
+            <Button
+              variant="link"
+              size="sm"
+              className="text-blue-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isSelected) {
+                  setSelectedAdvance(null); // Hide details
+                } else {
+                  dispatch(fetchClaimDetails(item.advanceId));
+                  setSelectedAdvance(item);
+                }
+              }}
+            >
+              {isSelected ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+              {isSelected ? 'Hide' : 'View'}
+            </Button>
+          );
+        },
       },
     ],
-    [employees, dispatch]
+    [employees, dispatch, selectedAdvance]
   );
+
+  // Add a row class name callback
+  const rowClassName = (row: any) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-yellow-100' : '');
 
   return (
     <div className="bg-white text-xs p-8 rounded-2xl font-sans space-y-10">
       <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Request List</h2>
         {loading && <Loader />}
-        <TableList data={data} columns={columns} showSearchInput showFilter onRowClick={() => {}} />
+        <TableList
+          data={data}
+          columns={columns}
+          showSearchInput
+          showFilter
+          onRowClick={() => {}}
+          rowClassName={(row) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-primary border-l-2 border-primary' : '')}
+        />
       </Card>
 
       {selectedAdvance && (

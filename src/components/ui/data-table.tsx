@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import {
   ColumnFiltersState,
@@ -13,7 +11,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { ArrowUp, ArrowDown, ArrowUpDown, ListFilter, Search, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, ListFilter, Search, ChevronRight, ChevronLeft } from 'lucide-react';
 
 import { Input } from './input';
 import { Button } from './button';
@@ -29,6 +27,7 @@ interface TableListProps {
   rightElements?: React.ReactNode;
   showSearchInput?: boolean;
   onRowClick?: (rowData: any) => void;
+  rowClassName?: (row: any) => string; // ✅ New prop
 }
 
 export default function TableList({
@@ -40,6 +39,7 @@ export default function TableList({
   rightElements,
   inputPlaceholder = 'Search...',
   onRowClick,
+  rowClassName,
 }: TableListProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -187,7 +187,9 @@ export default function TableList({
                 <tr
                   key={row.id}
                   onClick={() => onRowClick?.(row.original)}
-                  className="odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition-colors duration-200 cursor-pointer border-b border-blue-100"
+                  className={`odd:bg-white even:bg-blue-50 hover:bg-blue-100 transition-colors duration-200 cursor-pointer border-b border-blue-100 ${
+                    rowClassName?.(row) || ''
+                  }`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-4 py-3 text-center">
