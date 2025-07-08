@@ -1,53 +1,109 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye } from 'lucide-react';
+import { EyeIcon, EyeOff } from 'lucide-react';
 import { BeneficiaryDetailsCard } from '@/components/hr/approveadvance/BeneficiaryDetails';
 import { HospitalizationDetailsCard } from '@/components/hr/approveadvance/HospitalizationDetailsCard';
 import { PatientDetailsCard } from '@/components/hr/approveadvance/PatientDetailsTable';
-import TableList from '@/components/ui/data-table';
-
-const InputField = ({
-  label,
-  value,
-  onChange,
-  placeholder = '',
-  readOnly = false,
-}: {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  readOnly?: boolean;
-}) => (
-  <div className="flex flex-col gap-1">
-    <Label className="text-blue-800 text-sm font-semibold">{label}</Label>
-    <Input
-      className={`border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 ${readOnly ? 'bg-gray-100' : ''}`}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      readOnly={readOnly}
-    />
-  </div>
-);
+import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
+import { DisplayField, InfoCard, StatusBadge } from '@/components/hr/reviewclaim/ReviewComponents';
 
 const ApproveAdvance = () => {
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const detailsRef = useRef<HTMLDivElement>(null);
+  
   const [formData, setFormData] = useState({
     estimatedAmount: '',
     approvedAmount: '',
     declarationChecked: false,
   });
 
+  // Auto scroll to details when toggled on
+  useEffect(() => {
+    if (showDetails && detailsRef.current) {
+      detailsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [showDetails]);
+
+  const handleViewToggle = (rowData: any) => {
+    const isSame = selectedAdvance?.id === rowData.id;
+    if (isSame) {
+      const shouldShow = !showDetails;
+      setShowDetails(shouldShow);
+      if (!shouldShow) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      setSelectedAdvance(rowData);
+      setShowDetails(true);
+      setFormData({
+        estimatedAmount: rowData.hospitalizationDetails.estimatedAmount.toString(),
+        approvedAmount: '',
+        declarationChecked: false,
+      });
+    }
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'srNo',
+        header: 'Sr. No',
+        cell: ({ row }: any) => row.index + 1,
+      },
+      {
+        accessorKey: 'employeeName',
+        header: 'Employee Name',
+      },
+      {
+        accessorKey: 'patientName',
+        header: 'Patient Name',
+      },
+      {
+        accessorKey: 'relation',
+        header: 'Relation',
+      },
+      {
+        accessorKey: 'requestedDate',
+        header: 'Requested Date',
+      },
+      {
+        accessorKey: 'requestedAmount',
+        header: 'Advance Requested (₹)',
+        cell: ({ getValue }: any) => `₹ ${getValue().toLocaleString()}`,
+      },
+      {
+        accessorKey: 'action',
+        header: 'Action',
+        cell: ({ row }: any) => {
+          const rowData = row.original;
+          const isSelected = selectedAdvance?.id === rowData.id;
+
+          return (
+            <Button
+              size="sm"
+              onClick={() => handleViewToggle(rowData)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+            >
+              {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+              {isSelected && showDetails ? 'Hide' : 'View'}
+            </Button>
+          );
+        },
+      },
+    ],
+    [selectedAdvance, showDetails]
+  );
 
   const advanceList = [
     {
@@ -57,11 +113,14 @@ const ApproveAdvance = () => {
       relation: 'Self',
       requestedDate: '2025-06-20',
       requestedAmount: 20000,
+      status: 'Pending',
+      advanceNumber: 'ADV-2025-001',
       patientDetails: {
         name: 'Anil Singh',
         relation: 'Self',
         dob: 'Jan 01, 1980',
         gender: 'Male',
+        employeeId: 'EMP001234',
       },
       hospitalizationDetails: {
         hospitalName: 'Apollo Hospitals',
@@ -88,108 +147,130 @@ const ApproveAdvance = () => {
         utrNo: 'UTR9876543210',
       },
     },
+    {
+      id: 2,
+      employeeName: 'Priya Patel',
+      patientName: 'Rohit Patel',
+      relation: 'Son',
+      requestedDate: '2025-06-15',
+      requestedAmount: 15000,
+      status: 'Pending',
+      advanceNumber: 'ADV-2025-002',
+      patientDetails: {
+        name: 'Rohit Patel',
+        relation: 'Son',
+        dob: 'Mar 15, 2010',
+        gender: 'Male',
+        employeeId: 'EMP001235',
+      },
+      hospitalizationDetails: {
+        hospitalName: 'Fortis Hospital',
+        admissionDate: '2025-07-10',
+        treatmentType: 'Allopathic',
+        diagnosis: 'Appendix Surgery',
+        estimatedAmount: 18000,
+        payTo: 'Hospital',
+        regdNo: 'HOS789012',
+        doctorName: 'Dr. Rajesh Kumar',
+        advanceRequested: 15000,
+        estimateFiles: [],
+        admissionAdviceFiles: [],
+        incomeProofFiles: [],
+      },
+      beneficiaryDetails: {
+        beneficiaryName: 'Fortis Healthcare Limited',
+        bankName: 'ICICI Bank',
+        accountNo: '12345678901234',
+        sapRefNo: 'SAP-FOR-54321',
+        transactionDate: '2025-06-20',
+        gstNo: '29ABCDE5678F1Z5',
+        ifscCode: 'ICIC0001234',
+        utrNo: 'UTR5432109876',
+      },
+    },
   ];
 
-  const columns = [
-    {
-      accessorKey: 'id',
-      header: 'Sr No',
-      cell: ({ row }: any) => row.index + 1,
-    },
-    {
-      accessorKey: 'employeeName',
-      header: 'Employee Name',
-    },
-    {
-      accessorKey: 'patientName',
-      header: 'Patient Name',
-    },
-    {
-      accessorKey: 'relation',
-      header: 'Relation',
-    },
-    {
-      accessorKey: 'requestedDate',
-      header: 'Requested Date',
-    },
-    {
-      accessorKey: 'requestedAmount',
-      header: 'Advance Requested (₹)',
-      cell: ({ row }: any) => `₹ ${row.original.requestedAmount.toLocaleString()}`,
-    },
-    {
-      id: 'actions',
-      header: 'Actions',
-      cell: ({ row }: any) => (
-        <Button
-          variant="link"
-          size="sm"
-          className="text-blue-600"
-          onClick={(e) => {
-            e.stopPropagation();
-            const item = row.original;
-            const isSame = selectedAdvance?.id === item.id;
-            if (isSame) {
-              setSelectedAdvance(null);
-              setFormData({ estimatedAmount: '', approvedAmount: '', declarationChecked: false });
-            } else {
-              setSelectedAdvance(item);
-              setFormData({
-                estimatedAmount: item.hospitalizationDetails.estimatedAmount.toString(),
-                approvedAmount: '',
-                declarationChecked: false,
-              });
-            }
-          }}
-        >
-          <Eye className="w-4 h-4 mr-1" />
-          View
-        </Button>
-      ),
-    },
-  ];
+  const handleApprove = () => {
+    if (selectedAdvance && formData.approvedAmount && formData.declarationChecked) {
+      console.log('Approving advance:', {
+        advanceId: selectedAdvance.id,
+        approvedAmount: formData.approvedAmount,
+        declaredBy: 'Current User',
+      });
+      // Add your approval logic here
+    }
+  };
 
   return (
-    <div className="bg-white text-xs p-8 rounded-2xl  font-sans space-y-10">
-      <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
-        <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Request List</h2>
-        <TableList
-          data={advanceList}
-          columns={columns}
-          showSearchInput
-          showFilter
-          onRowClick={(row) => {
-            const isSame = selectedAdvance?.id === row.id;
-            if (isSame) {
-              setSelectedAdvance(null);
-            } else {
-              setSelectedAdvance(row);
-              setFormData({
-                estimatedAmount: row.hospitalizationDetails.estimatedAmount.toString(),
-                approvedAmount: '',
-                declarationChecked: false,
-              });
-            }
-          }}
-        />
-      </Card>
+    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      <ClaimSettlementList columns={columns} claimList={advanceList} />
+      
+      {selectedAdvance && showDetails && (
+        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
+          <div className="p-6 bg-white">
+            {/* Header Section */}
+            <div className="mb-8 border-b border-gray-200 pb-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 mb-2">Advance Request Details</h1>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-600">
+                      Advance #: <span className="font-medium text-gray-900">{selectedAdvance.advanceNumber}</span>
+                    </span>
+                    <StatusBadge status={selectedAdvance.status} type="pending" />
+                  </div>
+                </div>
+              </div>
+            </div>
 
-      {selectedAdvance && (
-        <div className="space-y-6">
-          <PatientDetailsCard {...selectedAdvance.patientDetails} />
-          <HospitalizationDetailsCard {...selectedAdvance.hospitalizationDetails} />
-          <BeneficiaryDetailsCard {...selectedAdvance.beneficiaryDetails} />
+            {/* Patient Information */}
+            <div className="mb-8">
+              <PatientDetailsCard {...selectedAdvance.patientDetails} />
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Approval Form</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InputField label="Estimated Amount" value={formData.estimatedAmount} onChange={() => {}} readOnly />
-                <InputField label="Approved Amount" value={formData.approvedAmount} onChange={(e) => handleInputChange('approvedAmount', e.target.value)} />
+            {/* Hospitalization Details */}
+            <div className="mb-8">
+              <HospitalizationDetailsCard {...selectedAdvance.hospitalizationDetails} />
+            </div>
 
-                <div className="md:col-span-2 mt-4 flex gap-2 items-start bg-blue-50 p-4 border border-blue-200 rounded-lg">
+            {/* Beneficiary Details */}
+            <div className="mb-8">
+              <BeneficiaryDetailsCard {...selectedAdvance.beneficiaryDetails} />
+            </div>
+
+            {/* Approval Form */}
+            <div className="mb-6">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Approval Form</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="estimated-amount" className="text-sm font-medium text-gray-700 mb-1 block">
+                      Estimated Amount
+                    </Label>
+                    <Input
+                      id="estimated-amount"
+                      type="number"
+                      value={formData.estimatedAmount}
+                      className="w-full max-w-[280px] min-w-[160px] h-9 bg-gray-100"
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="approved-amount" className="text-sm font-medium text-gray-700 mb-1 block">
+                      Approved Amount
+                    </Label>
+                    <Input
+                      id="approved-amount"
+                      type="number"
+                      value={formData.approvedAmount}
+                      onChange={(e) => handleInputChange('approvedAmount', e.target.value)}
+                      className="w-full max-w-sm min-w-[160px] h-9"
+                      placeholder="Enter approved amount"
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex gap-2 items-start bg-blue-50 p-4 border border-blue-200 rounded-lg">
                   <Checkbox
                     id="declaration"
                     checked={formData.declarationChecked}
@@ -199,21 +280,24 @@ const ApproveAdvance = () => {
                     I hereby declare that the information given in this form is correct and complete to the best of my knowledge.
                   </Label>
                 </div>
+              </div>
+            </div>
 
-                <div className="md:col-span-2 text-right">
+            {/* Action Section */}
+            <div className="mb-6">
+              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <div className="flex justify-end">
                   <Button
-                    className="bg-indigo-600 text-white"
+                    onClick={handleApprove}
                     disabled={!formData.declarationChecked || !formData.approvedAmount}
-                    onClick={() => {
-                      // Handle approval logic
-                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium h-9 disabled:bg-gray-400"
                   >
                     Approve Request
                   </Button>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
