@@ -13,9 +13,7 @@ import RequestAdvanceTopUpForm from '@/components/user/RequestAdvanceTopUpForm';
 const AdvanceClaimPage = () => {
   const [showForm, setShowForm] = useState(false);
   const dispatch = useAppDispatch();
-
   const formRef = useRef<HTMLDivElement | null>(null);
-
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const { data: claimList, loading } = useAppSelector((state: RootState) => state.claim);

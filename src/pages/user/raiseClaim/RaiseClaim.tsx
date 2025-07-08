@@ -57,7 +57,12 @@ interface ClaimRequest {
   HospitalRegstrationDetailsFile?: { Files: any[] };
   PaidAmount?: number;
   NotIncluded?: { BilledAmount: number; ClaimedAmount: number; files?: File[] }[];
-  claimedTotal?: number;
+  claimedTotal?: number; // Added properties for files to rawPayload for pre-hospitalization forms
+  PreHospitalizationProcedureFiles?: File[];
+  PreHospitalizationExpensesOtherFiles?: File[];
+  PreHospitalizationExpensesMedicineFiles?: File[];
+  PreHospitalizationExpensesInvestigationFiles?: File[];
+  PreHospitalizationExpensesConsultationFiles?: File[];
 }
 
 type RaiseClaimProps = {
@@ -100,13 +105,15 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     billDetails?.OtherBill?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
-  const netTotal = hospClaimedAmount + [
-    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0);
+  const netTotal =
+    hospClaimedAmount +
+    [
+      preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
+      preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
+      preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
+      preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
+      preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
+    ].reduce((sum, val) => sum + Number(val), 0);
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,
@@ -117,67 +124,60 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   };
 
   const handleSubmit = async () => {
-
     setIsSubmitting(true);
     try {
-      // your full formData logic here (no change made to that)
-
-      
-
-      const rawPayload = {
+      const rawPayload: Partial<ClaimRequest> = {
         ...patientDetails,
         ...billDetails,
         ...preHospDetails,
         ...postHospDetails,
       };
-      console.log(rawPayload, "this is rawpayload")
+      console.log(rawPayload, 'this is rawpayload');
 
       const formData = new FormData();
-      // ... your formData.append() code here as before ...
-
-      
-      formData.append('Unit', user.unitId);
+      formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
       formData.append('PayTo', rawPayload.PayTo || 'Doctor');
       formData.append('patientId', String(user.EmpCode || 0));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
       formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
-      formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId);
-      formData.append('HospitalRegNo', rawPayload.HospitalRegNo || rawPayload.HospitalId);
+      formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId || ''); // Added optional chaining and fallback
+      formData.append('HospitalRegNo', rawPayload.HospitalRegNo || rawPayload.HospitalId || ''); // Added optional chaining and fallback
       formData.append('TreatmentType', rawPayload.TreatmentType || '');
       formData.append('Digonosis', rawPayload.Digonosis || '');
       formData.append('DoctorName', rawPayload.DoctorName || '');
       formData.append('DateOfAdmission', rawPayload.DateOfAdmission || '');
       formData.append('DateofDischarge', rawPayload.DateofDischarge || '');
-      formData.append('IsSpecailDisease', 'true');
+      formData.append('IsSpecailDisease', String(rawPayload.IsSpecailDisease ?? false)); // Ensure boolean is stringified
       formData.append('IsTaxAble', String(rawPayload.IsTaxAble ?? true));
-      formData.append('IsPreHospitalizationExpenses', String(rawPayload.IsPreHospitalizationExpenses ?? false));
-      formData.append('PreHospitalizationExpensesMedicine.BilledAmount', rawPayload.PreHospitalizationExpensesMedicine.BilledAmount);
-      formData.append('PreHospitalizationExpensesMedicine.ClaimedAmount', rawPayload.PreHospitalizationExpensesMedicine.ClaimedAmount);
-      formData.append('PreHospitalizationExpensesMedicine.ClaimDate', rawPayload.PreHospitalizationExpensesMedicine.ClaimDate);
+      formData.append('IsPreHospitalizationExpenses', String(rawPayload.IsPreHospitalizationExpenses ?? false)); // Pre-hospitalization expenses with optional chaining
 
-      formData.append('PreHospitalizationExpensesConsultation.BilledAmount', rawPayload.PreHospitalizationExpensesConsultation.BilledAmount);
-      formData.append('PreHospitalizationExpensesConsultation.ClaimedAmount', rawPayload.PreHospitalizationExpensesConsultation.ClaimedAmount);
-      formData.append('PreHospitalizationExpensesConsultation.ClaimDate', rawPayload.PreHospitalizationExpensesConsultation.ClaimDate);
-      
-      formData.append('PreHospitalizationExpensesInvestigation.BilledAmount', rawPayload.PreHospitalizationExpensesInvestigation.BilledAmount);
-      formData.append('PreHospitalizationExpensesInvestigation.ClaimedAmount', rawPayload.PreHospitalizationExpensesInvestigation.ClaimedAmount);
-      formData.append('PreHospitalizationExpensesInvestigation.ClaimDate', rawPayload.PreHospitalizationExpensesInvestigation.ClaimDate);
+      formData.append('PreHospitalizationExpensesMedicine.BilledAmount', String(rawPayload.PreHospitalizationExpensesMedicine?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesMedicine.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesMedicine.ClaimDate', rawPayload.PreHospitalizationExpensesMedicine?.ClaimDate || '');
 
-      formData.append('PreHospitalizationExpensesOther.BilledAmount', rawPayload.PreHospitalizationExpensesOther.BilledAmount);
-      formData.append('PreHospitalizationExpensesOther.ClaimedAmount', rawPayload.PreHospitalizationExpensesOther.ClaimedAmount);
-      formData.append('PreHospitalizationExpensesOther.ClaimDate', rawPayload.PreHospitalizationExpensesOther.ClaimDate);
+      formData.append('PreHospitalizationExpensesConsultation.BilledAmount', String(rawPayload.PreHospitalizationExpensesConsultation?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesConsultation.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesConsultation.ClaimDate', rawPayload.PreHospitalizationExpensesConsultation?.ClaimDate || '');
+      formData.append('PreHospitalizationExpensesInvestigation.BilledAmount', String(rawPayload.PreHospitalizationExpensesInvestigation?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesInvestigation.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesInvestigation.ClaimDate', rawPayload.PreHospitalizationExpensesInvestigation?.ClaimDate || '');
 
-      formData.append('PreHospitalizationProcedure.BilledAmount', rawPayload.PreHospitalizationProcedure.BilledAmount);
-      formData.append('PreHospitalizationProcedure.ClaimedAmount', rawPayload.PreHospitalizationProcedure.ClaimedAmount);
-      formData.append('PreHospitalizationProcedure.ClaimDate', rawPayload.PreHospitalizationProcedure.ClaimDate);
-      
-      rawPayload.PreHospitalizationProcedureFiles?.forEach((file: File) => formData.append('PreHospitalizationProcedure.Files', file));
-      rawPayload.PreHospitalizationExpensesOtherFiles?.forEach((file: File) => formData.append('PreHospitalizationExpensesOther.Files', file));
-      rawPayload.PreHospitalizationExpensesMedicineFiles?.forEach((file: File) => formData.append('PreHospitalizationExpensesMedicine.Files', file));
-      rawPayload.PreHospitalizationExpensesInvestigationFiles?.forEach((file: File) => formData.append('PreHospitalizationExpensesInvestigation.Files', file));
-      rawPayload.PreHospitalizationExpensesConsultationFiles?.forEach((file: File) => formData.append('PreHospitalizationExpensesConsultation.Files', file));
+      formData.append('PreHospitalizationExpensesOther.BilledAmount', String(rawPayload.PreHospitalizationExpensesOther?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesOther.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesOther?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesOther.ClaimDate', rawPayload.PreHospitalizationExpensesOther?.ClaimDate || '');
 
-      formData.append('ClaimAmount', String(netTotal)); // ✅ Fixed: use calculated netTotal
+      formData.append('PreHospitalizationProcedure.BilledAmount', String(rawPayload.PreHospitalizationProcedure?.BilledAmount || 0));
+      formData.append('PreHospitalizationProcedure.ClaimedAmount', String(rawPayload.PreHospitalizationProcedure?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationProcedure.ClaimDate', rawPayload.PreHospitalizationProcedure?.ClaimDate || '');
+      rawPayload.PreHospitalizationProcedure?.Files?.forEach((file: File) => formData.append('PreHospitalizationProcedure.Files', file));
+      rawPayload.PreHospitalizationExpensesOther?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesOther.Files', file));
+      rawPayload.PreHospitalizationExpensesMedicine?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesMedicine.Files', file));
+      rawPayload.PreHospitalizationExpensesInvestigation?.Files?.forEach((file: File) =>
+        formData.append('PreHospitalizationExpensesInvestigation.Files', file)
+      );
+      rawPayload.PreHospitalizationExpensesConsultation?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesConsultation.Files', file));
+
+      formData.append('ClaimAmount', String(netTotal));
       formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
       formData.append('EmpId', String(user.EmpCode || 0));
       formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
@@ -186,9 +186,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
       rawPayload.DischargeSummaryUpload?.forEach((file: File) => formData.append('DischargeSummaryUpload', file));
       rawPayload.InvestigationReportsUpload?.forEach((file: File) => formData.append('InvestigationReportsUpload', file));
       rawPayload.FinalHospitalBillUpload?.forEach((file: File) => formData.append('FinalHospitalBillUpload', file));
-      rawPayload.PostHospitalTreatmentAdviseUpload?.forEach((file: File) =>
-        formData.append('PostHospitalTreatmentAdviseUpload', file)
-      );
+      rawPayload.PostHospitalTreatmentAdviseUpload?.forEach((file: File) => formData.append('PostHospitalTreatmentAdviseUpload', file));
 
       const includedMedicen = (rawPayload.MedicenBill || []).filter((b: any) => b.included !== false);
       if (includedMedicen[0]) {
@@ -257,16 +255,11 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         });
       }
 
-      rawPayload.HospitalIncomeTaxFile?.Files?.forEach((file: File, i: number) =>
-        formData.append(`HospitalIncomeTaxFile.Files[${i}]`, file)
-      );
-      rawPayload.HospitalRegstrationDetailsFile?.Files?.forEach((file: File, i: number) =>
-        formData.append(`HospitalRegstrationDetailsFile.Files[${i}]`, file)
-      );
+      rawPayload.HospitalIncomeTaxFile?.Files?.forEach((file: File, i: number) => formData.append(`HospitalIncomeTaxFile.Files[${i}]`, file));
+      rawPayload.HospitalRegstrationDetailsFile?.Files?.forEach((file: File, i: number) => formData.append(`HospitalRegstrationDetailsFile.Files[${i}]`, file));
       if (rawPayload.FinalHospitalBillUpload?.[0]) {
         formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
       }
-
 
       await dispatch(submitDirectClaim(formData));
       await dispatch(getMyClaims(user.EmpCode));
@@ -285,31 +278,40 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
 
   return (
     <div className="bg-gray-100 p-2 min-h-screen">
+           {' '}
       {isSubmitting ? (
         <div className="flex items-center justify-center h-full py-10">
-          <Loader />
+                    <Loader />       {' '}
         </div>
       ) : (
         <>
+                   {' '}
           <div className="mt-4">
-            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
+                        <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />         {' '}
           </div>
+                   {' '}
           <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
+                        <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />         {' '}
           </div>
+                   {' '}
           <div className="mt-4">
-            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
+                        <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />         {' '}
           </div>
+                   {' '}
           <div>
+                       {' '}
             <PostHospitalizationAndDeclaration
               postHospitalizationAndDeclaration={postHospDetailsWithSummary}
               onChange={setPostHospDetails}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
             />
+                     {' '}
           </div>
+                 {' '}
         </>
       )}
+         {' '}
     </div>
   );
 };

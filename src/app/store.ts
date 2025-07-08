@@ -11,6 +11,8 @@ import masterRoleReducer from '@/features/allRole/materRoleListSlice';
 import empRoleListReducer from '@/features/allRole/empRoleListSlice';
 import getAdvanceClaimReducer from '@/features/medicalClaim/getAdvanceClaimSlice';
 import claimHr from '@/features/hr/getClaimRequestSlice'
+import getClaimDetailsReducer from '@/features/medicalClaim/getClaimDetailsSlice';
+import advanceApprovalReducer from '@/features/medicalClaim/advanceApprovalSlice';
 
 const persistConfig = {
   key: 'root',
@@ -27,7 +29,9 @@ const rootReducer = combineReducers({
   masterRole: masterRoleReducer,
   empRoleList: empRoleListReducer,
   getAdvanceClaim: getAdvanceClaimReducer,
-  getClaimHr:claimHr
+  getClaimHr:claimHr,
+  getClaimDetails: getClaimDetailsReducer,
+  advanceApproval: advanceApprovalReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

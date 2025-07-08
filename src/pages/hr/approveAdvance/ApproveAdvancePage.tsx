@@ -1,28 +1,31 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Eye } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import TableList from '@/components/ui/data-table';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { fetchAdvanceData } from '@/features/medicalClaim/getAdvanceClaimSlice';
+import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
+import { PatientDetailsCard } from '@/components/hr/advanceApprove/PatientDetailsTable';
+import { HospitalizationDetailsCard } from '@/components/hr/advanceApprove/HospitalizationDetailsCard';
+import { BeneficiaryDetailsCard } from '@/components/hr/advanceApprove/BeneficiaryDetails';
+import AdvanceApprovalForm from '@/components/hr/advanceApprove/AdvanceApprovalForm';
+import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
+import toast from 'react-hot-toast';
 
 const ApproveAdvancePage = () => {
-  const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
   const dispatch = useAppDispatch();
-  const { data, loading, error } = useAppSelector((state: RootState) => state.getAdvanceClaim);
+  const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
+
+  const { data, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
+  const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
+  const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
+
   const user = useAppSelector((state: RootState) => state.user);
   const { employees } = useAppSelector((state: RootState) => state.employee);
-
-  console.log('advance Claim Data', data);
-
-  const [formData, setFormData] = useState({
-    estimatedAmount: '',
-    approvedAmount: '',
-    declarationChecked: false,
-  });
 
   useEffect(() => {
     if (user?.EmpCode) {
@@ -30,9 +33,18 @@ const ApproveAdvancePage = () => {
     }
   }, [dispatch, user?.EmpCode]);
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  useEffect(() => {
+    if (success) {
+      toast.success('Advance approved successfully!');
+      dispatch(resetAdvanceApprovalState());
+      dispatch(fetchAdvanceData(Number(user.EmpCode)));
+      setSelectedAdvance(null);
+    }
+    if (error) {
+      toast.error(error);
+      dispatch(resetAdvanceApprovalState());
+    }
+  }, [success, error, dispatch]);
 
   const columns = useMemo(
     () => [
@@ -67,19 +79,15 @@ const ApproveAdvancePage = () => {
         accessorKey: 'relation',
         header: 'Relation',
         enableSorting: false,
-        cell: ({ row }: any) => {
-          return <div className="text-center">Self</div>;
-        },
+        cell: () => <div className="text-center">Self</div>,
         className: 'text-center',
       },
-
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
         cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
         className: 'text-center',
       },
-
       {
         accessorKey: 'advanceAmount',
         header: 'Claim Amount',
@@ -90,43 +98,68 @@ const ApproveAdvancePage = () => {
         },
         className: 'text-center',
       },
-
       {
         id: 'actions',
         header: 'Actions',
-        cell: ({ row }: any) => (
-          <Button
-            variant="link"
-            size="sm"
-            className="text-blue-600"
-            onClick={(e) => {
-              e.stopPropagation();
-              const item = row.original;
-              const isSame = selectedAdvance?.id === item.id;
-              if (isSame) {
-                setSelectedAdvance(null);
-                setFormData({ estimatedAmount: '', approvedAmount: '', declarationChecked: false });
-              } else {
-                setSelectedAdvance(item);
-                setFormData({
-                  estimatedAmount: item.hospitalizationDetails.estimatedAmount.toString(),
-                  approvedAmount: '',
-                  declarationChecked: false,
-                });
-              }
-            }}
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            View
-          </Button>
-        ),
+        cell: ({ row }: any) => {
+          const item = row.original;
+          const isSelected = selectedAdvance?.advanceId === item.advanceId;
+
+          return (
+            <Button
+              variant="link"
+              size="sm"
+              className="text-blue-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isSelected) {
+                  setSelectedAdvance(null);
+                } else {
+                  dispatch(fetchClaimDetails(item.advanceId));
+                  setSelectedAdvance(item);
+                }
+              }}
+            >
+              {isSelected ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+              {isSelected ? 'Hide' : 'View'}
+            </Button>
+          );
+        },
       },
     ],
-    [employees]
+    [employees, dispatch, selectedAdvance]
   );
 
+  const getPatientDetails = () => {
+    if (!selectedAdvance) return null;
+    const result = findEmployeeDetails(employees, String(selectedAdvance.patientId));
+    return {
+      name: result?.employee?.empName || 'Unknown',
+      relation: 'Self',
+      dob: 'Not Available',
+      gender: 'Not Available',
+    };
+  };
+
+  const handleSubmitAdvanceRequest = ({ approvedAmount }: { approvedAmount: number }) => {
+    if (!selectedAdvance || !user.EmpCode) return;
+
+    dispatch(
+      submitAdvanceApproval({
+        AdvanceId: Number(selectedAdvance.advanceId),
+        SenderId: Number(user.EmpCode),
+        RecipientId: 101002,
+        ClaimTypeId: 1,
+        StatusId: 2,
+        ApprovalAmount: approvedAmount,
+      })
+    );
+  };
+
+  const patientDetails = getPatientDetails();
+
   return (
-    <div className="bg-white text-xs p-8 rounded-2xl  font-sans space-y-10">
+    <div className="bg-white text-xs p-8 rounded-2xl font-sans space-y-10">
       <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Request List</h2>
         {loading && <Loader />}
@@ -135,64 +168,60 @@ const ApproveAdvancePage = () => {
           columns={columns}
           showSearchInput
           showFilter
-          onRowClick={(row) => {
-            const isSame = selectedAdvance?.id === row.id;
-            if (isSame) {
-              setSelectedAdvance(null);
-            } else {
-              setSelectedAdvance(row);
-              setFormData({
-                estimatedAmount: row.hospitalizationDetails.estimatedAmount.toString(),
-                approvedAmount: '',
-                declarationChecked: false,
-              });
-            }
-          }}
+          onRowClick={() => {}}
+          rowClassName={(row) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-blue-50 border-l-2 border-blue-600' : '')}
         />
       </Card>
 
-      {/* {selectedAdvance && (
-        <div className="space-y-6">
-          <PatientDetailsCard {...selectedAdvance.patientDetails} />
-          <HospitalizationDetailsCard {...selectedAdvance.hospitalizationDetails} />
-          <BeneficiaryDetailsCard {...selectedAdvance.beneficiaryDetails} />
+      {selectedAdvance && patientDetails && (
+        <>
+          {detailsLoading && <Loader />}
+          <h2 className="text-xl font-bold text-blue-700 mb-4">Patient Details & Advance Details</h2>
+          <PatientDetailsCard {...patientDetails} />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-primary">Approval Form</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InputField label="Estimated Amount" value={formData.estimatedAmount} onChange={() => {}} readOnly />
-                <InputField label="Approved Amount" value={formData.approvedAmount} onChange={(e) => handleInputChange('approvedAmount', e.target.value)} />
+          {claimDetails?.advanceBasicDetails && (
+            <HospitalizationDetailsCard
+              hospitalName={claimDetails.advanceBasicDetails.hospitalName || '-'}
+              regdNo={claimDetails.advanceBasicDetails.hospitalRegNo || '-'}
+              admissionDate={claimDetails.advanceBasicDetails.likelyDate || ''}
+              treatmentType={claimDetails.advanceBasicDetails.treatmentType || '-'}
+              diagnosis={claimDetails.advanceBasicDetails.digonosis || '-'}
+              estimatedAmount={claimDetails.advanceBasicDetails.estimatedAmount || 0}
+              advanceRequested={claimDetails.advanceBasicDetails.advanceAmount || 0}
+              doctorName={claimDetails.advanceBasicDetails.doctorName || '-'}
+              payTo={claimDetails.advanceBasicDetails.payTo || '-'}
+              estimateFiles={
+                Array.isArray(claimDetails.documentLists)
+                  ? claimDetails.documentLists.filter((doc) => doc.category === 'EstimateAmount').map((doc) => doc.pathUrl)
+                  : []
+              }
+              admissionAdviceFiles={
+                Array.isArray(claimDetails.documentLists)
+                  ? claimDetails.documentLists.filter((doc) => doc.category === 'AdmissionAdviceUpload').map((doc) => doc.pathUrl)
+                  : []
+              }
+              incomeProofFiles={[]}
+            />
+          )}
 
-                <div className="md:col-span-2 mt-4 flex gap-2 items-start bg-blue-50 p-4 border border-blue-200 rounded-lg">
-                  <Checkbox
-                    id="declaration"
-                    checked={formData.declarationChecked}
-                    onCheckedChange={(checked) => handleInputChange('declarationChecked', checked)}
-                  />
-                  <Label htmlFor="declaration" className="text-sm text-gray-700 leading-relaxed">
-                    I hereby declare that the information given in this form is correct and complete to the best of my knowledge.
-                  </Label>
-                </div>
+          {claimDetails?.hospitalAccoundetail && (
+            <BeneficiaryDetailsCard
+              beneficiaryName={claimDetails.hospitalAccoundetail.beneficiaryName}
+              bankName={claimDetails.hospitalAccoundetail.bankName}
+              accountNumber={claimDetails.hospitalAccoundetail.accountNumber}
+              branchName={claimDetails.hospitalAccoundetail.branchName}
+              ifscCode={claimDetails.hospitalAccoundetail.ifscCode}
+              hospitalGSTNo={claimDetails.hospitalAccoundetail.hospitalGSTNo}
+              utrNo={claimDetails.hospitalAccoundetail.utrNo}
+              transactionDate={claimDetails.hospitalAccoundetail.transactionDate}
+              sapRefNumber={claimDetails.hospitalAccoundetail.sapRefNumber}
+              sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
+            />
+          )}
 
-                <div className="md:col-span-2 text-right">
-                  <Button
-                    className="bg-indigo-600 text-white"
-                    disabled={!formData.declarationChecked || !formData.approvedAmount}
-                    onClick={() => {
-                      // Handle approval logic
-                    }}
-                  >
-                    Approve Request
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      )} */}
+          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} />
+        </>
+      )}
     </div>
   );
 };

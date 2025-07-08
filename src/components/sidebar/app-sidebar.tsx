@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Home, FilePlus2, IndianRupee, Stamp, SearchCheck, CheckCircle2, LogOut, ChevronsLeft, ChevronsRight, Building2 } from 'lucide-react';
+import { LayoutDashboard, FileText, CreditCard, Stamp, Search, BadgeCheck, Power, ChevronLeft, ChevronRight, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -22,38 +22,44 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     {
       title: 'Dashboard',
       url: '/dashboard',
-      icon: Home,
+      icon: LayoutDashboard,
       roles: ['user'],
     },
     {
       title: 'Raise Claim',
       url: '/raise-claim',
-      icon: FilePlus2,
+      icon: FileText,
       roles: ['user'],
     },
     {
       title: 'Request Advance',
       url: '/request-advance',
-      icon: IndianRupee,
+      icon: CreditCard,
       roles: ['user'],
     },
     {
       title: 'Approve Advance',
       url: '/approve-advance',
       icon: Stamp,
-      roles: ['user'],
+      roles: ['HR1', 'HR2'],
     },
     {
       title: 'Review Claim',
       url: '/review-claim',
-      icon: SearchCheck,
-      roles: ['user'],
+      icon: Search,
+      roles: ['HR1', 'HR2'],
     },
     {
       title: 'Approve Claim',
       url: '/ClaimAfterDoctorReview',
-      icon: CheckCircle2,
-      roles: ['user'],
+      icon: BadgeCheck,
+      roles: ['HR1', 'HR2'],
+    },
+    {
+      title: 'Banking',
+      url: '/Banking',
+      icon: CreditCard,
+      roles: ['Finance'],
     },
   ];
 
@@ -64,7 +70,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     window.location.href = environment.exitUrl;
   };
 
-  const ToggleIcon = state === 'collapsed' ? ChevronsRight : ChevronsLeft;
+  const ToggleIcon = state === 'collapsed' ? ChevronRight : ChevronLeft;
 
   const menuButtonBaseClass =
     'transition-all duration-300 ease-in-out h-full w-full cursor-pointer active:bg-primary hover:bg-primary hover:text-white [&>svg]:size-7';
@@ -89,7 +95,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               className={`${menuButtonBaseClass} text-black`}
             >
               <div className="flex items-center gap-2">
-                <Building2 size={24} />
+                <Briefcase size={24} />
                 <span>Manage Organization</span>
               </div>
             </SidebarMenuButton>
@@ -97,7 +103,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <Separator />
           <SidebarMenuButton onClick={handleLogout} tooltip="Exit" asChild className={menuButtonBaseClass}>
             <div className="flex items-center gap-2">
-              <LogOut size={24} />
+              <Power size={24} />
               <span>Exit</span>
             </div>
           </SidebarMenuButton>

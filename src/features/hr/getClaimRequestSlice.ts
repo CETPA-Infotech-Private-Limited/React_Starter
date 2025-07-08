@@ -3,10 +3,12 @@ import axiosInstance from "@/services/axiosInstance";
 
 // ---------------- Interfaces ---------------- //
 
-export interface GetClaimParams {
-  recipientId: number;
-  pageId: number;
-  empId?: number;
+export interface GetClaimState {
+  loading: boolean;
+  error: string | null;
+  success: boolean;
+  data: DirectClaim[] | null;       // For list view
+  claimDetail: DirectClaim | null;  // For single claim view
 }
 
 export interface DirectClaim {
@@ -35,7 +37,9 @@ const initialState: GetClaimState = {
   error: null,
   success: false,
   data: null,
+  claimDetail: null, // 👈 Added
 };
+
 
 // ---------------- Async Thunk ---------------- //
 
@@ -58,15 +62,23 @@ export const getClaimHr = createAsyncThunk<
   }
 );
 
-export const getClaimDataHr= createAsyncThunk( "claims/details" ,async({advanceid},{rejectWithValue})=>{
-    try{
-        const response= await axiosInstance.get(`/Claim/GetClaimDetails/${advanceid}`)
-        return response.data.data;
-    }catch(error){
-        console.error('Error fetching claims:', error);
+export const getClaimDataHr = createAsyncThunk<
+  DirectClaim, // 👈 return type
+  { advanceid: number }, // 👈 argument
+  { rejectValue: string }
+>(
+  "claims/details",
+  async ({ advanceid }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/Claim/GetClaimDetails/${advanceid}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error fetching claims:', error);
       return rejectWithValue('Failed to fetch claims details in HR');
     }
-})
+  }
+);
+
 
 // ---------------- Slice ---------------- //
 
@@ -96,11 +108,12 @@ const claimSliceHr = createSlice({
         state.error = null;
         state.success = false;
       })
-      .addCase(getClaimDataHr.fulfilled, (state, action: PayloadAction<DirectClaim[]>) => {
-        state.loading = false;
-        state.success = true;
-        state.data = action.payload;
-      })
+      .addCase(getClaimDataHr.fulfilled, (state, action: PayloadAction<DirectClaim>) => {
+  state.loading = false;
+  state.success = true;
+  state.claimDetail = action.payload; 
+})
+
       .addCase(getClaimDataHr.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Unknown error';

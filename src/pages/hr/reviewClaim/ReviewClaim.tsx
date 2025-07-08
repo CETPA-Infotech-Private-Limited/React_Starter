@@ -8,15 +8,14 @@ import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewclaim/HospitalizationBillView';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
-import { getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 
   const ReviewClaim = () => {
     const dispatch = useAppDispatch()
       
        const claimHrData = useAppSelector((state:RootState)=>state.getClaimHr.data)
-     
-      console.log(claimHrData,"this is the data")
+       
        const { employees } = useAppSelector((state: RootState) => state.employee);
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -29,13 +28,7 @@ useEffect(() => {
   if (user?.EmpCode) {
     dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
   }
-}, [user?.EmpCode]); // ✅ Correct dependencies
-
-
-
-  
-  
-
+}, [user?.EmpCode]); 
   // Auto scroll to details when toggled on
   useEffect(() => {
     if (showDetails && detailsRef.current){
@@ -55,8 +48,17 @@ useEffect(() => {
       setSelectedClaim(rowData);
       setShowDetails(true);
     }
+
+     if (rowData.directClaimId) {
+      dispatch(getClaimDataHr({advanceid: rowData.directClaimId}));
+      
+    }
   };
 
+ const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
+
+  console.log(claimDetail,'this is claimdetail')
+    
   const columns = useMemo(
     () => [
       {
@@ -92,6 +94,8 @@ useEffect(() => {
           const rowData = row.original;
           const isSelected = selectedClaim?.id === rowData.id;
 
+          
+
           return (
             <Button
               size="sm"
@@ -119,6 +123,7 @@ useEffect(() => {
       relation: 'Self', // if not available
       requestedDate: new Date(value.requestDate).toLocaleDateString(),
       claimAmount: value.cliamAmount,
+      directClaimId:value.directClaimId
     }))
   : [];
 
@@ -155,7 +160,7 @@ useEffect(() => {
       {/* Conditional Claim Detail Section */}
       {selectedClaim && showDetails && (
         <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
-          <HospitalizationBillView />
+          <HospitalizationBillView claimDetail={claimDetail} />
           <ViewClaimDetails claim={selectedClaim} />
         </div>
       )}
