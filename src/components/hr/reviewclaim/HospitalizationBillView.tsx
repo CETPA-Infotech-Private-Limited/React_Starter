@@ -16,19 +16,20 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
 
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
 
+
   const billItems = [
-    { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineBill ?? 0 },
-    { id: 2, billType: 'Consultation', billedAmount: billDetails?.consultationBill ?? 0, claimedAmount: billDetails?.consultationBill ?? 0 },
-    { id: 3, billType: 'Investigation', billedAmount: billDetails?.investigationBill ?? 0, claimedAmount: billDetails?.investigationBill ?? 0 },
-    { id: 4, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentBill ?? 0 },
-    { id: 5, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.othersBill ?? 0 },
+    { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
+    { id: 2, billType: 'Consultation', billedAmount: billDetails?.consultationBill ?? 0, claimedAmount: billDetails?.consultationClaim ?? 0 },
+    { id: 3, billType: 'Investigation', billedAmount: billDetails?.investigationBill ?? 0, claimedAmount: billDetails?.investigationClaim ?? 0 },
+    { id: 4, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
+    { id: 5, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
   ];
 
   const preHospItems = [
-    { id: 1, billType: 'Medicine', billedDate: preHospitalizationExpenses?.medicineBillDate, billedAmount: preHospitalizationExpenses?.medicineAmount ?? 0, claimedAmount: preHospitalizationExpenses?.medicineAmount ?? 0, hasFiles: 0 },
-    { id: 2, billType: 'Consultation', billedDate: preHospitalizationExpenses?.consultationBillDate, billedAmount: preHospitalizationExpenses?.consultationAmount ?? 0, claimedAmount: preHospitalizationExpenses?.consultationAmount ?? 0, hasFiles: 0 },
-    { id: 3, billType: 'Investigation', billedDate: preHospitalizationExpenses?.investigationBillDate, billedAmount: preHospitalizationExpenses?.investigationAmount ?? 0, claimedAmount: preHospitalizationExpenses?.investigationAmount ?? 0, hasFiles: 0 },
-    { id: 4, billType: 'Other', billedDate: preHospitalizationExpenses?.othersBillDate, billedAmount: preHospitalizationExpenses?.othersAmount ?? 0, claimedAmount: preHospitalizationExpenses?.othersAmount ?? 0, hasFiles: 0 },
+    { id: 1, billType: 'Medicine', billedDate: preHospitalizationExpenses?.medicineBillDate, billedAmount: preHospitalizationExpenses?.medicineBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.medicineClaimAmount ?? 0, hasFiles: 0 },
+    { id: 2, billType: 'Consultation', billedDate: preHospitalizationExpenses?.consultationBillDate, billedAmount: preHospitalizationExpenses?.consultationBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.consultationClaimAmount ?? 0, hasFiles: 0 },
+    { id: 3, billType: 'Investigation', billedDate: preHospitalizationExpenses?.investigationBillDate, billedAmount: preHospitalizationExpenses?.investigationBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.investigationClaimAmount ?? 0, hasFiles: 0 },
+    { id: 4, billType: 'Other', billedDate: preHospitalizationExpenses?.othersBillDate, billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0, hasFiles: 0 },
   ];
 
   const totalBilled = billItems.reduce((sum, item) => sum + item.billedAmount, 0);

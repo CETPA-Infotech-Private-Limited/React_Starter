@@ -49,9 +49,9 @@ useEffect(() => {
       setShowDetails(true);
     }
 
-     if (rowData.directClaimId) {
-      dispatch(getClaimDataHr({advanceid: rowData.directClaimId}));
-      
+     if (rowData.claimId) {
+      dispatch(getClaimDataHr({advanceid: rowData.claimId}));
+     
     }
   };
 
@@ -123,7 +123,7 @@ useEffect(() => {
       relation: 'Self', // if not available
       requestedDate: new Date(value.requestDate).toLocaleDateString(),
       claimAmount: value.cliamAmount,
-      directClaimId:value.directClaimId
+      claimId:value.claimId
     }))
   : [];
 
