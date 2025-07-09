@@ -14,22 +14,35 @@ export interface AdvanceItem {
 
 interface AdvanceState {
   data: AdvanceItem[];
+  bankingData: AdvanceItem[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: AdvanceState = {
   data: [],
+  bankingData: [],
   loading: false,
   error: null,
 };
 
-export const fetchAdvanceData = createAsyncThunk('advance/GetAdvanceClaim', async (empId: number, { rejectWithValue }) => {
+// Fetch for user-specific advance claims
+export const fetchAdvanceData = createAsyncThunk('advance/fetchUserAdvanceClaims', async (empId: number, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.get(`/claim/GetAdvanceClaim/${empId}`);
     return response.data.data as AdvanceItem[];
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch advance data');
+  }
+});
+
+// Fetch for banking claims
+export const fetchBankingAdvanceData = createAsyncThunk('advance/fetchBankingAdvanceClaims', async (empId: number, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get(`/claim/GetClaimForBankingList/${empId}`);
+    return response.data.data as AdvanceItem[];
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || 'Failed to fetch banking data');
   }
 });
 
@@ -39,6 +52,7 @@ const getAdvanceClaimSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Handle user advance claims
       .addCase(fetchAdvanceData.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -48,6 +62,20 @@ const getAdvanceClaimSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(fetchAdvanceData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Handle banking claims
+      .addCase(fetchBankingAdvanceData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBankingAdvanceData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bankingData = action.payload;
+      })
+      .addCase(fetchBankingAdvanceData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

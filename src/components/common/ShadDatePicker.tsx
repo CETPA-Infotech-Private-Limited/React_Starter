@@ -8,6 +8,11 @@ import { CalendarIcon } from 'lucide-react';
 interface ShadDatePickerProps extends DatePickerProps {
   placeholder?: string;
   className?: string;
+  showTimeSelect?: boolean;
+  timeIntervals?: number; // ⬅️ For minute selection
+  showMonthYearPicker?: boolean;
+  showMonthDropdown?: boolean;
+  showYearDropdown?: boolean;
 }
 
 const CustomInput = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement> & { className?: string }>(
@@ -23,11 +28,28 @@ const CustomInput = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
 );
 CustomInput.displayName = 'CustomInput';
 
-const ShadDatePicker: React.FC<ShadDatePickerProps> = ({ selected, onChange, placeholder = 'Select date', className = '', ...props }) => {
+const ShadDatePicker: React.FC<ShadDatePickerProps> = ({
+  selected,
+  onChange,
+  placeholder = 'Select date',
+  className = '',
+  showTimeSelect = false,
+  timeIntervals = 15, // ⬅️ default to 15 minutes
+  showMonthYearPicker = false,
+  showMonthDropdown = false,
+  showYearDropdown = false,
+  ...props
+}) => {
   return (
     <DatePicker
       selected={selected}
       onChange={onChange}
+      showTimeSelect={showTimeSelect}
+      timeIntervals={timeIntervals}
+      showMonthYearPicker={showMonthYearPicker}
+      showMonthDropdown={showMonthDropdown}
+      showYearDropdown={showYearDropdown}
+      dateFormat={showMonthYearPicker ? 'MM/yyyy' : showTimeSelect ? 'dd/MM/yyyy h:mm aa' : 'dd/MM/yyyy'}
       customInput={<CustomInput placeholder={placeholder} className={className} />}
       wrapperClassName="w-full"
       {...props}

@@ -19,7 +19,6 @@ import toast from 'react-hot-toast';
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
-
   const { data, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
   const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
   const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
@@ -150,7 +149,7 @@ const ApproveAdvancePage = () => {
         SenderId: Number(user.EmpCode),
         RecipientId: 101002,
         ClaimTypeId: 1,
-        StatusId: 2,
+        StatusId: 4,
         ApprovalAmount: approvedAmount,
       })
     );

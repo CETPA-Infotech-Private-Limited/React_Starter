@@ -136,7 +136,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
 
       const formData = new FormData();
       formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
-      formData.append('PayTo', rawPayload.PayTo || 'Doctor');
+      formData.append('PayTo', rawPayload.PayTo || 'Hospital');
       formData.append('patientId', String(user.EmpCode || 0));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
       formData.append('RequestName', rawPayload.RequestName || 'Claim Request');

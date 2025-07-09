@@ -25,6 +25,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 type AdvanceApprovalFormProps = {
   estimatedAmount: number;
+  approvalLoading: boolean;
   onSubmit: (data: { approvedAmount: number }) => void;
 };
 
