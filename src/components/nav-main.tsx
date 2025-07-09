@@ -29,12 +29,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                 >
                   <div className="flex items-center gap-2">
                     {item.icon && <item.icon size={24} />}
-<<<<<<< HEAD
-                    
-                    <span className={isActive ? 'font-bold' : 'font-normal'}>{item.title}</span>
-=======
                     <span>{item.title}</span>
->>>>>>> 9ee274f1e9ae803872e80905cb91797a7689b297
                   </div>
                   {isOpen ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
                 </SidebarMenuButton>

@@ -3,12 +3,13 @@ import axiosInstance from "@/services/axiosInstance";
 
 // ---------------- Interfaces ---------------- //
 
+// ✅ Final GetClaimState should be:
 export interface GetClaimState {
   loading: boolean;
   error: string | null;
   success: boolean;
-  data: DirectClaim[] | null;       // For list view
-  claimDetail: DirectClaim | null;  // For single claim view
+  data: DirectClaim[] | null;
+  claimDetail: DirectClaim | null;
 }
 
 export interface DirectClaim {
