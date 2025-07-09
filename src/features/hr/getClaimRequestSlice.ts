@@ -3,12 +3,13 @@ import axiosInstance from "@/services/axiosInstance";
 
 // ---------------- Interfaces ---------------- //
 
+// ✅ Final GetClaimState should be:
 export interface GetClaimState {
   loading: boolean;
   error: string | null;
   success: boolean;
-  data: DirectClaim[] | null;       // For list view
-  claimDetail: DirectClaim | null;  // For single claim view
+  data: DirectClaim[] | null;
+  claimDetail: DirectClaim | null;
 }
 
 export interface DirectClaim {
@@ -28,6 +29,12 @@ export interface GetClaimState {
   error: string | null;
   success: boolean;
   data: DirectClaim[] | null;
+}
+
+export interface GetClaimParams {
+  recipientId: number;
+  pageId: number;
+  empId?: number;
 }
 
 // ---------------- Initial State ---------------- //
@@ -52,7 +59,7 @@ export const getClaimHr = createAsyncThunk<
   async ({ recipientId, pageId, empId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/Claim/GetClaimRequest/${recipientId}/${pageId}`, {
-        params: empId ? { empId } : {},
+        
       });
       return response.data.data;
     } catch (error: any) {

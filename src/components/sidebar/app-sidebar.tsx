@@ -65,8 +65,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           roles: ['HR1', 'HR2'],
         },
         {
-          title: 'Approve Advance',
+          title: 'Advance Approve',
           url: '/approve-advance',
+          roles: ['HR1', 'HR2'],
+        },
+        {
+          title: 'Doctor Approved Claim',
+          url: '/review-claim2',
           roles: ['HR1', 'HR2'],
         },
       ],
