@@ -37,12 +37,20 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       icon: CreditCard,
       roles: ['user'],
     },
+    
     {
       title: 'My Claim',
       url: '/my-claim',
       icon: CreditCard,
       roles: ['user'],
     },
+    {
+      title: 'Doctor Review',
+      url: '/doctor-review',
+      icon: FileText,
+      roles: ['user'],
+    },
+
     {
       title: 'Approve Advance',
       url: '/approve-advance',
