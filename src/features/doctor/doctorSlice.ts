@@ -26,7 +26,7 @@ export const submitClaimProcessByHr = createAsyncThunk(
   'claim/submitClaimProcessByHr',
   async (formData:FormData, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('/api/Claim/SubmitClaimProcessByHr', formData, {
+      const response = await axiosInstance.post('/Claim/SubmitClaimProcessByHr', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }});
       return response.data;
     } catch (error: any) {

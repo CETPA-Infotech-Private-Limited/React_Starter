@@ -70,11 +70,11 @@ const dispatch = useAppDispatch()
   };
     const formData = new FormData()
 
-    formData.append('AdvanceId', claimDetail.advanceBasicDetails.claimId)
-    formData.append('SenderId', user.EmpCode)
-    formData.append('RecipientId', 102199)
-    formData.append('ClaimTypeId',claimDetail.advanceBasicDetails.claimTypeId)
-    formData.append('StatusId', 18)
+    formData.append('AdvanceId', String(claimDetail.advanceBasicDetails.claimId))
+    formData.append('SenderId', String(user.EmpCode))
+    formData.append('RecipientId', '102199')
+    formData.append('ClaimTypeId',String(claimDetail.advanceBasicDetails.claimTypeId))
+    formData.append('StatusId', '5')
 
     await(dispatch(submitClaimProcessByHr(formData)))
 
