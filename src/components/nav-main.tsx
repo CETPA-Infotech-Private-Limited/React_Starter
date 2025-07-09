@@ -33,6 +33,7 @@ export function NavMain({
                     }`}
                   >
                     {item.icon && <item.icon size={24} />}
+                    
                     <span className={isActive ? 'font-bold' : 'font-normal'}>{item.title}</span>
                   </div>
                 </SidebarMenuButton>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutDashboard, FileText, CreditCard, Stamp, Search, BadgeCheck, Power, ChevronLeft, ChevronRight, Briefcase } from 'lucide-react';
+import { LayoutDashboard, FileText, CreditCard, Stamp, Search, BadgeCheck, Power, ChevronLeft, ChevronRight, Briefcase, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -38,6 +38,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       roles: ['user'],
     },
     {
+      title: 'My Claim',
+      url: '/my-claim',
+      icon: CreditCard,
+      roles: ['user'],
+    },
+    {
       title: 'Approve Advance',
       url: '/approve-advance',
       icon: Stamp,
@@ -57,7 +63,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: 'Banking',
-      url: '/Banking',
+      url: '/banking',
       icon: CreditCard,
       roles: ['Finance'],
     },
@@ -103,7 +109,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <Separator />
           <SidebarMenuButton onClick={handleLogout} tooltip="Exit" asChild className={menuButtonBaseClass}>
             <div className="flex items-center gap-2">
-              <Power size={24} />
+              <LogOut size={24} />
               <span>Exit</span>
             </div>
           </SidebarMenuButton>

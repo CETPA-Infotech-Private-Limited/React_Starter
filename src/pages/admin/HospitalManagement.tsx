@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useEffect, useMemo, useState } from 'react';
 import HospitalTable from '@/components/admin/hospitalManagement/HospitalTable';
 import AddHospitalDialog from '@/components/admin/hospitalManagement/AddHospitalDialog';

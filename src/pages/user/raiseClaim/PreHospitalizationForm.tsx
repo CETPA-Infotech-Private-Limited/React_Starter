@@ -1,19 +1,9 @@
-'use client';
-
 import React, { useState } from 'react';
 import { UploadCloud, Trash2, Plus } from 'lucide-react'; // Added Plus icon back for addNewBill
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -100,9 +90,7 @@ const UploadDialog = ({ title, files, onFilesChange }: { title: string; files: F
                 onChange={handleFileChange}
                 className="border border-blue-400 shadow-sm focus:ring-1 focus:ring-blue-500 cursor-pointer rounded-lg py-1.5 px-2 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 font-sans"
               />
-              {selectedFiles.length > 0 && (
-                <p className="text-xs text-gray-500 mt-1">{selectedFiles.length} file(s) selected.</p>
-              )}
+              {selectedFiles.length > 0 && <p className="text-xs text-gray-500 mt-1">{selectedFiles.length} file(s) selected.</p>}
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="comment" className="text-blue-800 font-semibold text-sm font-sans">
@@ -194,11 +182,46 @@ interface PreHospitalizationFormProps {
 const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospitalizationFormProps) => {
   const [isFormVisible, setIsFormVisible] = useState<boolean>(!!preHospitalizationForm.IsPreHospitalizationExpenses);
   const [bills, setBills] = useState<Bill[]>([
-    { id: 1, type: 'Medicine', billDate: preHospitalizationForm?.PreHospitalizationExpensesMedicine?.ClaimDate || '', billedAmount: preHospitalizationForm?.PreHospitalizationExpensesMedicine?.BilledAmount?.toString() || '0', claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesMedicine?.ClaimedAmount?.toString() || '0', isDefault: true },
-    { id: 2, type: 'Consultation', billDate: preHospitalizationForm?.PreHospitalizationExpensesConsultation?.ClaimDate || '', billedAmount: preHospitalizationForm?.PreHospitalizationExpensesConsultation?.BilledAmount?.toString() || '0', claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesConsultation?.ClaimedAmount?.toString() || '0', isDefault: true },
-    { id: 3, type: 'Investigation', billDate: preHospitalizationForm?.PreHospitalizationExpensesInvestigation?.ClaimDate || '', billedAmount: preHospitalizationForm?.PreHospitalizationExpensesInvestigation?.BilledAmount?.toString() || '0', claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesInvestigation?.ClaimedAmount?.toString() || '0', isDefault: true },
-    { id: 4, type: 'Procedure', billDate: preHospitalizationForm?.PreHospitalizationProcedure?.ClaimDate || '', billedAmount: preHospitalizationForm?.PreHospitalizationProcedure?.BilledAmount?.toString() || '0', claimedAmount: preHospitalizationForm?.PreHospitalizationProcedure?.ClaimedAmount?.toString() || '0', isDefault: true },
-    { id: 5, type: 'Other', billDate: preHospitalizationForm?.PreHospitalizationExpensesOther?.ClaimDate || '', billedAmount: preHospitalizationForm?.PreHospitalizationExpensesOther?.BilledAmount?.toString() || '0', claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesOther?.ClaimedAmount?.toString() || '0', isDefault: true },
+    {
+      id: 1,
+      type: 'Medicine',
+      billDate: preHospitalizationForm?.PreHospitalizationExpensesMedicine?.ClaimDate || '',
+      billedAmount: preHospitalizationForm?.PreHospitalizationExpensesMedicine?.BilledAmount?.toString() || '0',
+      claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesMedicine?.ClaimedAmount?.toString() || '0',
+      isDefault: true,
+    },
+    {
+      id: 2,
+      type: 'Consultation',
+      billDate: preHospitalizationForm?.PreHospitalizationExpensesConsultation?.ClaimDate || '',
+      billedAmount: preHospitalizationForm?.PreHospitalizationExpensesConsultation?.BilledAmount?.toString() || '0',
+      claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesConsultation?.ClaimedAmount?.toString() || '0',
+      isDefault: true,
+    },
+    {
+      id: 3,
+      type: 'Investigation',
+      billDate: preHospitalizationForm?.PreHospitalizationExpensesInvestigation?.ClaimDate || '',
+      billedAmount: preHospitalizationForm?.PreHospitalizationExpensesInvestigation?.BilledAmount?.toString() || '0',
+      claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesInvestigation?.ClaimedAmount?.toString() || '0',
+      isDefault: true,
+    },
+    {
+      id: 4,
+      type: 'Procedure',
+      billDate: preHospitalizationForm?.PreHospitalizationProcedure?.ClaimDate || '',
+      billedAmount: preHospitalizationForm?.PreHospitalizationProcedure?.BilledAmount?.toString() || '0',
+      claimedAmount: preHospitalizationForm?.PreHospitalizationProcedure?.ClaimedAmount?.toString() || '0',
+      isDefault: true,
+    },
+    {
+      id: 5,
+      type: 'Other',
+      billDate: preHospitalizationForm?.PreHospitalizationExpensesOther?.ClaimDate || '',
+      billedAmount: preHospitalizationForm?.PreHospitalizationExpensesOther?.BilledAmount?.toString() || '0',
+      claimedAmount: preHospitalizationForm?.PreHospitalizationExpensesOther?.ClaimedAmount?.toString() || '0',
+      isDefault: true,
+    },
   ]);
   // File uploads state for each bill type (PascalCase keys)
   const ensureFileArray = (arr: any): File[] => (Array.isArray(arr) && arr.length > 0 && arr[0] instanceof File ? arr : []);
@@ -215,7 +238,7 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
   const [errors, setErrors] = useState<{ [id: number]: string }>({});
   const updateBill = (id: number, field: keyof Bill, value: string) => {
     let errorMsg = '';
-    const updatedBills = bills.map(bill => {
+    const updatedBills = bills.map((bill) => {
       if (bill.id === id) {
         let newBill = { ...bill, [field]: value };
         // Validation: ClaimedAmount should not exceed BilledAmount
@@ -232,34 +255,34 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
       return bill;
     });
     setBills(updatedBills);
-    setErrors(prev => ({ ...prev, [id]: errorMsg }));
+    setErrors((prev) => ({ ...prev, [id]: errorMsg }));
     // Map local state to API structure and call onChange (PascalCase keys, including file arrays)
     const apiPreHospDetails = {
       IsPreHospitalizationExpenses: isFormVisible,
       PreHospitalizationExpensesMedicine: {
         BilledAmount: Number(updatedBills[0].billedAmount),
         ClaimedAmount: Number(updatedBills[0].claimedAmount),
-        ClaimDate: updatedBills[0].billDate
+        ClaimDate: updatedBills[0].billDate,
       },
       PreHospitalizationExpensesConsultation: {
         BilledAmount: Number(updatedBills[1].billedAmount),
         ClaimedAmount: Number(updatedBills[1].claimedAmount),
-        ClaimDate: updatedBills[1].billDate
+        ClaimDate: updatedBills[1].billDate,
       },
       PreHospitalizationExpensesInvestigation: {
         BilledAmount: Number(updatedBills[2].billedAmount),
         ClaimedAmount: Number(updatedBills[2].claimedAmount),
-        ClaimDate: updatedBills[2].billDate
+        ClaimDate: updatedBills[2].billDate,
       },
       PreHospitalizationProcedure: {
         BilledAmount: Number(updatedBills[3].billedAmount),
         ClaimedAmount: Number(updatedBills[3].claimedAmount),
-        ClaimDate: updatedBills[3].billDate
+        ClaimDate: updatedBills[3].billDate,
       },
       PreHospitalizationExpensesOther: {
         BilledAmount: Number(updatedBills[4].billedAmount),
         ClaimedAmount: Number(updatedBills[4].claimedAmount),
-        ClaimDate: updatedBills[4].billDate
+        ClaimDate: updatedBills[4].billDate,
       },
       PreHospitalizationExpensesMedicineFiles: uploads.PreHospitalizationExpensesMedicineFiles,
       PreHospitalizationExpensesConsultationFiles: uploads.PreHospitalizationExpensesConsultationFiles,
@@ -278,18 +301,20 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
     onChange({ ...preHospitalizationForm, [billTypeKey]: files });
   };
 
-  const calculateSubTotal = (): number => { // Added return type
+  const calculateSubTotal = (): number => {
+    // Added return type
     return bills.reduce((sum, bill) => sum + parseFloat(bill.billedAmount || '0'), 0);
   };
 
   return (
-    <div className=" pb-4 font-sans text-gray-800 flex justify-center items-start "> {/* Added padding and background to outer div */}
+    <div className=" pb-4 font-sans text-gray-800 flex justify-center items-start ">
+      {' '}
+      {/* Added padding and background to outer div */}
       <div className="bg-white w-full rounded-2xl shadow-xl p-6 border border-blue-200">
-        
         <div className="flex items-center w-full space-x-3 mb-6">
           <Checkbox
             checked={isFormVisible}
-            onCheckedChange={checked => {
+            onCheckedChange={(checked) => {
               setIsFormVisible(checked === true);
               onChange({ ...preHospitalizationForm, IsPreHospitalizationExpenses: checked === true });
             }}
@@ -305,34 +330,22 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-primary text-white">
-                    <th className="px-4 py-3 text-left text-sm font-semibold rounded-tl-lg">
-                      S.No.
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      Bill Type
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      Bill Date
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      Billed Amount
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      Claimed Amount
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold">
-                      Upload
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold rounded-tr-lg">
-                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold rounded-tl-lg">S.No.</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Bill Type</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Bill Date</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Billed Amount</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Claimed Amount</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">Upload</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold rounded-tr-lg"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {bills.map((bill, index) => (
-                    <tr key={bill.id} className="group hover:bg-blue-50 odd:bg-white even:bg-blue-50 border-b border-blue-100 last:border-b-0 transition-colors duration-200">
-                      <td className="px-4 py-3 text-sm text-blue-900 font-medium">
-                        {bill.isDefault ? index + 1 : ''}
-                      </td>
+                    <tr
+                      key={bill.id}
+                      className="group hover:bg-blue-50 odd:bg-white even:bg-blue-50 border-b border-blue-100 last:border-b-0 transition-colors duration-200"
+                    >
+                      <td className="px-4 py-3 text-sm text-blue-900 font-medium">{bill.isDefault ? index + 1 : ''}</td>
                       <td className="px-4 py-3 text-sm">
                         {bill.isDefault ? (
                           <span className="text-gray-700">{bill.type}</span>
@@ -408,7 +421,6 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
                           />
                         )}
                       </td>
-                      
                     </tr>
                   ))}
                 </tbody>

@@ -30,6 +30,12 @@ export interface GetClaimState {
   data: DirectClaim[] | null;
 }
 
+export interface GetClaimParams {
+  recipientId: number;
+  pageId: number;
+  empId?: number;
+}
+
 // ---------------- Initial State ---------------- //
 
 const initialState: GetClaimState = {
@@ -52,7 +58,7 @@ export const getClaimHr = createAsyncThunk<
   async ({ recipientId, pageId, empId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/Claim/GetClaimRequest/${recipientId}/${pageId}`, {
-        params: empId ? { empId } : {},
+        
       });
       return response.data.data;
     } catch (error: any) {

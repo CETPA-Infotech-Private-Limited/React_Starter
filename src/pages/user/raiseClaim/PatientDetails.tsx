@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { UploadCloud, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -142,7 +140,7 @@ const PatientDetails = ({ patientDetail, patientDetailOnChange }) => {
             <Label htmlFor="member-select" className="sm:w-32 font-semibold text-blue-800 flex-shrink-0 text-sm font-sans">
               Select Member
             </Label>
-            <FamilyMemberSelect onOpenChange={() => patientDetailOnChange({ ...patientDetail, member: 'selected' })}/>
+            <FamilyMemberSelect onOpenChange={() => patientDetailOnChange({ ...patientDetail, member: 'selected' })} />
           </div>
 
           {/* Hospital Empanelled radio button and conditional fields */}

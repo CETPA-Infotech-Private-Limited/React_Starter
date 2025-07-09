@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -17,7 +15,7 @@ const ApproveAdvance = () => {
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
-  
+
   const [formData, setFormData] = useState({
     estimatedAmount: '',
     approvedAmount: '',
@@ -204,7 +202,7 @@ const ApproveAdvance = () => {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <ClaimSettlementList columns={columns} claimList={advanceList} />
-      
+
       {selectedAdvance && showDetails && (
         <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
           <div className="p-6 bg-white">
@@ -269,7 +267,7 @@ const ApproveAdvance = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="mt-4 flex gap-2 items-start bg-blue-50 p-4 border border-blue-200 rounded-lg">
                   <Checkbox
                     id="declaration"

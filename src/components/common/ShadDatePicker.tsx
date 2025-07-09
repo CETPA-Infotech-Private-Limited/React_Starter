@@ -1,5 +1,3 @@
-'use client';
-
 import React, { forwardRef } from 'react';
 import DatePicker, { ReactDatePickerProps as DatePickerProps } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';

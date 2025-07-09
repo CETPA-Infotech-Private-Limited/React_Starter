@@ -10,8 +10,22 @@ import {
   StatusBadge
 } from './ReviewComponents';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
+
+interface ClaimProcessPayload {
+  AdvanceId: number;
+  SenderId: number;
+  RecipientId: number;
+  ClaimTypeId: number;
+  StatusId: number;
+}
+
 
 const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
+const dispatch = useAppDispatch()
+
   if (!claimDetail) return null;
 
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
@@ -38,6 +52,34 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
 
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
+
+  console.log(claimDetail ,'this is claim detail object')
+
+  const user = useAppSelector((state:RootState)=>state.user)
+  
+
+
+
+  const handleSendToDoctor = async()=>{
+     const payload: ClaimProcessPayload = {
+    AdvanceId: Number(claimDetail.advanceBasicDetails.claimId),
+    SenderId: Number(user.EmpCode),
+    RecipientId: 102199,
+    ClaimTypeId: Number(claimDetail.advanceBasicDetails.claimTypeId),
+    StatusId: 18,
+  };
+    const formData = new FormData()
+
+    formData.append('AdvanceId', claimDetail.advanceBasicDetails.claimId)
+    formData.append('SenderId', user.EmpCode)
+    formData.append('RecipientId', 102199)
+    formData.append('ClaimTypeId',claimDetail.advanceBasicDetails.claimTypeId)
+    formData.append('StatusId', 18)
+
+    await(dispatch(submitClaimProcessByHr(formData)))
+
+
+  }
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
@@ -111,7 +153,11 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
 
       <div className="mt-6">
         <Textarea placeholder="Add clarification..." />
+        
         <Button className="mt-2">Seek Clarification</Button>
+        <div>
+        <Button className='mt-2 pl-6 pr-6' onClick={handleSendToDoctor}>Send to Doctor</Button>
+        </div>
       </div>
     </div>
   );

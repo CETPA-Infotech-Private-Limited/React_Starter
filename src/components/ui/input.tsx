@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 
 import { Eye, EyeOff } from 'lucide-react';
@@ -13,19 +11,7 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   postfixPadding?: string;
 };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      className,
-      type,
-      enableToggle = false,
-      prefix,
-      postfix,
-      prefixPadding = 'pl-12',
-      postfixPadding = 'pr-12',
-      ...props
-    },
-    ref
-  ) => {
+  ({ className, type, enableToggle = false, prefix, postfix, prefixPadding = 'pl-12', postfixPadding = 'pr-12', ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const togglePasswordVisibility = () => {
       setShowPassword((prev) => {
@@ -51,11 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {type === 'password' && enableToggle && (
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            className="absolute right-2 top-1/2 -translate-y-1/2 transform text-muted-foreground"
-          >
+          <button type="button" onClick={togglePasswordVisibility} className="absolute right-2 top-1/2 -translate-y-1/2 transform text-muted-foreground">
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}

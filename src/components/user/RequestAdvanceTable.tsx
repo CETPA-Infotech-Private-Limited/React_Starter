@@ -11,7 +11,7 @@ const RequestAdvanceTable = ({ columns, data, onAddClick }) => {
       showSearchInput
       rightElements={
         <Button onClick={onAddClick}>
-          <Plus /> New Advance Claim Request
+          <Plus /> New Advance Request
         </Button>
       }
     />
