@@ -5,10 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EyeIcon, EyeOff } from 'lucide-react';
+<<<<<<< HEAD
 import { BeneficiaryDetailsCard} from '@/components/hr/advanceApprove/BeneficiaryDetails';
 import { PatientDetailsCard } from '@/components/hr/advanceApprove/PatientDetailsTable';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import { DisplayField, InfoCard, StatusBadge } from '@/components/hr/reviewclaim/ReviewComponents';
+=======
+import { BeneficiaryDetailsCard } from '@/components/hr/approveadvance/BeneficiaryDetails';
+import { HospitalizationDetailsCard } from '@/components/hr/approveadvance/HospitalizationDetailsCard';
+import { PatientDetailsCard } from '@/components/hr/approveadvance/PatientDetailsTable';
+import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
+import { DisplayField, InfoCard, StatusBadge } from '@/components/hr/reviewClaim/ReviewComponents';
+>>>>>>> e1c6e810795f824376a94d91536577a3b21bc604
 
 const ApproveAdvance = () => {
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);

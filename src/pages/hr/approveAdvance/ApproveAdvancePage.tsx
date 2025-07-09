@@ -203,7 +203,7 @@ const ApproveAdvancePage = () => {
             />
           )}
 
-          {claimDetails?.hospitalAccoundetail && (
+          {/* {claimDetails?.hospitalAccoundetail && (
             <BeneficiaryDetailsCard
               beneficiaryName={claimDetails.hospitalAccoundetail.beneficiaryName}
               bankName={claimDetails.hospitalAccoundetail.bankName}
@@ -216,7 +216,7 @@ const ApproveAdvancePage = () => {
               sapRefNumber={claimDetails.hospitalAccoundetail.sapRefNumber}
               sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
             />
-          )}
+          )} */}
 
           <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} />
         </>

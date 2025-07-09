@@ -6,14 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 type Props = {
   value: string | undefined;
   onChange: (value: string) => void;
+  disabled?: boolean;
 };
 
-const FamilyMemberSelect: React.FC<Props> = ({ value, onChange }) => {
+const FamilyMemberSelect: React.FC<Props> = ({ value, onChange, disabled = false }) => {
   const user = useAppSelector((state: RootState) => state.user);
 
   const memberList = [
     {
-      patientId: user.EmpCode,
+      patientId: user.EmpCode?.toString() || '',
       name: user.name,
       relation: 'Self',
       age: 30,
@@ -21,10 +22,11 @@ const FamilyMemberSelect: React.FC<Props> = ({ value, onChange }) => {
   ];
 
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-full border border-blue-200 rounded-lg">
-        <SelectValue placeholder="Choose Member" />
+    <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <SelectTrigger disabled={disabled} className="w-full border border-blue-200 rounded-lg text-xs font-sans">
+        <SelectValue placeholder="Select Member" />
       </SelectTrigger>
+
       <SelectContent>
         {memberList.map((member) => (
           <SelectItem key={member.patientId} value={member.patientId}>

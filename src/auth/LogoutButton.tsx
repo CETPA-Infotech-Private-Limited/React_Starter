@@ -61,10 +61,7 @@ const LogoutButton = () => {
 
           <AlertDialogDescription className=" text-slate-600 leading-relaxed mt-3">
             <div className="space-y-2">
-              <div className="text-black text-lg text-center">
-                {' '}
-                Are you sure you want to terminate all your current sessions?
-              </div>
+              <div className="text-black text-lg text-center">Are you sure you want to terminate all your current sessions?</div>
               <div className="flex items-center justify-center gap-2 text-xs mt-4 text-slate-500">
                 You will be logged out from all applications and need to sign in again.
               </div>

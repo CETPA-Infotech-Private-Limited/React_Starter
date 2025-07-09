@@ -73,7 +73,7 @@ export function HospitalizationDetailsCard({
         <CardTitle className="text-xl font-bold text-blue-800 tracking-tight">Hospitalization Details</CardTitle>
       </CardHeader>
 
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-2">
         <ReadOnlyField label="Hospital Name" value={hospitalName} />
         <ReadOnlyField label="Hospital Regd. No." value={regdNo} />
         <ReadOnlyField label="Doctor's Name" value={doctorName} />

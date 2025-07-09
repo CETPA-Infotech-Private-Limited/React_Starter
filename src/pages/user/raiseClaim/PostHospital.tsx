@@ -129,7 +129,7 @@ interface PostHospitalizationFormProps {
 }
 
 const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit }: PostHospitalizationFormProps) => {
-  const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
+
 
   // File upload states
   const [postHospitalTreatmentAdviseFiles, setPostHospitalTreatmentAdviseFiles] = useState<File[]>(
@@ -165,7 +165,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Label className="text-base text-xl font-extrabold text-primary min-w-[200px]">Post Hospitalization Applicable</Label>
+              <Label className=" text-xl font-extrabold text-primary min-w-[200px]">Post Hospitalization Applicable</Label>
               <RadioGroup
                 value={IsPostHospitalization ? 'yes' : 'no'}
                 onValueChange={(val) => onChange({ ...postHospitalizationAndDeclaration, IsPostHospitalization: val === 'yes' })}
