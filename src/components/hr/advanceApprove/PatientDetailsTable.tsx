@@ -10,7 +10,7 @@ type PatientDetailsProps = {
 
 export function PatientDetailsCard({ name, relation, dob, gender }: PatientDetailsProps) {
   return (
-    <Card className="border border-blue-200 shadow-xl rounded-2xl font-sans text-sm p-6">
+    <Card className="border border-blue-200 shadow-xl rounded-2xl font-sans text-sm px-4 py-0">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-bold text-blue-800 tracking-tight">Patient Details</CardTitle>
       </CardHeader>

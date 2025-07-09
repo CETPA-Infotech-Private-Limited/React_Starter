@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import ViewClaimDetails from '@/components/hr/reviewclaim/ViewClaimDetails';
@@ -11,27 +9,27 @@ import { RootState } from '@/app/store';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 
-  const ReviewClaim = () => {
-    const dispatch = useAppDispatch()
-      
-       const claimHrData = useAppSelector((state:RootState)=>state.getClaimHr.data)
-       
-       const { employees } = useAppSelector((state: RootState) => state.employee);
+const ReviewClaim = () => {
+  const dispatch = useAppDispatch();
+
+  const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
+
+  const { employees } = useAppSelector((state: RootState) => state.employee);
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  const user = useAppSelector((state:RootState)=>state.user)
-  console.log(user, "this is userDetails")
+  const user = useAppSelector((state: RootState) => state.user);
+  console.log(user, 'this is userDetails');
 
-useEffect(() => {
-  if (user?.EmpCode) {
-    dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
-  }
-}, [user?.EmpCode]); 
+  useEffect(() => {
+    if (user?.EmpCode) {
+      dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+    }
+  }, [user?.EmpCode]);
   // Auto scroll to details when toggled on
   useEffect(() => {
-    if (showDetails && detailsRef.current){
+    if (showDetails && detailsRef.current) {
       detailsRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [showDetails]);
@@ -49,16 +47,15 @@ useEffect(() => {
       setShowDetails(true);
     }
 
-     if (rowData.directClaimId) {
-      dispatch(getClaimDataHr({advanceid: rowData.directClaimId}));
-      
+    if (rowData.directClaimId) {
+      dispatch(getClaimDataHr({ advanceid: rowData.directClaimId }));
     }
   };
 
- const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
+  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
 
-  console.log(claimDetail,'this is claimdetail')
-    
+  console.log(claimDetail, 'this is claimdetail');
+
   const columns = useMemo(
     () => [
       {
@@ -94,8 +91,6 @@ useEffect(() => {
           const rowData = row.original;
           const isSelected = selectedClaim?.id === rowData.id;
 
-          
-
           return (
             <Button
               size="sm"
@@ -112,20 +107,20 @@ useEffect(() => {
     [selectedClaim, showDetails]
   );
 
-  const empData = findEmployeeDetails(employees, user.EmpCode)
-  console.log(empData,"this is emp data")
+  const empData = findEmployeeDetails(employees, user.EmpCode);
+  console.log(empData, 'this is emp data');
 
   const claimList = Array.isArray(claimHrData)
-  ? claimHrData.map((value, index) => ({
-      id: value.claimId,
-      employeeName: empData.employee.empName,
-      patientName: empData.employee.empName,
-      relation: 'Self', // if not available
-      requestedDate: new Date(value.requestDate).toLocaleDateString(),
-      claimAmount: value.cliamAmount,
-      directClaimId:value.directClaimId
-    }))
-  : [];
+    ? claimHrData.map((value, index) => ({
+        id: value.claimId,
+        employeeName: empData.employee.empName,
+        patientName: empData.employee.empName,
+        relation: 'Self', // if not available
+        requestedDate: new Date(value.requestDate).toLocaleDateString(),
+        claimAmount: value.cliamAmount,
+        directClaimId: value.directClaimId,
+      }))
+    : [];
 
   //   {
   //     id: 'CLM002',

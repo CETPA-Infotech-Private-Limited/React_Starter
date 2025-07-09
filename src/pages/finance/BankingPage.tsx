@@ -99,11 +99,21 @@ const ApproveAdvancePage = () => {
         className: 'text-center',
       },
       {
+        accessorKey: 'approvedAmount',
+        header: 'Approved Amount',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const amount = row.original.approvedAmount;
+          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
+        },
+        className: 'text-center',
+      },
+      {
         id: 'actions',
         header: 'Actions',
         cell: ({ row }: any) => {
           const item = row.original;
-          const isSelected = selectedAdvance?.advanceId === item.advanceId;
+          const isSelected = selectedAdvance?.claimId === item.claimId;
 
           return (
             <Button
@@ -115,7 +125,7 @@ const ApproveAdvancePage = () => {
                 if (isSelected) {
                   setSelectedAdvance(null);
                 } else {
-                  dispatch(fetchClaimDetails(item.advanceId));
+                  dispatch(fetchClaimDetails(item.claimId));
                   setSelectedAdvance(item);
                 }
               }}
@@ -146,7 +156,7 @@ const ApproveAdvancePage = () => {
 
     dispatch(
       submitAdvanceApproval({
-        AdvanceId: Number(selectedAdvance.advanceId),
+        claimId: Number(selectedAdvance.claimId),
         SenderId: Number(user.EmpCode),
         RecipientId: 101002,
         ClaimTypeId: 1,
@@ -177,19 +187,9 @@ const ApproveAdvancePage = () => {
           showSearchInput
           showFilter
           onRowClick={() => {}}
-          rowClassName={(row) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-blue-50 border-l-2 border-blue-600' : '')}
+          rowClassName={(row) => (selectedAdvance?.claimId === row.original.claimId ? 'bg-blue-50 border-l-2 border-blue-600' : '')}
         />
       </Card>
-      <AdvanceBankingDetailsForm
-        onSubmit={handleBankingDetailsSubmit}
-        loading={false}
-        initialData={{
-          sapRefNumber: 'ABC123456',
-          sapRefDate: '2025-07-08',
-          transactionDate: '2025-07-07',
-          utrNo: 'UTR789456',
-        }}
-      />
 
       {selectedAdvance && patientDetails && (
         <>
@@ -222,7 +222,7 @@ const ApproveAdvancePage = () => {
             />
           )}
 
-          {claimDetails?.hospitalAccoundetail && (
+          {/* {claimDetails?.hospitalAccoundetail && (
             <BeneficiaryDetailsCard
               beneficiaryName={claimDetails.hospitalAccoundetail.beneficiaryName}
               bankName={claimDetails.hospitalAccoundetail.bankName}
@@ -235,9 +235,12 @@ const ApproveAdvancePage = () => {
               sapRefNumber={claimDetails.hospitalAccoundetail.sapRefNumber}
               sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
             />
-          )}
-
-          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} />
+          )} */}
+          {/* 
+          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} /> */}
+          <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white  ">
+            <h2 className="text-xl font-bold text-blue-700 mb-4">Verify And Approved</h2>
+          </Card>
         </>
       )}
     </div>

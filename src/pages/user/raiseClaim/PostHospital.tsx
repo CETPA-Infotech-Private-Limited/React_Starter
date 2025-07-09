@@ -1,24 +1,13 @@
-'use client';
-
 import React, { useState } from 'react';
 import { UploadCloud, Trash2, X, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
-
 
 interface UploadDialogProps {
   title: string;
@@ -63,9 +52,7 @@ const UploadDialog: React.FC<UploadDialogProps> = ({ title, files, onFilesChange
       <DialogContent className="sm:max-w-[560px] text-black text-xs bg-gradient-to-br from-white via-blue-50 to-white shadow-xl border border-blue-300 rounded-2xl p-6 animate-fade-in font-sans">
         <DialogHeader className="relative">
           <DialogTitle className="text-xl text-blue-800 font-extrabold tracking-tight mb-1 drop-shadow text-center font-sans">{title}</DialogTitle>
-          <DialogDescription className="text-xs text-gray-600 italic mb-4 text-center font-sans">
-            Upload relevant documents.
-          </DialogDescription>
+          <DialogDescription className="text-xs text-gray-600 italic mb-4 text-center font-sans">Upload relevant documents.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
           <div className="grid gap-1.5">
@@ -145,9 +132,15 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
   const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
 
   // File upload states
-  const [postHospitalTreatmentAdviseFiles, setPostHospitalTreatmentAdviseFiles] = useState<File[]>(postHospitalizationAndDeclaration.PostHospitalTreatmentAdviseUpload || []);
-  const [regdCertificateFiles, setRegdCertificateFiles] = useState<File[]>((postHospitalizationAndDeclaration.HospitalRegstrationDetailsFile && postHospitalizationAndDeclaration.HospitalRegstrationDetailsFile.Files) || []);
-  const [incomeTaxExemptionFiles, setIncomeTaxExemptionFiles] = useState<File[]>((postHospitalizationAndDeclaration.HospitalIncomeTaxFile && postHospitalizationAndDeclaration.HospitalIncomeTaxFile.Files) || []);
+  const [postHospitalTreatmentAdviseFiles, setPostHospitalTreatmentAdviseFiles] = useState<File[]>(
+    postHospitalizationAndDeclaration.PostHospitalTreatmentAdviseUpload || []
+  );
+  const [regdCertificateFiles, setRegdCertificateFiles] = useState<File[]>(
+    (postHospitalizationAndDeclaration.HospitalRegstrationDetailsFile && postHospitalizationAndDeclaration.HospitalRegstrationDetailsFile.Files) || []
+  );
+  const [incomeTaxExemptionFiles, setIncomeTaxExemptionFiles] = useState<File[]>(
+    (postHospitalizationAndDeclaration.HospitalIncomeTaxFile && postHospitalizationAndDeclaration.HospitalIncomeTaxFile.Files) || []
+  );
 
   // Propagate file changes up to parent
   React.useEffect(() => {
@@ -172,12 +165,10 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Label className="text-base text-xl font-extrabold text-primary min-w-[200px]">
-                Post Hospitalization Applicable
-              </Label>
+              <Label className="text-base text-xl font-extrabold text-primary min-w-[200px]">Post Hospitalization Applicable</Label>
               <RadioGroup
                 value={IsPostHospitalization ? 'yes' : 'no'}
-                onValueChange={val => onChange({ ...postHospitalizationAndDeclaration, IsPostHospitalization: val === 'yes' })}
+                onValueChange={(val) => onChange({ ...postHospitalizationAndDeclaration, IsPostHospitalization: val === 'yes' })}
                 className="flex space-x-6"
               >
                 <div className="flex items-center space-x-2">
@@ -197,14 +188,8 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
 
             {IsPostHospitalization && (
               <div className="flex items-center space-x-3">
-                <Label className="text-md text-primary font-medium ">
-                  Upload Post Hospitalization Treatment Advice
-                </Label>
-                <UploadDialog
-                  title="Upload File"
-                  files={postHospitalTreatmentAdviseFiles}
-                  onFilesChange={setPostHospitalTreatmentAdviseFiles}
-                />
+                <Label className="text-md text-primary font-medium ">Upload Post Hospitalization Treatment Advice</Label>
+                <UploadDialog title="Upload File" files={postHospitalTreatmentAdviseFiles} onFilesChange={setPostHospitalTreatmentAdviseFiles} />
               </div>
             )}
           </div>
@@ -220,7 +205,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
               <Label className="text-base font-medium text-primary min-w-[200px]">Special Disease</Label>
               <RadioGroup
                 value={IsSpecailDisease ? 'yes' : 'no'}
-                onValueChange={val => onChange({ ...postHospitalizationAndDeclaration, IsSpecailDisease: val === 'yes' })}
+                onValueChange={(val) => onChange({ ...postHospitalizationAndDeclaration, IsSpecailDisease: val === 'yes' })}
                 className="flex space-x-6"
               >
                 <div className="flex items-center space-x-2">
@@ -246,7 +231,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
                 <Input
                   id="special-disease-name"
                   value={SpecialDiseaseName || ''}
-                  onChange={e => onChange({ ...postHospitalizationAndDeclaration, SpecialDiseaseName: e.target.value })}
+                  onChange={(e) => onChange({ ...postHospitalizationAndDeclaration, SpecialDiseaseName: e.target.value })}
                   placeholder="Enter disease name"
                   className="w-64"
                 />
@@ -260,7 +245,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
               <Label className="text-base font-medium text-primary min-w-[200px]">Taxable</Label>
               <RadioGroup
                 value={IsTaxAble ? 'yes' : 'no'}
-                onValueChange={val => onChange({ ...postHospitalizationAndDeclaration, IsTaxAble: val === 'yes' })}
+                onValueChange={(val) => onChange({ ...postHospitalizationAndDeclaration, IsTaxAble: val === 'yes' })}
                 className="flex space-x-6"
               >
                 <div className="flex items-center space-x-2">
@@ -282,20 +267,12 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
               <div className="grid grid-cols-2 gap-6 mt-4">
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <Label className="text-md font-medium w-full text-primary">Upload Regd. Certificate</Label>
-                  <UploadDialog
-                    title="Upload File"
-                    files={regdCertificateFiles}
-                    onFilesChange={setRegdCertificateFiles}
-                  />
+                  <UploadDialog title="Upload File" files={regdCertificateFiles} onFilesChange={setRegdCertificateFiles} />
                 </div>
 
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <Label className="text-md w-full font-medium text-primary">Hospital Income Tax Exemption Letter</Label>
-                  <UploadDialog
-                    title="Upload File"
-                    files={incomeTaxExemptionFiles}
-                    onFilesChange={setIncomeTaxExemptionFiles}
-                  />
+                  <UploadDialog title="Upload File" files={incomeTaxExemptionFiles} onFilesChange={setIncomeTaxExemptionFiles} />
                 </div>
               </div>
             )}
@@ -333,23 +310,18 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
         <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <Checkbox
             checked={!!DeclarationChecked}
-            onCheckedChange={checked => onChange({ ...postHospitalizationAndDeclaration, DeclarationChecked: checked === true })}
+            onCheckedChange={(checked) => onChange({ ...postHospitalizationAndDeclaration, DeclarationChecked: checked === true })}
             id="final-declaration"
             className="mt-0.5"
-          />  
+          />
           <Label htmlFor="final-declaration" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-            I the undersigned hereby declare that the information given in this form is correct and complete to the best
-            of my knowledge and belief.
+            I the undersigned hereby declare that the information given in this form is correct and complete to the best of my knowledge and belief.
           </Label>
         </div>
 
         {/* Submit Button */}
         <div className="flex justify-end pt-4">
-          <Button
-            onClick={onSubmit}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2"
-            disabled={!DeclarationChecked}
-          >
+          <Button onClick={onSubmit} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2" disabled={!DeclarationChecked}>
             Submit Claim
           </Button>
         </div>

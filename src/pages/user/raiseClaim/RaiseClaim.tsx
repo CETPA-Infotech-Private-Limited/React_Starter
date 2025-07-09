@@ -1,4 +1,3 @@
-'use client';
 import React, { useState } from 'react';
 import { submitDirectClaim, getMyClaims } from '@/features/user/claim/claimSlice';
 import type { RootState } from '@/app/store';

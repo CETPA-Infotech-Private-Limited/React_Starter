@@ -23,6 +23,7 @@ import DirectRequestTable from '@/pages/user/raiseClaim/AdvanceRequestTable';
 import HospitalManagement from '@/pages/admin/HospitalManagement';
 import ApproveAdvancePage from '@/pages/hr/approveAdvance/ApproveAdvancePage';
 import BankingPage from '@/pages/finance/BankingPage';
+import MyClaim from '@/pages/user/MyClaim';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -47,13 +48,13 @@ const AppRoutes = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/raise-claim" element={<DirectRequestTable />} />
+            <Route path="/approve-advance" element={<ApproveAdvancePage />} />
             <Route path="/review-claim" element={<ReviewClaim />} />
             <Route path="/ClaimAfterDoctorReview" element={<ApproveClaim />} />
-            <Route path="/approve-advance" element={<ApproveAdvancePage />} />
+            <Route path="/my-claim" element={<MyClaim />} />
 
             <Route path="/request-advance" element={<AdvanceClaimPage />} />
-             <Route path="/banking" element={<BankingPage/>} />
-
+            <Route path="/banking" element={<BankingPage />} />
           </Route>
         </Route>
 
