@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
-import {format} from 'date-fns';  
-
+import { format } from 'date-fns';
 
 const DirectRequestTable = () => {
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
@@ -106,7 +105,9 @@ const DirectRequestTable = () => {
           employeeName: userdata.name || '',
           patientName: userdata.name || '',
           relation: value.relation || 'Self',
-          requestedDate: value.requestedDate ? format(new Date(value.requestedDate), 'dd-MM-yyyy'): format(new Date(), 'dd-MM-yyyy'),
+          requestedDate: value.requestedDate
+  ? format(new Date(value.requestedDate), 'dd-MM-yyyy')
+  : format(new Date(), 'dd-MM-yyyy'),
           claimAmount: value.claimAmount || value.cliamAmount || 0,
         }))
     : [];

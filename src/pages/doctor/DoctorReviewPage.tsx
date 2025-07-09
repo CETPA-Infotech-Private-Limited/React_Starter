@@ -1,17 +1,257 @@
-import RequestAdvanceTable from '@/components/user/RequestAdvanceTable'
-import React from 'react'
-import TableList from '@/components/ui/data-table'
+import React, { useMemo, useState, useRef, useEffect } from 'react';
+import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
+import ViewClaimDetails from '@/components/hr/reviewclaim/ViewClaimDetails';
+import { Button } from '@/components/ui/button';
+import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
+import HospitalizationBillView from '@/components/hr/reviewclaim/HospitalizationBillView';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import { findEmployeeDetails } from '@/lib/helperFunction';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';    
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const DoctorReviewPage = () => {
-//   return (
-// <TableList
-//       columns={columns}
-//       data={data}
-//       showFilter={true}
-//       showSearchInput
-    
-// )
+  const dispatch = useAppDispatch();
+  const claimDrData = useAppSelector((state: RootState) => state.getClaimHr.data);
+  const { employees } = useAppSelector((state: RootState) => state.employee);
+  const user = useAppSelector((state: RootState) => state.user);
+  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
 
-}
+  const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const detailsRef = useRef<HTMLDivElement>(null);
+
+  // Form State for Doctor & Employee Declaration
+  const [form, setForm] = useState({
+    postHospitalization: '',
+    postHospComment: '',
+    employeeSpecialDisease: '',
+    specialDiseaseName: '',
+    doctorSpecialDisease: '',
+    doctorComment: '',
+    additionalComment: '',
+    verified: false,
+  });
+
+  
+  const handleChange = (field: string, value: any) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    console.log('Submitted Form:', form);
+    // Replace this with your backend submission logic
+  };
+
+  useEffect(() => {
+    if (user?.EmpCode) {
+      dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+    }
+  }, [user?.EmpCode]);
+
+  useEffect(() => {
+    if (showDetails && detailsRef.current) {
+      detailsRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [showDetails]);
+
+  const handleViewToggle = (rowData: any) => {
+    const isSame = selectedClaim?.id === rowData.id;
+    if (isSame) {
+      const shouldShow = !showDetails;
+      setShowDetails(shouldShow);
+      if (!shouldShow) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      setSelectedClaim(rowData);
+      setShowDetails(true);
+    }
+
+    if (rowData.directClaimId) {
+      dispatch(getClaimDataHr({ advanceid: rowData.directClaimId }));
+    }
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'srNo',
+        header: 'Sr. No',
+        cell: ({ row }: any) => row.index + 1,
+      },
+      {
+        accessorKey: 'employeeName',
+        header: 'Employee Name',
+      },
+      {
+        accessorKey: 'patientName',
+        header: 'Patient Name',
+      },
+      {
+        accessorKey: 'relation',
+        header: 'Relation',
+      },
+      {
+        accessorKey: 'requestedDate',
+        header: 'Requested Date',
+      },
+      {
+        accessorKey: 'claimAmount',
+        header: 'Claim Amount (₹)',
+        cell: ({ getValue }: any) => `₹ ${getValue().toLocaleString()}`,
+      },
+      {
+        accessorKey: 'action',
+        header: 'Action',
+        cell: ({ row }: any) => {
+          const rowData = row.original;
+          const isSelected = selectedClaim?.id === rowData.id;
+
+          return (
+            <Button
+              size="sm"
+              onClick={() => handleViewToggle(rowData)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+            >
+              {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+              {isSelected && showDetails ? 'Hide' : 'View'}
+            </Button>
+          );
+        },
+      },
+    ],
+    [selectedClaim, showDetails]
+  );
+
+  const empData = findEmployeeDetails(employees, user.EmpCode);
+
+  const claimList = Array.isArray(claimDrData)
+    ? claimDrData.map((value, index) => ({
+        id: value.claimId,
+        employeeName: empData.employee.empName,
+        patientName: empData.employee.empName,
+        relation: 'Self', // fallback
+        requestedDate: new Date(value.requestDate).toLocaleDateString(),
+        claimAmount: value.cliamAmount,
+        directClaimId: value.directClaimId,
+      }))
+    : [];
+
+  return (
+    <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
+      {/* Header & Table */}
+      <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-5">
+          <FileSearch className="text-blue-600 w-6 h-6" />
+          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
+        </div>
+
+        <ClaimSettlementList columns={columns} claimList={claimList} />
+      </div>
+
+      {/* Conditional Claim Detail Section */}
+      {selectedClaim && showDetails && (
+        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
+          <HospitalizationBillView claimDetail={claimDetail} />
+          <ViewClaimDetails claim={selectedClaim} />
+
+          {/* Claim Additional Details Form */}
+          <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
+            {/* Post Hospitalization Section */}
+            <div className="space-y-2">
+              <Label className="font-semibold">Post Hospitalization Applicable</Label>
+              <div className="flex gap-4">
+                {['Yes', 'No'].map((opt) => (
+                  <label key={opt} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="postHosp"
+                      checked={form.postHospitalization === opt}
+                      onChange={() => handleChange('postHospitalization', opt)}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+
+              <div className="mt-2">
+                <Label className="font-semibold">Comment for Post Hospitalization Treatment Advice</Label>
+                <Textarea
+                  value={form.postHospComment}
+                  onChange={(e) => handleChange('postHospComment', e.target.value)}
+                  placeholder="Enter comment"
+                />
+              </div>
+            </div>
+
+            {/* Declaration by Employee */}
+           
+            {/* Declaration by Doctor */}
+            <div className="space-y-3 border rounded-md p-4">
+              <Label className="font-semibold">Declaration by Doctor</Label>
+              <div className="flex gap-6">
+                <Label className="font-medium">Special Disease</Label>
+                {['Yes', 'No'].map((opt) => (
+                  <label key={opt} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="docDisease"
+                      checked={form.doctorSpecialDisease === opt}
+                      onChange={() => handleChange('doctorSpecialDisease', opt)}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+
+              <div className="mt-2">
+                <Label className="font-semibold">Comment for Special Disease</Label>
+                <Textarea
+                  value={form.doctorComment}
+                  onChange={(e) => handleChange('doctorComment', e.target.value)}
+                  placeholder="Enter comment"
+                />
+              </div>
+            </div>
+
+            {/* Additional Comments */}
+            <div className="space-y-2">
+              <Label className="font-semibold">Additional Comments / Recommendation</Label>
+              <Textarea
+                value={form.additionalComment}
+                onChange={(e) => handleChange('additionalComment', e.target.value)}
+                placeholder="Enter any additional comments"
+              />
+            </div>
+
+            {/* Verified Checkbox */}
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="verified"
+                checked={form.verified}
+                onCheckedChange={(checked) => handleChange('verified', !!checked)}
+              />
+              <Label htmlFor="verified">Verified</Label>
+            </div>
+
+            {/* Submit */}
+            <div className="flex justify-end">
+              <Button className="bg-indigo-600 text-white" onClick={handleSubmit}>
+                Send to HR
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default DoctorReviewPage;

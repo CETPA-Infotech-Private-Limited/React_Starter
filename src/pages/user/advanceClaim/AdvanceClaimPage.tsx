@@ -67,7 +67,8 @@ const AdvanceClaimPage = () => {
   <div className="text-center">
     {row.original.requestDate ? format(new Date(row.original.requestDate), 'dd-MM-yyyy') : '-'}
   </div>
-)    , className: 'text-center', },
+)
+      },
 
       {
         accessorKey: 'patientId',

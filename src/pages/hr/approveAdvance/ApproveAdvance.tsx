@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EyeIcon, EyeOff } from 'lucide-react';
-import { BeneficiaryDetailsCard } from '@/components/hr/approveadvance/BeneficiaryDetails';
-import { HospitalizationDetailsCard } from '@/components/hr/approveadvance/HospitalizationDetailsCard';
-import { PatientDetailsCard } from '@/components/hr/approveadvance/PatientDetailsTable';
+import { BeneficiaryDetailsCard} from '@/components/hr/advanceApprove/BeneficiaryDetails';
+import { PatientDetailsCard } from '@/components/hr/advanceApprove/PatientDetailsTable';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import { DisplayField, InfoCard, StatusBadge } from '@/components/hr/reviewclaim/ReviewComponents';
 
@@ -226,10 +225,7 @@ const ApproveAdvance = () => {
               <PatientDetailsCard {...selectedAdvance.patientDetails} />
             </div>
 
-            {/* Hospitalization Details */}
-            <div className="mb-8">
-              <HospitalizationDetailsCard {...selectedAdvance.hospitalizationDetails} />
-            </div>
+
 
             {/* Beneficiary Details */}
             <div className="mb-8">
