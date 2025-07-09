@@ -24,6 +24,7 @@ import HospitalManagement from '@/pages/admin/HospitalManagement';
 import ApproveAdvancePage from '@/pages/hr/approveAdvance/ApproveAdvancePage';
 import BankingPage from '@/pages/finance/BankingPage';
 import MyClaim from '@/pages/user/MyClaim';
+import AfterDocReview from '@/components/hr2/AfterDocReview';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -50,6 +51,7 @@ const AppRoutes = () => {
             <Route path="/raise-claim" element={<DirectRequestTable />} />
             <Route path="/approve-advance" element={<ApproveAdvancePage />} />
             <Route path="/review-claim" element={<ReviewClaim />} />
+            <Route path="/review-claim2" element={<AfterDocReview/>} />
             <Route path="/ClaimAfterDoctorReview" element={<ApproveClaim />} />
             <Route path="/my-claim" element={<MyClaim />} />
 

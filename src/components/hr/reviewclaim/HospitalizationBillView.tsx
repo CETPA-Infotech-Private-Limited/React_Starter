@@ -10,22 +10,8 @@ import {
   StatusBadge
 } from './ReviewComponents';
 import { Textarea } from '@/components/ui/textarea';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { RootState } from '@/app/store';
-import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
-
-interface ClaimProcessPayload {
-  AdvanceId: number;
-  SenderId: number;
-  RecipientId: number;
-  ClaimTypeId: number;
-  StatusId: number;
-}
-
 
 const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
-const dispatch = useAppDispatch()
-
   if (!claimDetail) return null;
 
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
@@ -53,32 +39,12 @@ const dispatch = useAppDispatch()
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
 
-  console.log(claimDetail ,'this is claim detail object')
+  console.log({claimDetail} ,'this is claim detail object')
 
-  const user = useAppSelector((state:RootState)=>state.user)
-  
-
-
+const formData = new FormData()
 
   const handleSendToDoctor = async()=>{
-     const payload: ClaimProcessPayload = {
-    AdvanceId: Number(claimDetail.advanceBasicDetails.claimId),
-    SenderId: Number(user.EmpCode),
-    RecipientId: 102199,
-    ClaimTypeId: Number(claimDetail.advanceBasicDetails.claimTypeId),
-    StatusId: 18,
-  };
-    const formData = new FormData()
-
-    formData.append('AdvanceId', String(claimDetail.advanceBasicDetails.claimId))
-    formData.append('SenderId', String(user.EmpCode))
-    formData.append('RecipientId', '102199')
-    formData.append('ClaimTypeId',String(claimDetail.advanceBasicDetails.claimTypeId))
-    formData.append('StatusId', '5')
-
-    await(dispatch(submitClaimProcessByHr(formData)))
-
-
+    formData.append('AdvanceId',aa)
   }
 
   return (

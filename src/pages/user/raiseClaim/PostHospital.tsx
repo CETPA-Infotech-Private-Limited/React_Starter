@@ -129,7 +129,7 @@ interface PostHospitalizationFormProps {
 }
 
 const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit }: PostHospitalizationFormProps) => {
-  const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
+
 
   // File upload states
   const [postHospitalTreatmentAdviseFiles, setPostHospitalTreatmentAdviseFiles] = useState<File[]>(
