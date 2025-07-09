@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
 import TableList from '@/components/ui/data-table';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -16,6 +16,8 @@ import AdvanceApprovalForm from '@/components/hr/advanceApprove/AdvanceApprovalF
 import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
 import toast from 'react-hot-toast';
 import AdvanceBankingDetailsForm from '@/components/finance/Banking/AdvanceBankingDetailsForm';
+import InputField from '@/components/common/InputField';
+import { ReadOnlyField } from '@/components/common/ReadOnlyField';
 
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
@@ -151,29 +153,19 @@ const ApproveAdvancePage = () => {
     };
   };
 
-  const handleSubmitAdvanceRequest = ({ approvedAmount }: { approvedAmount: number }) => {
-    if (!selectedAdvance || !user.EmpCode) return;
-
-    dispatch(
-      submitAdvanceApproval({
-        claimId: Number(selectedAdvance.claimId),
-        SenderId: Number(user.EmpCode),
-        RecipientId: 101002,
-        ClaimTypeId: 1,
-        StatusId: 4,
-        ApprovalAmount: approvedAmount,
-      })
-    );
-  };
-
   const patientDetails = getPatientDetails();
 
-  const handleBankingDetailsSubmit = (data: { sapRefNumber: string; sapRefDate: string; transactionDate: string; utrNo: string }) => {
-    console.log('Submitted banking data:', data);
-
-    // You can dispatch to Redux, send to API, etc.
-    // Example:
-    // dispatch(updateBankingInfo(data));
+  const handleBankingDetailsSubmit = () => {
+    dispatch(
+      submitAdvanceApproval({
+        AdvanceId: Number(selectedAdvance.empId),
+        SenderId: Number(user.EmpCode),
+        RecipientId: selectedAdvance.empId,
+        ClaimTypeId: 1,
+        StatusId: 2,
+        ApprovalAmount: selectedAdvance.approvedAmount,
+      })
+    );
   };
 
   return (
@@ -236,10 +228,18 @@ const ApproveAdvancePage = () => {
               sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
             />
           )} */}
-          {/* 
-          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} /> */}
+
           <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white  ">
             <h2 className="text-xl font-bold text-blue-700 mb-4">Verify And Approved</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ReadOnlyField label="Advance Request Amount" value={selectedAdvance?.advanceAmount} />
+              <ReadOnlyField label="Final Approve Amount" value={selectedAdvance?.approvedAmount} />
+            </div>
+            <div className=" flex justify-end">
+              <Button className=" mt-4" onClick={handleBankingDetailsSubmit}>
+                Verify & Approve
+              </Button>
+            </div>
           </Card>
         </>
       )}

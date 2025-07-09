@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutDashboard, FileText, CreditCard, Stamp, Search, BadgeCheck, Power, ChevronLeft, ChevronRight, Briefcase, LogOut } from 'lucide-react';
+import { FileText, CreditCard, Stamp, Search, BadgeCheck, Power, ChevronLeft, ChevronRight, Briefcase, LogOut, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -26,40 +26,56 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       roles: ['user'],
     },
     {
-      title: 'Raise Claim',
-      url: '/raise-claim',
+      title: 'In Patient',
+      icon: CreditCard,
+      roles: ['user'],
+      children: [
+        {
+          title: 'Raise Claim',
+          url: '/raise-claim',
+          roles: ['user'],
+        },
+        {
+          title: 'Request Advance',
+          url: '/request-advance',
+          roles: ['user'],
+        },
+
+        {
+          title: 'My Claim',
+          url: '/my-claim',
+          roles: ['user'],
+        },
+      ],
+    },
+    {
+      title: 'Advances',
       icon: FileText,
       roles: ['user'],
+      children: [
+        {
+          title: 'Approve Advance',
+          url: '/approve-advance',
+          roles: ['HR1', 'HR2'],
+        },
+      ],
     },
     {
-      title: 'Request Advance',
-      url: '/request-advance',
-      icon: CreditCard,
-      roles: ['user'],
-    },
-    {
-      title: 'My Claim',
-      url: '/my-claim',
-      icon: CreditCard,
-      roles: ['user'],
-    },
-    {
-      title: 'Approve Advance',
-      url: '/approve-advance',
-      icon: Stamp,
-      roles: ['HR1', 'HR2'],
-    },
-    {
-      title: 'Review Claim',
-      url: '/review-claim',
+      title: 'Review',
       icon: Search,
       roles: ['HR1', 'HR2'],
-    },
-    {
-      title: 'Approve Claim',
-      url: '/ClaimAfterDoctorReview',
-      icon: BadgeCheck,
-      roles: ['HR1', 'HR2'],
+      children: [
+        {
+          title: 'Review Claim',
+          url: '/review-claim',
+          roles: ['HR1', 'HR2'],
+        },
+        {
+          title: 'Approve Claim',
+          url: '/ClaimAfterDoctorReview',
+          roles: ['HR1', 'HR2'],
+        },
+      ],
     },
     {
       title: 'Banking',

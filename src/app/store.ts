@@ -15,6 +15,7 @@ import getClaimDetailsReducer from '@/features/medicalClaim/getClaimDetailsSlice
 import advanceApprovalReducer from '@/features/medicalClaim/advanceApprovalSlice';
 import myClaimsReducer from '@/features/user/claim/myClaimSlice';
 import submitClaimProcessSlice from '@/features/doctor/doctorSlice'
+import approveClaimByFinanceReducer from '@/features/medicalClaim/approveClaimByFinanceSlice';
 
 const persistConfig = {
   key: 'root',
@@ -35,7 +36,8 @@ const rootReducer = combineReducers({
   getClaimDetails: getClaimDetailsReducer,
   advanceApproval: advanceApprovalReducer,
   myClaims: myClaimsReducer,
-  submitClaimProcessSlice:submitClaimProcessSlice
+  submitClaimProcessSlice:submitClaimProcessSlice,
+  approveClaimByFinance: approveClaimByFinanceReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
