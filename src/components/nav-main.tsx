@@ -31,7 +31,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                     {item.icon && <item.icon size={24} />}
                     <span>{item.title}</span>
                   </div>
-                  {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  {isOpen ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
                 </SidebarMenuButton>
               ) : (
                 <NavLink to={item.url!} onClick={() => setOpenMobile(false)}>
