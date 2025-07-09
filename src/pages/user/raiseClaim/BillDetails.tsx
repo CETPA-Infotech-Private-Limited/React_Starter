@@ -3,8 +3,7 @@ import { UploadCloud, Trash2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+
 import { Checkbox } from '@radix-ui/react-checkbox';
 
 interface UploadedItem {
@@ -76,9 +75,7 @@ const UploadDialog = ({ files, onFilesChange }: { files: File[]; onFilesChange: 
       <DialogContent className="sm:max-w-[560px] text-black text-xs bg-gradient-to-br from-white via-blue-50 to-white shadow-xl border border-blue-300 rounded-2xl p-6 animate-fade-in font-sans">
         <form onSubmit={handleAdd}>
           <DialogHeader className="relative">
-            <DialogTitle className="text-xl text-blue-800 font-extrabold tracking-tight mb-1 drop-shadow text-center font-sans">
-              Upload Documents
-            </DialogTitle>
+            <DialogTitle className="text-xl text-blue-800 font-extrabold tracking-tight mb-1 drop-shadow text-center font-sans">Upload Documents</DialogTitle>
             <DialogDescription className="text-xs text-gray-600 italic mb-4 text-center font-sans">
               Upload relevant documents with optional comments.
             </DialogDescription>
@@ -203,14 +200,12 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
 
   const isBillFilled = (bill: BillItem) => {
     return (
-      bill.type.trim() !== '' &&
-      bill.billedAmount.trim() !== '' && bill.billedAmount !== '0' &&
-      bill.claimedAmount.trim() !== '' && bill.claimedAmount !== '0'
+      bill.type.trim() !== '' && bill.billedAmount.trim() !== '' && bill.billedAmount !== '0' && bill.claimedAmount.trim() !== '' && bill.claimedAmount !== '0'
     );
   };
 
   const addNewBill = (afterIndex: number) => {
-    const nextCustomBill = bills.slice(afterIndex + 1).find(b => !b.isDefault);
+    const nextCustomBill = bills.slice(afterIndex + 1).find((b) => !b.isDefault);
     if (nextCustomBill && !isBillFilled(nextCustomBill)) {
       return;
     }
@@ -275,13 +270,15 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
         ClaimedAmount: Number(currentBills[5].claimedAmount),
       },
       // Map custom bills and their files if not included
-      NotIncluded: currentBills.filter(bill => !bill.included).map(bill => ({
-        id: bill.id,
-        type: bill.type,
-        billedAmount: Number(bill.billedAmount),
-        claimedAmount: Number(bill.claimedAmount),
-        files: bill.files, // Include files for not-included bills
-      })),
+      NotIncluded: currentBills
+        .filter((bill) => !bill.included)
+        .map((bill) => ({
+          id: bill.id,
+          type: bill.type,
+          billedAmount: Number(bill.billedAmount),
+          claimedAmount: Number(bill.claimedAmount),
+          files: bill.files, // Include files for not-included bills
+        })),
       claimedTotal: currentBills.reduce((sum, bill) => sum + parseFloat(bill.claimedAmount || '0'), 0),
     };
     onChange(apiBillDetails);
@@ -376,9 +373,9 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                           className="h-8 px-3 py-1.5 flex items-center justify-center border-blue-400 text-blue-700 hover:bg-blue-100"
                           title="Add New Bill"
                           disabled={(() => {
-                            const nextCustomBill = bills.slice(index + 1).find(b => !b.isDefault);
+                            const nextCustomBill = bills.slice(index + 1).find((b) => !b.isDefault);
                             if (nextCustomBill && !isBillFilled(nextCustomBill)) return true;
-                            const lastCustomBill = bills.filter(b => !b.isDefault).slice(-1)[0];
+                            const lastCustomBill = bills.filter((b) => !b.isDefault).slice(-1)[0];
                             if (lastCustomBill && !isBillFilled(lastCustomBill)) return true;
                             return false;
                           })()}

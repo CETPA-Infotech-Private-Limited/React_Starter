@@ -66,18 +66,18 @@ interface ClaimRequest {
 
 type RaiseClaimProps = {
   onCloseForm: () => void;
+  defaultData?: any;
 };
 
-const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
+const RaiseClaim = ({ onCloseForm, defaultData }: RaiseClaimProps) => {
+  console.log('defaultData', defaultData);
   const [patientDetails, setPatientDetails] = useState<Partial<ClaimRequest>>({});
   const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
   const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
   const [postHospDetails, setPostHospDetails] = useState<Partial<ClaimRequest>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
-
   const preHospBilledAmount = [
     preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
     preHospDetails?.PreHospitalizationExpensesConsultation?.BilledAmount || 0,
@@ -131,8 +131,6 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...preHospDetails,
         ...postHospDetails,
       };
-      console.log(rawPayload, 'this is rawpayload');
-
       const formData = new FormData();
       formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
       formData.append('PayTo', rawPayload.PayTo || 'Doctor');
@@ -276,41 +274,32 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   };
 
   return (
-    <div className="bg-gray-100 p-2 min-h-screen">
-           {' '}
+    <div className=" p-2 min-h-screen">
       {isSubmitting ? (
         <div className="flex items-center justify-center h-full py-10">
-                    <Loader />       {' '}
+          <Loader />
         </div>
       ) : (
         <>
-                   {' '}
           <div className="mt-4">
-                        <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />         {' '}
+            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} defaultData={defaultData} />
           </div>
-                   {' '}
           <div className="mt-4">
-                        <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />         {' '}
+            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
           </div>
-                   {' '}
           <div className="mt-4">
-                        <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />         {' '}
+            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
           </div>
-                   {' '}
           <div>
-                       {' '}
             <PostHospitalizationAndDeclaration
               postHospitalizationAndDeclaration={postHospDetailsWithSummary}
               onChange={setPostHospDetails}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
             />
-                     {' '}
           </div>
-                 {' '}
         </>
       )}
-         {' '}
     </div>
   );
 };

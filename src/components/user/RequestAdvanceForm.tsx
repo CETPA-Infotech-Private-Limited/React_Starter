@@ -150,14 +150,12 @@ const RequestAdvanceForm = ({ setShowForm }) => {
       <h2 className="text-2xl font-extrabold mb-6 text-center text-primary tracking-tight drop-shadow font-sans">Advance Request Form</h2>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="flex flex-col gap-1">
             <Label className="text-blue-800 text-sm font-semibold">Select Member</Label>
             <FamilyMemberSelect value={selectedMemberId} onChange={setSelectedMemberId} />
           </div>
-
           <InputField label="Doctor's Name" value={doctorName} onChange={(e) => setDoctorName(e.target.value)} />
-
           <div className="flex flex-col gap-1">
             <Label className="text-blue-800 text-sm font-semibold">Is Hospital Empanelled?</Label>
             <RadioGroup value={isEmpanelled} onValueChange={(val) => setIsEmpanelled(val as 'yes' | 'no')} className="flex gap-4 mt-2">
@@ -171,7 +169,6 @@ const RequestAdvanceForm = ({ setShowForm }) => {
               </div>
             </RadioGroup>
           </div>
-
           {isEmpanelled === 'yes' ? (
             <div className="flex flex-col gap-1">
               <Label className="text-blue-800 text-sm font-semibold">Select Hospital</Label>

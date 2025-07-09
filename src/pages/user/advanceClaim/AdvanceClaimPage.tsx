@@ -17,7 +17,6 @@ const AdvanceClaimPage = () => {
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const { data: claimList, loading } = useAppSelector((state: RootState) => state.claim);
-
   const [activeForm, setActiveForm] = useState<'new' | 'topup' | null>(null);
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
 
@@ -63,11 +62,9 @@ const AdvanceClaimPage = () => {
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
-       cell: ({ row }: any) => (
-  <div className="text-center">
-    {row.original.requestDate ? format(new Date(row.original.requestDate), 'dd-MM-yyyy') : '-'}
-  </div>
-)    , className: 'text-center', },
+        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate ? format(new Date(row.original.requestDate), 'dd-MM-yyyy') : '-'}</div>,
+        className: 'text-center',
+      },
 
       {
         accessorKey: 'patientId',
@@ -96,7 +93,7 @@ const AdvanceClaimPage = () => {
         },
         className: 'text-center',
       },
-      
+
       {
         accessorKey: 'status',
         header: 'Status',
@@ -105,7 +102,7 @@ const AdvanceClaimPage = () => {
         className: 'text-center',
       },
 
-      {  
+      {
         accessorKey: 'approvedDate',
         header: 'Approved Date',
         enableSorting: false,
@@ -123,7 +120,7 @@ const AdvanceClaimPage = () => {
         },
         className: 'text-center',
       },
-      
+
       {
         accessorKey: 'action',
         header: 'Action',

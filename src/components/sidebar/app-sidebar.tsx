@@ -48,18 +48,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         },
       ],
     },
-    {
-      title: 'Advances',
-      icon: FileText,
-      roles: ['user'],
-      children: [
-        {
-          title: 'Approve Advance',
-          url: '/approve-advance',
-          roles: ['HR1', 'HR2'],
-        },
-      ],
-    },
+
     {
       title: 'Review',
       icon: Search,
@@ -73,6 +62,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         {
           title: 'Approve Claim',
           url: '/ClaimAfterDoctorReview',
+          roles: ['HR1', 'HR2'],
+        },
+        {
+          title: 'Approve Advance',
+          url: '/approve-advance',
           roles: ['HR1', 'HR2'],
         },
       ],

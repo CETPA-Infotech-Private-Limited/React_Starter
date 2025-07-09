@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
-import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
-import ViewClaimDetails from '@/components/hr/reviewclaim/ViewClaimDetails';
+import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
+import ViewClaimDetails from '@/components/hr/reviewClaim/ViewClaimDetails';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
-import HospitalizationBillView from '@/components/hr/reviewclaim/HospitalizationBillView';
+import HospitalizationBillView from '@/components/hr/reviewClaim/HospitalizationBillView';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
@@ -121,24 +121,6 @@ const ReviewClaim = () => {
         directClaimId: value.directClaimId,
       }))
     : [];
-
-  //   {
-  //     id: 'CLM002',
-  //     employeeName: 'Alice Smith',
-  //     patientName: 'Bob Smith',
-  //     relation: 'Son',
-  //     requestedDate: '2025-06-25',
-  //     claimAmount: 1200,
-  //   },
-  //   {
-  //     id: 'CLM003',
-  //     employeeName: 'Raj Patel',
-  //     patientName: 'Rina Patel',
-  //     relation: 'Daughter',
-  //     requestedDate: '2025-06-15',
-  //     claimAmount: 800,
-  //   },
-  // ];
 
   return (
     <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">

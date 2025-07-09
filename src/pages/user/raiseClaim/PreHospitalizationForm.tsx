@@ -308,7 +308,6 @@ const PreHospitalizationForm = ({ preHospitalizationForm, onChange }: PreHospita
 
   return (
     <div className=" pb-4 font-sans text-gray-800 flex justify-center items-start ">
-      {' '}
       {/* Added padding and background to outer div */}
       <div className="bg-white w-full rounded-2xl shadow-xl p-6 border border-blue-200">
         <div className="flex items-center w-full space-x-3 mb-6">

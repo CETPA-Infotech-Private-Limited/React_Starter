@@ -51,7 +51,7 @@ export function clearAllStorage(): void {
   const cookies: string[] = document.cookie.split(';');
   for (const cookie of cookies) {
     const [name] = cookie.split('=');
-    document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   }
 }
 
