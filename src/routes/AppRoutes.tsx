@@ -24,6 +24,8 @@ import HospitalManagement from '@/pages/admin/HospitalManagement';
 import ApproveAdvancePage from '@/pages/hr/approveAdvance/ApproveAdvancePage';
 import BankingPage from '@/pages/finance/BankingPage';
 import MyClaim from '@/pages/user/MyClaim';
+import DoctorReview from '@/pages/doctor/DoctorReviewPage';
+import DoctorReviewPage from '@/pages/doctor/DoctorReviewPage';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -55,6 +57,8 @@ const AppRoutes = () => {
 
             <Route path="/request-advance" element={<AdvanceClaimPage />} />
             <Route path="/banking" element={<BankingPage />} />
+            <Route path="/doctor-review" element={<DoctorReviewPage/>} />
+
           </Route>
         </Route>
 

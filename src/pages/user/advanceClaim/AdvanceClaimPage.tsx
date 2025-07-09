@@ -9,6 +9,7 @@ import RequestAdvanceTopUpForm from '@/components/user/RequestAdvanceTopUpForm';
 import { Button } from '@/components/ui/button';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import Loader from '@/components/ui/loader';
+import { format } from 'date-fns';
 
 const AdvanceClaimPage = () => {
   const dispatch = useAppDispatch();
@@ -60,15 +61,14 @@ const AdvanceClaimPage = () => {
         className: 'text-center',
       },
       {
-        accessorKey: 'empId',
-        header: 'Employee Name',
-        enableSorting: false,
-        cell: ({ row }: any) => {
-          const result = findEmployeeDetails(employees, String(row.original.empId));
-          return <div className="text-center">{result?.employee?.empName || 'Unknown'}</div>;
-        },
-        className: 'text-center',
-      },
+        accessorKey: 'requestDate',
+        header: 'Request Date',
+       cell: ({ row }: any) => (
+  <div className="text-center">
+    {row.original.requestDate ? format(new Date(row.original.requestDate), 'dd-MM-yyyy') : '-'}
+  </div>
+)    , className: 'text-center', },
+
       {
         accessorKey: 'patientId',
         header: 'Patient Name',
@@ -88,7 +88,7 @@ const AdvanceClaimPage = () => {
       },
       {
         accessorKey: 'advanceAmount',
-        header: 'Advance Amount',
+        header: 'Advance Requested (₹)',
         enableSorting: false,
         cell: ({ row }: any) => {
           const amount = row.original.advanceAmount;
@@ -96,12 +96,7 @@ const AdvanceClaimPage = () => {
         },
         className: 'text-center',
       },
-      {
-        accessorKey: 'requestDate',
-        header: 'Request Date',
-        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
-        className: 'text-center',
-      },
+      
       {
         accessorKey: 'status',
         header: 'Status',
@@ -109,6 +104,15 @@ const AdvanceClaimPage = () => {
         cell: ({ row }: any) => <div className="text-center">{row.original.status}</div>,
         className: 'text-center',
       },
+
+      {  
+        accessorKey: 'approvedDate',
+        header: 'Approved Date',
+        enableSorting: false,
+        cell: ({ row }: any) => <div className="text-center">{row.original.approvedDate || '-'}</div>,
+        className: 'text-center',
+      },
+
       {
         accessorKey: 'approvedAmount',
         header: 'Approved Amount',
@@ -119,13 +123,7 @@ const AdvanceClaimPage = () => {
         },
         className: 'text-center',
       },
-      {
-        accessorKey: 'approvedDate',
-        header: 'Approved Date',
-        enableSorting: false,
-        cell: ({ row }: any) => <div className="text-center">{row.original.approvedDate || '-'}</div>,
-        className: 'text-center',
-      },
+      
       {
         accessorKey: 'action',
         header: 'Action',
