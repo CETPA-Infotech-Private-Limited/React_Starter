@@ -1,8 +1,10 @@
+import { LucideIcon } from 'lucide-react';
 import { UserRole } from './auth';
 
-export interface NavItem {
+export type NavItem = {
   title: string;
-  url: string;
-  icon: React.ElementType;
-  roles: UserRole[];
-}
+  url?: string;
+  icon?: LucideIcon;
+  roles: string[];
+  children?: NavItem[];
+};
