@@ -1,16 +1,14 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
-import ViewClaimDetails from '@/components/hr/reviewclaim/ViewClaimDetails';
+import HospitalizationBillDetails from '@/components/doctor/doctorreview/HospitalizationBillDetails';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
-import HospitalizationBillView from '@/components/hr/reviewclaim/HospitalizationBillView';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';    
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 
 const DoctorReviewPage = () => {
@@ -24,7 +22,6 @@ const DoctorReviewPage = () => {
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  // Form State for Doctor & Employee Declaration
   const [form, setForm] = useState({
     postHospitalization: '',
     postHospComment: '',
@@ -36,7 +33,6 @@ const DoctorReviewPage = () => {
     verified: false,
   });
 
-  
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({
       ...prev,
@@ -46,7 +42,6 @@ const DoctorReviewPage = () => {
 
   const handleSubmit = () => {
     console.log('Submitted Form:', form);
-    // Replace this with your backend submission logic
   };
 
   useEffect(() => {
@@ -133,11 +128,11 @@ const DoctorReviewPage = () => {
   const empData = findEmployeeDetails(employees, user.EmpCode);
 
   const claimList = Array.isArray(claimDrData)
-    ? claimDrData.map((value, index) => ({
+    ? claimDrData.map((value) => ({
         id: value.claimId,
         employeeName: empData.employee.empName,
         patientName: empData.employee.empName,
-        relation: 'Self', // fallback
+        relation: 'Self',
         requestedDate: new Date(value.requestDate).toLocaleDateString(),
         claimAmount: value.cliamAmount,
         directClaimId: value.directClaimId,
@@ -146,7 +141,6 @@ const DoctorReviewPage = () => {
 
   return (
     <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
-      {/* Header & Table */}
       <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
         <div className="flex items-center gap-2 mb-5">
           <FileSearch className="text-blue-600 w-6 h-6" />
@@ -156,15 +150,14 @@ const DoctorReviewPage = () => {
         <ClaimSettlementList columns={columns} claimList={claimList} />
       </div>
 
-      {/* Conditional Claim Detail Section */}
       {selectedClaim && showDetails && (
-        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
-          <HospitalizationBillView claimDetail={claimDetail} />
-          <ViewClaimDetails claim={selectedClaim} />
+        <div
+          ref={detailsRef}
+          className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6"
+        >
+          <HospitalizationBillDetails claimDetail={claimDetail} />
 
-          {/* Claim Additional Details Form */}
           <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
-            {/* Post Hospitalization Section */}
             <div className="space-y-2">
               <Label className="font-semibold">Post Hospitalization Applicable</Label>
               <div className="flex gap-4">
@@ -191,9 +184,6 @@ const DoctorReviewPage = () => {
               </div>
             </div>
 
-            {/* Declaration by Employee */}
-           
-            {/* Declaration by Doctor */}
             <div className="space-y-3 border rounded-md p-4">
               <Label className="font-semibold">Declaration by Doctor</Label>
               <div className="flex gap-6">
@@ -221,7 +211,6 @@ const DoctorReviewPage = () => {
               </div>
             </div>
 
-            {/* Additional Comments */}
             <div className="space-y-2">
               <Label className="font-semibold">Additional Comments / Recommendation</Label>
               <Textarea
@@ -231,7 +220,6 @@ const DoctorReviewPage = () => {
               />
             </div>
 
-            {/* Verified Checkbox */}
             <div className="flex items-center gap-2">
               <Checkbox
                 id="verified"
@@ -241,7 +229,6 @@ const DoctorReviewPage = () => {
               <Label htmlFor="verified">Verified</Label>
             </div>
 
-            {/* Submit */}
             <div className="flex justify-end">
               <Button className="bg-indigo-600 text-white" onClick={handleSubmit}>
                 Send to HR
