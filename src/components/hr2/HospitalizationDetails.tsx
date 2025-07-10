@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   BillItemDisplayRow,
@@ -15,10 +15,12 @@ import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card } from '../ui/card';
-import { Loader } from 'lucide-react';
+import { EyeIcon, EyeOff, Loader } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { RootState } from '@/app/store';
+import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
+import { findEmployeeDetails } from '@/lib/helperFunction';
 
 const HospitalizationBillView = () => {
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('yes');
@@ -27,15 +29,139 @@ const HospitalizationBillView = () => {
   const [approvedAmount, setApprovedAmount] = useState('');
   const [sendTo, setSendTo] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+ const detailsRef = useRef<HTMLDivElement>(null);
+   const { employees } = useAppSelector((state: RootState) => state.employee);
+    const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
+
+
 const user = useAppSelector((state:RootState)=>state.user)
-const claimDetailAfterReview = useAppSelector((state:RootState)=>state)
+
+
+const claimDetailAfterReview = useAppSelector((state:RootState)=>state.claim)
 console.log(claimDetailAfterReview, 'this is claimdetails after review')
+
+
 
 console.log(user, 'this is user')
   const dispatch=useAppDispatch()
-  useEffect(()=>{
-    dispatch(getClaimHr({recipientId: user.EmpCode,pageId: 2}))
-  },[])
+
+  useEffect(() => {
+      if (user?.EmpCode) {
+        dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 2 }));
+      }
+    }, [user?.EmpCode]);
+  
+    useEffect(() => {
+      if (showDetails && detailsRef.current) {
+        detailsRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, [showDetails]);
+
+  // useEffect(()=>{
+  //   dispatch(getClaimHr({recipientId: user.EmpCode,pageId: 2}))
+  // },[])
+
+const handleViewToggle = (rowData: any) => {
+    const isSame = selectedClaim?.id === rowData.id;
+    if (isSame) {
+      const shouldShow = !showDetails;
+      setShowDetails(shouldShow);
+      if (!shouldShow) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      setSelectedClaim(rowData);
+      setShowDetails(true);
+    }
+
+    if (rowData.claimId) {
+      dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+    }
+  };
+
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: 'srNo',
+        header: 'Sr. No',
+        cell: ({ row }: any) => row.index + 1,
+      },
+      {
+        accessorKey: 'empId',
+        header: 'Employee Name',
+        cell: ({ row }: any) => {
+          const result = findEmployeeDetails(employees, String(row.original.empId));
+          return <div className="text-center">{result?.employee?.empName || 'Unknown'}</div>;
+        },
+        className: 'text-center',
+      },
+      {
+        accessorKey: 'patientId',
+        header: 'Patient Name',
+        cell: ({ row }: any) => {
+          const result = findEmployeeDetails(employees, String(row.original.patientId));
+          return <div className="text-center">{result?.employee?.empName || ''}</div>;
+        },
+        className: 'text-center',
+      },
+      {
+        accessorKey: 'relation',
+        header: 'Relation',
+        cell: () => <div className="text-center">Self</div>,
+        className: 'text-center',
+      },
+      {
+        accessorKey: 'requestedDate',
+        header: 'Requested Date',
+        cell: ({ row }: any) => {
+          const dateStr = row.original.requestedDate;
+          const date = dateStr ? new Date(dateStr).toLocaleDateString() : '-';
+          return <div className="text-center">{date}</div>;
+        },
+        className: 'text-center',
+      },
+      {
+        accessorKey: 'claimAmount',
+        header: 'Claim Amount (₹)',
+        cell: ({ getValue }: any) => `₹ ${getValue().toLocaleString()}`,
+        className: 'text-center',
+      },
+      {
+        id: 'action',
+        header: 'Action',
+        cell: ({ row }: any) => {
+          const rowData = row.original;
+          const isSelected = selectedClaim?.id === rowData.id;
+
+          return (
+            <Button
+              size="sm"
+              onClick={() => handleViewToggle(rowData)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+            >
+              {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+              {isSelected && showDetails ? 'Hide' : 'View'}
+            </Button>
+          );
+        },
+      },
+    ],
+    [employees, selectedClaim, showDetails]
+  );
+
+  const claimList = Array.isArray(claimHrData)
+    ? claimHrData.map((value) => ({
+        id: value.claimId,
+        empId: value.empId,
+        patientId: value.patientId,
+        relation: 'Self',
+        requestedDate: value.requestDate,
+        claimAmount: value.cliamAmount,
+        claimId: value.claimId,
+      }))
+    : [];
 
   const advanceBasicDetails = {
     patientName: 'John Doe',
@@ -126,6 +252,11 @@ console.log(user, 'this is user')
   };
 
   return (
+    <>
+    <ClaimSettlementList columns={columns} claimList={claimList} />
+    {selectedClaim && showDetails && (
+        
+      
     <div className="p-6 bg-white rounded-lg shadow">
       <h1 className="text-2xl font-bold text-primary drop-shadow mb-4">Hospitalization Claim Details</h1>
 
@@ -266,6 +397,8 @@ console.log(user, 'this is user')
         </div>
       </Card>
     </div>
+    )}
+    </>
   );
 };
 
