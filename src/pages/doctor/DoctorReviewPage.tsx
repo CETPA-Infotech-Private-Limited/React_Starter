@@ -5,15 +5,22 @@ import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
-import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import {getDoctorClaimListData} from '@/features/doctor/doctorSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 
-const DoctorReviewPage = () => {
+
+
+  const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
-  const claimDrData = useAppSelector((state: RootState) => state.getClaimHr.data);
+  const claimDrData = useAppSelector((state: RootState) => state.submitClaimProcessSlice);
+  const claimListData = claimDrData.response.data
+ 
+
+
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
@@ -86,9 +93,13 @@ const DoctorReviewPage = () => {
 
   useEffect(() => {
     if (user?.EmpCode) {
-      dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+      dispatch(getDoctorClaimListData(102199));
     }
   }, [user?.EmpCode]);
+ 
+  //  useEffect(()=>{
+  //   dispatch(fetchClaimDetails(claimListData?.advanceId))
+  //  },[claimListData])
 
   useEffect(() => {
     if (showDetails && detailsRef.current) {
@@ -110,7 +121,7 @@ const DoctorReviewPage = () => {
     }
 
     if (rowData.directClaimId) {
-      dispatch(getClaimDataHr({ advanceid: rowData.directClaimId }));
+      
     }
   };
 
