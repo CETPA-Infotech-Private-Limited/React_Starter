@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { submitDirectClaim, getMyClaims, submitAdvanceClaimSettle } from '@/features/user/claim/claimSlice';
+import React, { useEffect, useState } from 'react';
+import { submitDirectClaim, getMyClaims, submitAdvanceClaimSettle, resetAdvanceClaimSettleState } from '@/features/user/claim/claimSlice';
 import type { RootState } from '@/app/store';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import Loader from '@/components/ui/loader';
@@ -7,6 +7,7 @@ import PatientDetails from '@/components/user/advanceClaim/PatientDetails';
 import PreHospitalizationForm from '@/components/user/advanceClaim/PreHospitalizationForm';
 import BillDetailsForm from '@/components/user/advanceClaim/BillDetails';
 import PostHospitalizationAndDeclaration from '@/components/user/advanceClaim/PostHospital';
+import toast from 'react-hot-toast';
 
 interface ClaimRequest {
   IsSpecailDisease: boolean;
@@ -74,8 +75,10 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
   const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
   const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
   const [postHospDetails, setPostHospDetails] = useState<Partial<ClaimRequest>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { advanceSettleSuccess, advanceSettleError, advanceSettleLoading } = useAppSelector((state) => state.claim);
+
   const user = useAppSelector((state: RootState) => state.user);
+  console.log('defaultData,');
   const dispatch = useAppDispatch();
   const preHospBilledAmount = [
     preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
@@ -122,7 +125,6 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
     try {
       const rawPayload: Partial<ClaimRequest> = {
         ...patientDetails,
@@ -130,9 +132,11 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
         ...preHospDetails,
         ...postHospDetails,
       };
+console.log('rawpayloads', rawPayload)
+
       const formData = new FormData();
       formData.append('Unit', user.unitId || '');
-      formData.append('AdvanceId', user.unitId || '');
+      formData.append('AdvanceId', defaultData?.selectedAdvanceClaim?.advanceId || '');
 
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
       formData.append('patientId', String(defaultData?.selectedAdvanceClaim?.patientId));
@@ -144,6 +148,9 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
       formData.append('Digonosis', rawPayload.Digonosis || '');
       formData.append('DoctorName', rawPayload.DoctorName || '');
       formData.append('DateOfAdmission', rawPayload.DateOfAdmission || '');
+      formData.append('SpecialDiseaseName', rawPayload.SpecialDiseaseName || '')
+      formData.append('IsPostHospitalization', rawPayload.IsPostHospitalization || "false")
+      formData.append('Declaration', rawPayload.PostHopital || '')
       formData.append('DateofDischarge', rawPayload.DateofDischarge || '');
       formData.append('IsSpecailDisease', String(rawPayload.IsSpecailDisease ?? false)); // Ensure boolean is stringified
       formData.append('IsTaxAble', String(rawPayload.IsTaxAble ?? true));
@@ -260,47 +267,53 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
       }
 
       await dispatch(submitAdvanceClaimSettle(formData));
-      // await dispatch(getMyClaims(user.EmpCode));
-
-      // setPatientDetails({});
-      // setBillDetails({});
-      // setPreHospDetails({});
-      // setPostHospDetails({});
-      // onCloseForm();
     } catch (error) {
       console.error('Submit error:', error);
     } finally {
-      setIsSubmitting(false);
     }
   };
 
+  
+  useEffect(() => {
+    if (advanceSettleSuccess) {
+      toast.success('Advance claim settled successfully!');
+      dispatch(getMyClaims(Number(user.EmpCode)));
+      setPatientDetails({});
+      setBillDetails({});
+      setPreHospDetails({});
+      setPostHospDetails({});
+
+      onCloseForm();
+      dispatch(resetAdvanceClaimSettleState());
+    }
+
+    if (advanceSettleError) {
+      toast.error(advanceSettleError);
+      dispatch(resetAdvanceClaimSettleState());
+    }
+  }, [advanceSettleSuccess, advanceSettleError, dispatch, user.EmpCode, onCloseForm]);
+
   return (
     <div className=" p-2 min-h-screen">
-      {isSubmitting ? (
-        <div className="flex items-center justify-center h-full py-10">
-          <Loader />
+      <>
+        <div className="mt-4">
+          <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} defaultData={defaultData} />
         </div>
-      ) : (
-        <>
-          <div className="mt-4">
-            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} defaultData={defaultData} />
-          </div>
-          <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
-          </div>
-          <div className="mt-4">
-            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
-          </div>
-          <div>
-            <PostHospitalizationAndDeclaration
-              postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-              onChange={setPostHospDetails}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-        </>
-      )}
+        <div className="mt-4">
+          <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
+        </div>
+        <div className="mt-4">
+          <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
+        </div>
+        <div>
+          <PostHospitalizationAndDeclaration
+            postHospitalizationAndDeclaration={postHospDetailsWithSummary}
+            onChange={setPostHospDetails}
+            onSubmit={handleSubmit}
+            isSubmitting={advanceSettleLoading}
+          />
+        </div>
+      </>
     </div>
   );
 };
