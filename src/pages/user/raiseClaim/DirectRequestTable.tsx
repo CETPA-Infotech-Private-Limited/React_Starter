@@ -2,24 +2,26 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import RaiseClaim from './RaiseClaim';
+import AdvanceClaimSettle from './AdvanceClaimSettle';
+import TableList from '@/components/ui/data-table';
+import Loader from '@/components/ui/loader';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
+import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
-import TableList from '@/components/ui/data-table';
-import { CheckCircle, XCircle } from 'lucide-react';
-import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
-import Loader from '@/components/ui/loader';
 
 const DirectRequestTable = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedAdvanceClaim, setSelectedAdvanceClaim] = useState<any | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
   const dispatch = useAppDispatch();
+
   const employees = useAppSelector((state: RootState) => state.employee.employees);
   const user = useAppSelector((state) => state.user);
   const { data: claimData, loading } = useAppSelector((state: RootState) => state.claim);
-  const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
+  const { data: claimDetails, loading: detailsLoading } = useAppSelector((state: RootState) => state.getClaimDetails);
 
   useEffect(() => {
     if (user.EmpCode) {
@@ -109,7 +111,7 @@ const DirectRequestTable = () => {
         header: 'Action',
         enableSorting: false,
         cell: ({ row }: any) => {
-          const isClaimSelected = selectedAdvanceClaim?.claimId === row.original.claimId;
+          const isSelected = selectedAdvanceClaim?.claimId === row.original.claimId;
 
           return (
             <div className="flex justify-center gap-2">
@@ -118,18 +120,19 @@ const DirectRequestTable = () => {
                 variant={row.original.statusId === 2 ? 'default' : 'ghost'}
                 disabled={row.original.statusId !== 2}
                 onClick={() => {
-                  if (isClaimSelected) {
+                  if (isSelected) {
                     setSelectedAdvanceClaim(null);
+                    setShowForm(false);
                   } else {
                     dispatch(fetchClaimDetails(row.original.advanceId));
                     setSelectedAdvanceClaim(row.original);
-                    setShowForm(false);
+                    setShowForm(true);
                     handleScrollToForm();
                   }
                 }}
                 className="flex items-center gap-2"
               >
-                {isClaimSelected ? (
+                {isSelected ? (
                   <>
                     <XCircle size={16} />
                     Cancel
@@ -137,7 +140,7 @@ const DirectRequestTable = () => {
                 ) : (
                   <>
                     <CheckCircle size={16} />
-                    Claim Now
+                    Settle Now
                   </>
                 )}
               </Button>
@@ -146,7 +149,7 @@ const DirectRequestTable = () => {
         },
       },
     ],
-    [employees, selectedAdvanceClaim]
+    [employees, selectedAdvanceClaim, dispatch]
   );
 
   return (
@@ -155,7 +158,9 @@ const DirectRequestTable = () => {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-blue-800">Approved Advance Request List</h1>
         </div>
+
         {(detailsLoading || loading) && <Loader />}
+
         <TableList
           data={filteredClaims}
           columns={columns}
@@ -170,21 +175,25 @@ const DirectRequestTable = () => {
               }}
               variant={showForm ? 'secondary' : 'default'}
             >
-              {showForm ? 'Cancel das' : '+ New Direct Claim Request'}
+              {showForm ? 'Cancel' : '+ New Direct Claim Request'}
             </Button>
           }
         />
       </div>
 
-      {(showForm || selectedAdvanceClaim) && (
+      {showForm && (
         <div className="mt-6" ref={formRef}>
-          <RaiseClaim
-            onCloseForm={() => {
-              setShowForm(false);
-              setSelectedAdvanceClaim(null);
-            }}
-            defaultData={{ ...claimDetails, selectedAdvanceClaim }}
-          />
+          {selectedAdvanceClaim ? (
+            <AdvanceClaimSettle
+              onCloseForm={() => {
+                setShowForm(false);
+                setSelectedAdvanceClaim(null);
+              }}
+              defaultData={{ ...claimDetails, selectedAdvanceClaim }}
+            />
+          ) : (
+            <RaiseClaim onCloseForm={() => setShowForm(false)} defaultData={null} />
+          )}
         </div>
       )}
     </div>

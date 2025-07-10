@@ -12,12 +12,13 @@ interface PrivateRouteProps {
   allowedRoles?: UserRole[];
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles = [] }) => {
   const auth = useAuth();
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   useSessionChecker();
+
   const employees = useAppSelector((state) => state.employee.employees);
   const { loading: userLoading, Roles } = useAppSelector((state) => state.user);
 
@@ -25,30 +26,39 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   const isInitializing = auth.isLoading;
   const redirectHandled = useRef(false);
 
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated && !isInitializing && !redirectHandled.current) {
       redirectHandled.current = true;
       auth.signinRedirect({
-        state: { returnUrl: location.pathname + location.search },
+        state: {
+          returnUrl: location.pathname + location.search, // includes query params
+        },
       });
     }
   }, [isAuthenticated, isInitializing, location.pathname, location.search, auth]);
 
+  // After successful login
   useEffect(() => {
     if (isAuthenticated && auth.user && !redirectHandled.current) {
       redirectHandled.current = true;
+
       dispatch(fetchUserProfile());
-      {
-        employees.length === 0 && dispatch(fetchEmployees());
+      if (employees.length === 0) {
+        dispatch(fetchEmployees());
       }
 
+      // Restore the full URL (including query parameters)
       let returnUrl: string | undefined;
-      if (auth.user && auth.user.state && typeof (auth.user.state as any).returnUrl === 'string') {
+
+      if (auth.user?.state && typeof (auth.user.state as any).returnUrl === 'string') {
         returnUrl = (auth.user.state as any).returnUrl;
       }
-      navigate(returnUrl ?? location.pathname, { replace: true });
+
+      const fallbackUrl = location.pathname + location.search;
+      navigate(returnUrl ?? fallbackUrl, { replace: true });
     }
-  }, [isAuthenticated, auth.user, dispatch, navigate, location.pathname]);
+  }, [isAuthenticated, auth.user, dispatch, employees.length, navigate, location.pathname, location.search]);
 
   const hasRequiredRole = allowedRoles.length === 0 || Roles?.some((role) => allowedRoles.includes(role as UserRole));
 
