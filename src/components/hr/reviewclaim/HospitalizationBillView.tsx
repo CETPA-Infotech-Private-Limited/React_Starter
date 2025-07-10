@@ -1,14 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  BillItemDisplayRow,
-  DisplayField,
-  DisplayTable,
-  InfoCard,
-  PreHospDisplayRow,
-  SectionHeader,
-  StatusBadge
-} from './ReviewComponents';
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader, StatusBadge } from './ReviewComponents';
 import { Textarea } from '@/components/ui/textarea';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
@@ -16,10 +8,9 @@ import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
 
 const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
   if (!claimDetail) return null;
-const user = useAppSelector((state:RootState)=>state.user)
-const dispatch = useAppDispatch()
+  const user = useAppSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
-
 
   const billItems = [
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
@@ -30,10 +21,38 @@ const dispatch = useAppDispatch()
   ];
 
   const preHospItems = [
-    { id: 1, billType: 'Medicine', billedDate: preHospitalizationExpenses?.medicineBillDate, billedAmount: preHospitalizationExpenses?.medicineBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.medicineClaimAmount ?? 0, hasFiles: 0 },
-    { id: 2, billType: 'Consultation', billedDate: preHospitalizationExpenses?.consultationBillDate, billedAmount: preHospitalizationExpenses?.consultationBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.consultationClaimAmount ?? 0, hasFiles: 0 },
-    { id: 3, billType: 'Investigation', billedDate: preHospitalizationExpenses?.investigationBillDate, billedAmount: preHospitalizationExpenses?.investigationBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.investigationClaimAmount ?? 0, hasFiles: 0 },
-    { id: 4, billType: 'Other', billedDate: preHospitalizationExpenses?.othersBillDate, billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0, hasFiles: 0 },
+    {
+      id: 1,
+      billType: 'Medicine',
+      billedDate: preHospitalizationExpenses?.medicineBillDate,
+      billedAmount: preHospitalizationExpenses?.medicineBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.medicineClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 2,
+      billType: 'Consultation',
+      billedDate: preHospitalizationExpenses?.consultationBillDate,
+      billedAmount: preHospitalizationExpenses?.consultationBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.consultationClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 3,
+      billType: 'Investigation',
+      billedDate: preHospitalizationExpenses?.investigationBillDate,
+      billedAmount: preHospitalizationExpenses?.investigationBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.investigationClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 4,
+      billType: 'Other',
+      billedDate: preHospitalizationExpenses?.othersBillDate,
+      billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0,
+      hasFiles: 0,
+    },
   ];
 
   const totalBilled = billItems.reduce((sum, item) => sum + item.billedAmount, 0);
@@ -43,21 +62,19 @@ const dispatch = useAppDispatch()
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
 
-  console.log(claimDetail ,'this is claim detail object')
+  console.log(claimDetail, 'this is claim detail object');
 
-const formData = new FormData()
+  const formData = new FormData();
 
-  const handleSendToDoctor = async()=>{
-    formData.append('AdvanceId', String(claimDetail.advanceBasicDetails.claimId))
-    formData.append('SenderId',String(user.EmpCode))
-    formData.append('RecipientId', String(102199))
-    formData.append('ClaimTypeId', String(claimDetail.advanceBasicDetails.claimTypeId))
-    formData.append('StatusId', String(4))
+  const handleSendToDoctor = async () => {
+    formData.append('AdvanceId', String(claimDetail.advanceBasicDetails.claimId));
+    formData.append('SenderId', String(user.EmpCode));
+    formData.append('RecipientId', String(102199));
+    formData.append('ClaimTypeId', String(claimDetail.advanceBasicDetails.claimTypeId));
+    formData.append('StatusId', String(5));
 
-   
-      dispatch(submitClaimProcessByHr(formData))
-    
-  }
+    dispatch(submitClaimProcessByHr(formData));
+  };
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
@@ -131,10 +148,12 @@ const formData = new FormData()
 
       <div className="mt-6">
         <Textarea placeholder="Add clarification..." />
-        
+
         <Button className="mt-2">Seek Clarification</Button>
         <div>
-        <Button className='mt-2 pl-6 pr-6' onClick={handleSendToDoctor}>Send to Doctor</Button>
+          <Button className="mt-2 pl-6 pr-6" onClick={handleSendToDoctor}>
+            Send to Doctor
+          </Button>
         </div>
       </div>
     </div>

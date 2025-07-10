@@ -20,6 +20,7 @@ import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { RootState } from '@/app/store';
 import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
+import { submitAdvanceApproval } from '@/features/medicalClaim/advanceApprovalSlice';
 
 const HospitalizationBillView = () => {
   // State for the declaration and approval form
@@ -207,7 +208,7 @@ const HospitalizationBillView = () => {
     // Access pre-hospitalization expenses from `claimDetail.preHospitalizationExpenses`
     const expenses = claimDetail?.preHospitalizationExpenses || {};
     return [
-      { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: claimDetail.documentLists.pathUrl ? 1 : 0 },
+      { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0 },
       { id: 2, billType: 'Consultation', billedDate: expenses.consultationBillDate || 'N/A', billedAmount: expenses.consultationBillAmount || 0, claimedAmount: expenses.consultationClaimAmount || 0, hasFiles: expenses.consultationHasFiles ? 1 : 0 },
       { id: 3, billType: 'Investigation', billedDate: expenses.investigationBillDate || 'N/A', billedAmount: expenses.investigationBillAmount || 0, claimedAmount: expenses.investigationClaimAmount || 0, hasFiles: expenses.investigationHasFiles ? 1 : 0 },
       { id: 4, billType: 'Other', billedDate: expenses.othersBillDate || 'N/A', billedAmount: expenses.otherBillAmount || 0, claimedAmount: expenses.otherClaimAmount || 0, hasFiles: expenses.otherHasFiles ? 1 : 0 },
@@ -221,21 +222,30 @@ const HospitalizationBillView = () => {
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
 
+console.log(approvedAmount,'this is approved')
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const formData = {
-        AdvanceId: selectedClaim?.claimId,
-        ApprovedAmount: parseFloat(approvedAmount),
-        RequestedAmount: parseFloat(totalRequested),
-        SendTo: sendTo,
-        SpecialDisease: isSpecialDisease,
-        SpecialDiseaseName: isSpecialDisease === 'yes' ? specialDiseaseName : '',
+      const payload = {
+        AdvanceId: claimDetail.advanceBasicDetails.advanceId,
+        ApprovalAmount: String(approvedAmount),
+        RecipientId: '101002',
+        SenderId: user.EmpCode,
+        ClaimTypeId: claimDetail.advanceBasicDetails.claimTypeId,
+        StatusId: 4,
       };
 
+      
+
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log('Submitting data:', formData);
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // console.log('Submitting data:', formData);
+
+     
+       await dispatch(submitAdvanceApproval(payload))
+
+      
 
       // Reset form fields after successful submission
       setApprovedAmount('');
@@ -347,7 +357,7 @@ const HospitalizationBillView = () => {
                   <div className="flex items-center space-x-4">
                     <Label className=" font-medium text-gray-900">Special Disease</Label>
                       <RadioGroup
-                    value={claimDetail.advanceBasicDetails.isSpecailDisease ? 'yes' : 'no'}
+                    value={claimDetail?.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no'}
                        disabled
                        className="flex space-x-6"
 >
@@ -380,47 +390,34 @@ const HospitalizationBillView = () => {
               </Card>
 
               {/* Approval Form */}
-              <Card className='mt-8'>
-                <div className='p-4'>
-                  <h2 className='text-lg text-primary drop-shadow pb-4'>Approval Form</h2>
-                  <div className='flex'>
-                    <div className='flex w-1/2 items-center'>
-                      <Label className='p-4 pl-8 text-gray-900 w-1/2'>Total Claim Requested</Label>
-                      <Input
-                        className='w-1/2'
-                        disabled
-                        value={claimDetail.advanceBasicDetails.claimAmount}
-                        onChange={(e) => setTotalRequested(e.target.value)}
-                        type="number"
-                      />
-                    </div>
-                    <div className='flex w-1/2 items-center'>
-                      <Label className='p-4 pl-8 text-gray-900 w-1/2'>Approved Amount</Label>
-                      <Input
-                        className='w-1/2'
-                        value={approvedAmount}
-                        onChange={(e) => setApprovedAmount(e.target.value)}
-                        type="number"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Action */}
               <Card className="mt-8">
   <div className="p-4">
-    <h2 className="text-lg text-primary drop-shadow pb-4">Action</h2>
+    <h2 className="text-lg text-primary drop-shadow pb-4">Approval Form</h2>
 
-    {/* Responsive Flex Container */}
-    <div className="flex flex-col md:flex-row md:items-center w-full gap-4">
-      <Label className="md:w-1/6 text-gray-900">Send To</Label>
-      <Input
-        className="w-full md:w-1/2"
-        value={sendTo}
-        onChange={(e) => setSendTo(e.target.value)}
-        placeholder="e.g., Finance Dept."
-      />
+    {/* Responsive Flex Layout */}
+    <div className="flex flex-col md:flex-row md:gap-6 gap-4">
+      {/* Total Claim Requested */}
+      <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+        <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
+        <Input
+          className="w-full"
+          disabled
+          value={claimDetail?.advanceBasicDetails?.claimAmount}
+          onChange={(e) => setTotalRequested(e.target.value)}
+          type="number"
+        />
+      </div>
+
+      {/* Approved Amount */}
+      <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+        <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
+        <Input
+          className="w-full"
+          value={approvedAmount}
+          onChange={(e) => setApprovedAmount(e.target.value)}
+          type="number"
+        />
+      </div>
     </div>
 
     {/* Submit Button */}
@@ -431,7 +428,6 @@ const HospitalizationBillView = () => {
     </div>
   </div>
 </Card>
-
             </>
           )}
         </div>
