@@ -75,7 +75,6 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
   const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
   const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
   const [postHospDetails, setPostHospDetails] = useState<Partial<ClaimRequest>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { advanceSettleSuccess, advanceSettleError, advanceSettleLoading } = useAppSelector((state) => state.claim);
 
   const user = useAppSelector((state: RootState) => state.user);
@@ -126,7 +125,6 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
     try {
       const rawPayload: Partial<ClaimRequest> = {
         ...patientDetails,
@@ -267,7 +265,6 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
     } catch (error) {
       console.error('Submit error:', error);
     } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -275,7 +272,6 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
     if (advanceSettleSuccess) {
       toast.success('Advance claim settled successfully!');
       dispatch(getMyClaims(Number(user.EmpCode)));
-
       setPatientDetails({});
       setBillDetails({});
       setPreHospDetails({});
@@ -293,31 +289,25 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
 
   return (
     <div className=" p-2 min-h-screen">
-      {isSubmitting ? (
-        <div className="flex items-center justify-center h-full py-10">
-          <Loader />
+      <>
+        <div className="mt-4">
+          <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} defaultData={defaultData} />
         </div>
-      ) : (
-        <>
-          <div className="mt-4">
-            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} defaultData={defaultData} />
-          </div>
-          <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
-          </div>
-          <div className="mt-4">
-            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
-          </div>
-          <div>
-            <PostHospitalizationAndDeclaration
-              postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-              onChange={setPostHospDetails}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-        </>
-      )}
+        <div className="mt-4">
+          <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
+        </div>
+        <div className="mt-4">
+          <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
+        </div>
+        <div>
+          <PostHospitalizationAndDeclaration
+            postHospitalizationAndDeclaration={postHospDetailsWithSummary}
+            onChange={setPostHospDetails}
+            onSubmit={handleSubmit}
+            isSubmitting={advanceSettleLoading}
+          />
+        </div>
+      </>
     </div>
   );
 };
