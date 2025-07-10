@@ -4,6 +4,8 @@ import { CheckCircle, Eye, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
+
+
 export const SectionHeader = ({ title, subtitle, className = '' }) => (
   <div className={`mb-4 ${className}`}>
     <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
@@ -54,8 +56,6 @@ export const StatusBadge = ({ status, type = 'default' }) => {
   return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${variants[type]}`}>{status}</span>;
 };
 
- const [billComments, setBillComments] = useState<string[]>([]);
-  const [preHospComments, setPreHospComments] = useState<string[]>([]);
 
 
 export const BillItemDisplayRow = ({
@@ -65,9 +65,10 @@ export const BillItemDisplayRow = ({
   claimedAmount,
   included,
   clarification,
-  onCommentChange = () => {},
-  comment = '',
-}) => (
+}) =>{
+const [comment, setComment] = useState('');
+
+    return (
   <tr className="hover:bg-gray-50">
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{serialNo}</td>
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billType}</td>
@@ -85,12 +86,13 @@ export const BillItemDisplayRow = ({
       <Input
         placeholder="Doctor's comment"
         value={comment}
-        onChange={(e) => onCommentChange(e.target.value)}
+        onChange={(e) => setComment(e.target.value)}
         className="text-sm"
       />
     </td>
   </tr>
 );
+}
 
 export const PreHospDisplayRow = ({
   serialNo,
@@ -100,8 +102,6 @@ export const PreHospDisplayRow = ({
   claimedAmount,
   hasFiles,
   fileLinks = [],
-  comment = '',
-  onCommentChange = () => {},
 }: {
   serialNo: number;
   billType: string;
@@ -114,6 +114,7 @@ export const PreHospDisplayRow = ({
   onCommentChange?: (val: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
+  const [comment,setComment]=useState('')
 
   return (
     <>
@@ -153,7 +154,7 @@ export const PreHospDisplayRow = ({
           <Input
             placeholder="Doctor's comment"
             value={comment}
-            onChange={(e) => onCommentChange(e.target.value)}
+            onChange={(e) => setComment(e.target.value)}
             className="text-sm"
           />
         </td>
