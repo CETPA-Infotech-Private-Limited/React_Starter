@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   BillItemDisplayRow,
@@ -16,6 +16,9 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card } from '../ui/card';
 import { Loader } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import { RootState } from '@/app/store';
 
 const HospitalizationBillView = () => {
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('yes');
@@ -24,6 +27,15 @@ const HospitalizationBillView = () => {
   const [approvedAmount, setApprovedAmount] = useState('');
   const [sendTo, setSendTo] = useState('');
   const [loading, setLoading] = useState(false);
+const user = useAppSelector((state:RootState)=>state.user)
+const claimDetailAfterReview = useAppSelector((state:RootState)=>state)
+console.log(claimDetailAfterReview, 'this is claimdetails after review')
+
+console.log(user, 'this is user')
+  const dispatch=useAppDispatch()
+  useEffect(()=>{
+    dispatch(getClaimHr({recipientId: user.EmpCode,pageId: 2}))
+  },[])
 
   const advanceBasicDetails = {
     patientName: 'John Doe',
