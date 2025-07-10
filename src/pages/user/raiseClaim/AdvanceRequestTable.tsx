@@ -7,11 +7,8 @@ import { Button } from '@/components/ui/button';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
-<<<<<<< HEAD
 import { format } from 'date-fns';
-=======
 import { findEmployeeDetails } from '@/lib/helperFunction';
->>>>>>> e1c6e810795f824376a94d91536577a3b21bc604
 
 const DirectRequestTable = () => {
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
@@ -20,6 +17,7 @@ const DirectRequestTable = () => {
 
   const user = useAppSelector((state) => state.user.EmpCode);
   const userdata = useAppSelector((state: RootState) => state.user);
+  
   const claimdata = useAppSelector((state) => state.claim.data);
    const { employees } = useAppSelector((state: RootState) => state.employee);
 
