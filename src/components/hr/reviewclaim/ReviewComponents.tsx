@@ -5,21 +5,21 @@ import { useState } from 'react';
 
 export const SectionHeader = ({ title, subtitle, className = '' }) => (
   <div className={`mb-4 ${className}`}>
-    <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+    <h2 className="text-lg font-semibold text-primary drop-shadow">{title}</h2>
     {subtitle && <p className="text-sm text-gray-600 mt-1">{subtitle}</p>}
   </div>
 );
 
 export const InfoCard = ({ title, children, className = '' }) => (
   <div className={`bg-gray-50 rounded-lg p-4 border border-gray-200 ${className}`}>
-    <h3 className="font-bold  mb-3">{title}</h3>
+    <h3 className="font-bold text-primary drop-shadow  mb-3">{title}</h3>
     {children}
   </div>
 );
 
 export const DisplayField = ({ label, value, className = '', valueClassName = '' }) => (
   <div className={`flex flex-col ${className}`}>
-    <label className="text-sm font-medium text-gray-600 mb-1">{label}</label>
+    <label className="text-sm font-medium text-primary drop-shadow mb-1">{label}</label>
     <div className={`text-sm text-gray-900 py-1 ${valueClassName}`}>{value || '-'}</div>
   </div>
 );
@@ -30,7 +30,7 @@ export const DisplayTable = ({ headers, children, className = '' }) => (
       <thead className="bg-gray-50">
         <tr>
           {headers.map((header, index) => (
-            <th key={index} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+            <th key={index} className="px-4 py-3 text-left text-xs font-medium text-primary drop-shadow uppercase tracking-wider border-b border-gray-300">
               {header}
             </th>
           ))}
@@ -54,7 +54,7 @@ export const StatusBadge = ({ status, type = 'default' }) => {
 };
 
 export const BillItemDisplayRow = ({ serialNo, billType, billedAmount, claimedAmount, included, clarification }) => (
-  <tr className="hover:bg-gray-50">
+  <tr className="hover:bg-gray-50 text-primary">
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{serialNo}</td>
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billType}</td>
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{billedAmount.toFixed(2)}</td>

@@ -138,7 +138,7 @@ const HospitalizationBillView = () => {
         </div>
       </div>
 
-      <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" />
+      <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className='text-primary' />
       <DisplayTable headers={preHospHeaders}>
         {preHospItems.map((item, index) => (
           <PreHospDisplayRow
@@ -153,8 +153,8 @@ const HospitalizationBillView = () => {
         ))}
       </DisplayTable>
 
-      <div className="text-right mt-8">
-        <span className="font-semibold text-sm">Total Pre-Hospital: </span>
+      <div className="text-right mt-8 mb-4">
+        <span className="font-semibold text-lg text-primary drop-shadow p-4 ">Total Pre-Hospital: </span>
         <span className="text-lg font-bold">₹{preHospTotal.toFixed(2)}</span>
       </div>
         <Card className='p-8 '>
@@ -165,7 +165,7 @@ const HospitalizationBillView = () => {
   <div className="flex items-center justify-between">
       {/* Radio Group */}
       <div className="flex items-center space-x-4">
-        <Label className=" font-medium text-primary ">Special Disease</Label>
+        <Label className=" font-medium text-gray-900 ">Special Disease</Label>
         <RadioGroup
           value={isSpecialDisease}
           onValueChange={(val: 'yes' | 'no') => setIsSpecialDisease(val)}
@@ -185,7 +185,7 @@ const HospitalizationBillView = () => {
       {/* Conditionally Rendered Input */}
       {isSpecialDisease === 'yes' && (
         <div className="flex items-center space-x-3 pl-10">
-          <Label htmlFor="special-disease-name" className="text-sm font-medium text-primary">
+          <Label htmlFor="special-disease-name" className="text-sm font-medium text-gray-900">
             Special Disease Name
           </Label>
           <Input
@@ -212,11 +212,11 @@ const HospitalizationBillView = () => {
         <div className='flex'>
             <div className='flex justify-start w-1/2 items-center'>
                 
-                <Label className='p-4 pl-8 text-primary drop-shadow w-1/2'>Total Claim Requested</Label>
+                <Label className='p-4 pl-8 text-gray-900 drop-shadow w-1/2'>Total Claim Requested</Label>
                 <Input className='w-1/2'></Input>
             </div>
             <div className='flex'>
-                <Label className='p-4 pl-8 text-primary drop-shadow w-full'>Approved Amount</Label>
+                <Label className='p-4 pl-8 text-gray-900 drop-shadow w-full'>Approved Amount</Label>
                 <Input className='w-full'></Input>
             </div>
             </div>
@@ -233,7 +233,7 @@ const HospitalizationBillView = () => {
         
             <div className='flex justify-start w-1/2 items-center'>
                 
-                <Label className='p-4 pl-8 text-primary drop-shadow w-1/6'>Send to</Label>
+                <Label className='p-4 pl-8 text-gray-900 drop-shadow w-1/6'>Send to</Label>
                 <Input className='w-1/2'></Input>
             </div>
             
