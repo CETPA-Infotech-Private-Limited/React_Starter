@@ -1,5 +1,18 @@
 import * as React from 'react';
-import { FileText, CreditCard, Stamp, Search, BadgeCheck, Power, ChevronLeft, ChevronRight, Briefcase, LogOut, LayoutDashboard } from 'lucide-react';
+import {
+  FileText,
+  CreditCard,
+  Stamp,
+  Search,
+  BadgeCheck,
+  Power,
+  ChevronLeft,
+  ChevronRight,
+  Briefcase,
+  LogOut,
+  LayoutDashboard,
+  EqualApproximately,
+} from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -36,11 +49,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           roles: ['user'],
         },
 
-         {
-          title: 'Doctor Review',
-          url: '/doctor-review',
-          roles: ['user'],
-        },
         {
           title: 'Request Advance',
           url: '/request-advance',
@@ -56,7 +64,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
 
     {
-      title: 'Review',
+      title: 'HR Review',
       icon: Search,
       roles: ['HR1', 'HR2'],
       children: [
@@ -76,9 +84,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           roles: ['HR1', 'HR2'],
         },
         {
-          title: 'Doctor Approved Claim',
+          title: 'Approved Claim',
           url: '/review-claim2',
-          roles: ['HR1', 'HR2'],
+          roles: ['HR2'],
         },
       ],
     },
@@ -87,6 +95,13 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       url: '/banking',
       icon: CreditCard,
       roles: ['Finance'],
+    },
+
+    {
+      title: 'Doctor Review',
+      url: '/doctor-review',
+      icon: EqualApproximately,
+      roles: ['Doctor'],
     },
   ];
 

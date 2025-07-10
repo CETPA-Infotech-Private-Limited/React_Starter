@@ -16,25 +16,12 @@ import { json } from 'node:stream/consumers';
 
 const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
-
-  // Correctly access the status and error from your doctorSlice
-  // Assuming your doctorSlice has a state structure like:
-  // doctor: {
-  //   doctorClaims: [...],
-  //   postDocReviewStatus: 'idle' | 'pending' | 'succeeded' | 'failed',
-  //   postDocReviewError: null | string,
-  //   // ...other doctor-related states
-  // }
-  const data = useAppSelector(
-    (state: RootState) => state.submitClaimProcessSlice // Assuming this is the slice property that holds the status and error of the postDocReview thunk
-  );
-  console.log(data, 'data from doctorSlice');
+  const data = useAppSelector((state: RootState) => state.submitClaimProcessSlice);
 
   const claimDrData = useAppSelector((state: RootState) => state.submitClaimProcessSlice.response);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const claimDetail = useAppSelector((state: RootState) => state);
-  // console.log(claimDetail, 'claimDetail from doctorSlice');
 
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -123,16 +110,8 @@ const DoctorReviewPage = () => {
     console.log('billComments:', billComments);
     console.log('preHospComments:', preHospComments);
     console.log('form:', form);
-    // You can also log Redux state here if it's relevant to the component's render
-   ;
-    
-   
     console.groupEnd();
   }, [selectedClaim, showDetails, billComments, preHospComments, form]);
-
-
-  // Use a separate useEffect to handle post-submission logic based on Redux state
-// Dependencies for this effect
 
   const handleSubmit = async () => {
     if (!selectedClaim) return;
@@ -169,21 +148,17 @@ const DoctorReviewPage = () => {
     });
 
     const payload = {
-  claimId: selectedClaim.claimId || selectedClaim.id,
-  doctorId: user?.EmpCode ?? 0,
-  hrRecipentId: 57, // Replace with actual value if dynamic
-  claimType: Number(selectedClaim.claimTypeId) || 3,
-  claimStatus: 24,
-  isSpecailDisease: form.doctorSpecialDisease === 'Yes',
-  comments: commentsArray,
-};
+      claimId: selectedClaim.claimId || selectedClaim.id,
+      doctorId: user?.EmpCode ?? 0,
+      hrRecipentId: 57, // Replace with actual value if dynamic
+      claimType: Number(selectedClaim.claimTypeId) || 3,
+      claimStatus: 24,
+      isSpecailDisease: form.doctorSpecialDisease === 'Yes',
+      comments: commentsArray,
+    };
 
-dispatch(postDocReview(payload));
-
+    dispatch(postDocReview(payload));
   };
-
-
-
 
   useEffect(() => {
     if (user?.EmpCode) {
@@ -222,11 +197,10 @@ dispatch(postDocReview(payload));
 
       if (rowData.claimId || rowData.id) {
         dispatch(fetchClaimDetails(rowData.claimId || rowData.id));
-        dispatch(getClaimDataHr(rowData.claimId|| rowData.id ));
+        dispatch(getClaimDataHr(rowData.claimId || rowData.id));
       }
     }
   };
-  
 
   const columns = useMemo(
     () => [
@@ -306,10 +280,7 @@ dispatch(postDocReview(payload));
       </div>
 
       {selectedClaim && showDetails && (
-        <div
-          ref={detailsRef}
-          className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6"
-        >
+        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
           {/* HospitalizationBillDetails component */}
           <HospitalizationBillDetails
             claimDetail={claimDetail}
@@ -339,7 +310,9 @@ dispatch(postDocReview(payload));
               </div>
 
               <div className="mt-2">
-                <Label htmlFor="postHospComment" className="font-semibold">Comment for Post Hospitalization Treatment Advice</Label>
+                <Label htmlFor="postHospComment" className="font-semibold">
+                  Comment for Post Hospitalization Treatment Advice
+                </Label>
                 <Textarea
                   id="postHospComment"
                   value={form.postHospComment}
@@ -368,7 +341,9 @@ dispatch(postDocReview(payload));
               </div>
 
               <div className="mt-2">
-                <Label htmlFor="doctorComment" className="font-semibold">Comment for Special Disease</Label>
+                <Label htmlFor="doctorComment" className="font-semibold">
+                  Comment for Special Disease
+                </Label>
                 <Textarea
                   id="doctorComment"
                   value={form.doctorComment}
@@ -379,7 +354,9 @@ dispatch(postDocReview(payload));
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="additionalComment" className="font-semibold">Additional Comments / Recommendation</Label>
+              <Label htmlFor="additionalComment" className="font-semibold">
+                Additional Comments / Recommendation
+              </Label>
               <Textarea
                 id="additionalComment"
                 value={form.additionalComment}
@@ -389,20 +366,12 @@ dispatch(postDocReview(payload));
             </div>
 
             <div className="flex items-center gap-2">
-              <Checkbox
-                id="verified"
-                checked={form.verified}
-                onCheckedChange={(checked) => handleChange('verified', !!checked)}
-              />
+              <Checkbox id="verified" checked={form.verified} onCheckedChange={(checked) => handleChange('verified', !!checked)} />
               <Label htmlFor="verified">Verified</Label>
             </div>
 
             <div className="flex justify-end">
-              <Button
-                className="bg-indigo-600 text-white hover:bg-indigo-700"
-                onClick={handleSubmit}
-                 // Disable button during submission
-              >
+              <Button className="bg-indigo-600 text-white hover:bg-indigo-700" onClick={handleSubmit}>
                 Submit
               </Button>
             </div>
