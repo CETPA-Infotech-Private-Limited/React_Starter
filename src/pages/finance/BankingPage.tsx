@@ -115,7 +115,7 @@ const ApproveAdvancePage = () => {
         header: 'Actions',
         cell: ({ row }: any) => {
           const item = row.original;
-          const isSelected = selectedAdvance?.claimId === item.claimId;
+          const isSelected = selectedAdvance?.advanceId === item.advanceId;
 
           return (
             <Button
@@ -127,7 +127,7 @@ const ApproveAdvancePage = () => {
                 if (isSelected) {
                   setSelectedAdvance(null);
                 } else {
-                  dispatch(fetchClaimDetails(item.claimId));
+                  dispatch(fetchClaimDetails(item.advanceId));
                   setSelectedAdvance(item);
                 }
               }}
@@ -232,8 +232,8 @@ const ApproveAdvancePage = () => {
           <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white  ">
             <h2 className="text-xl font-bold text-blue-700 mb-4">Verify And Approved</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ReadOnlyField label="Advance Request Amount" value={selectedAdvance?.advanceAmount} />
-              <ReadOnlyField label="Final Approve Amount" value={selectedAdvance?.approvedAmount} />
+              <ReadOnlyField label="Advance Request Amount" value={formatRupees(selectedAdvance?.advanceAmount)} />
+              <ReadOnlyField label="Final Approve Amount" value={formatRupees(selectedAdvance?.approvedAmount)} />
             </div>
             <div className=" flex justify-end">
               <Button className=" mt-4" onClick={handleBankingDetailsSubmit}>
