@@ -77,9 +77,9 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
             <FamilyMemberSelect value={patientDetail.MemberId} disabled onOpenChange={() => {}} />
           </div>
 
-          <InputField label="Advance Request Amount" value={formatRupees(patientDetail.AdvanceAmount)} disabled onChange={() => {}} />
+          <InputField label="Advance Request Amount" value={formatRupees(defaultData?.selectedAdvanceClaim?.advanceAmount)} disabled onChange={() => {}} />
 
-          <InputField label="Final Approve Amount" value={formatRupees(patientDetail.ApprovedAmount)} disabled onChange={() => {}} />
+          <InputField label="Final Approve Amount" value={formatRupees(defaultData?.selectedAdvanceClaim?.approvedAmount)} disabled onChange={() => {}} />
 
           {/* Is Hospital Empanelled */}
           <div className="flex flex-col gap-1.5 w-full">

@@ -109,8 +109,21 @@ export const submitAdvanceClaimSettle = createAsyncThunk('claim/submitAdvanceCla
 
     return response.data.data;
   } catch (error: any) {
-    toast.error('Error occurred while submitting claim.');
-    return rejectWithValue(error.response?.data || error.message);
+    const res = error.response?.data;
+
+    if (res?.errors) {
+      // Flatten the errors into a string
+      const messages = Object.entries(res.errors)
+        .map(([field, errs]: [string, string[]]) => `${field}: ${errs.join(', ')}`)
+        .join(' | ');
+
+      toast.error('Validation error occurred.');
+      return rejectWithValue(messages);
+    }
+
+    const message = res?.message || error.message || 'Submission failed';
+    toast.error(message);
+    return rejectWithValue(message);
   }
 });
 
