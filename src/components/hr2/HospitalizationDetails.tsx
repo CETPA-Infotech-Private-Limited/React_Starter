@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,12 +15,16 @@ import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card } from '../ui/card';
-import InputField from '../common/InputField';
-
+import { Loader } from 'lucide-react';
 
 const HospitalizationBillView = () => {
-    const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('yes');
+  const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('yes');
   const [specialDiseaseName, setSpecialDiseaseName] = useState('Diabetes');
+  const [totalRequested, setTotalRequested] = useState('');
+  const [approvedAmount, setApprovedAmount] = useState('');
+  const [sendTo, setSendTo] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const advanceBasicDetails = {
     patientName: 'John Doe',
     dateOfAdmission: '2025-06-01',
@@ -81,11 +87,30 @@ const HospitalizationBillView = () => {
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
 
-  const formData = new FormData();
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('AdvanceId', 'ADV123456');
+      formData.append('ApprovedAmount', approvedAmount);
+      formData.append('RequestedAmount', totalRequested);
+      formData.append('SendTo', sendTo);
+      formData.append('SpecialDisease', isSpecialDisease);
+      formData.append('SpecialDiseaseName', specialDiseaseName);
 
-  const handleSendToDoctor = async () => {
-    formData.append('AdvanceId', 'ADV123456');
-    console.log('Sending to doctor...', formData);
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API
+
+      // Clear form
+      setApprovedAmount('');
+      setTotalRequested('');
+      setSendTo('');
+      setSpecialDiseaseName('');
+      setIsSpecialDisease('no');
+    } catch (err) {
+      console.error('Error submitting:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -157,92 +182,77 @@ const HospitalizationBillView = () => {
         <span className="font-semibold text-lg text-primary drop-shadow p-4 ">Total Pre-Hospital: </span>
         <span className="text-lg font-bold">₹{preHospTotal.toFixed(2)}</span>
       </div>
-        <Card className='p-8 '>
-            <div className='flex justify-start items-start pr-4 pb-4 text-lg font-medium text-primary drop-shadow '>
-                <h1>Declaration bye Emplyoee</h1>
-            </div>
+
+      {/* Declaration Section */}
+      <Card className='p-8 mt-6'>
+        <h2 className='text-lg font-medium text-primary drop-shadow mb-4'>Declaration by Employee</h2>
         <div className="flex items-center justify-between">
-  <div className="flex items-center justify-between">
-      {/* Radio Group */}
-      <div className="flex items-center space-x-4">
-        <Label className=" font-medium text-gray-900 ">Special Disease</Label>
-        <RadioGroup
-          value={isSpecialDisease}
-          onValueChange={(val: 'yes' | 'no') => setIsSpecialDisease(val)}
-          className="flex space-x-6"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="yes" id="special-disease-yes" />
-            <Label htmlFor="special-disease-yes" className="text-sm">Yes</Label>
+          <div className="flex items-center space-x-4">
+            <Label className=" font-medium text-gray-900">Special Disease</Label>
+            <RadioGroup
+              value={isSpecialDisease}
+              onValueChange={(val: 'yes' | 'no') => setIsSpecialDisease(val)}
+              className="flex space-x-6"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="yes" id="special-disease-yes" />
+                <Label htmlFor="special-disease-yes" className="text-sm">Yes</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="no" id="special-disease-no" />
+                <Label htmlFor="special-disease-no" className="text-sm">No</Label>
+              </div>
+            </RadioGroup>
           </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="no" id="special-disease-no" />
-            <Label htmlFor="special-disease-no" className="text-sm">No</Label>
+          {isSpecialDisease === 'yes' && (
+            <div className="flex items-center space-x-3 pl-10">
+              <Label htmlFor="special-disease-name" className="text-sm font-medium text-gray-900">
+                Special Disease Name
+              </Label>
+              <Input
+                id="special-disease-name"
+                value={specialDiseaseName}
+                onChange={(e) => setSpecialDiseaseName(e.target.value)}
+                placeholder="Enter disease name"
+                className="w-64"
+              />
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Approval Form */}
+      <Card className='mt-8'>
+        <div className='p-4'>
+          <h2 className='text-lg text-primary drop-shadow pb-4'>Approval Form</h2>
+          <div className='flex'>
+            <div className='flex w-1/2 items-center'>
+              <Label className='p-4 pl-8 text-gray-900 w-1/2'>Total Claim Requested</Label>
+              <Input className='w-1/2' value={totalRequested} onChange={(e) => setTotalRequested(e.target.value)} />
+            </div>
+            <div className='flex w-1/2 items-center'>
+              <Label className='p-4 pl-8 text-gray-900 w-1/2'>Approved Amount</Label>
+              <Input className='w-1/2' value={approvedAmount} onChange={(e) => setApprovedAmount(e.target.value)} />
+            </div>
           </div>
-        </RadioGroup>
-      </div>
-
-      {/* Conditionally Rendered Input */}
-      {isSpecialDisease === 'yes' && (
-        <div className="flex items-center space-x-3 pl-10">
-          <Label htmlFor="special-disease-name" className="text-sm font-medium text-gray-900">
-            Special Disease Name
-          </Label>
-          <Input
-            id="special-disease-name"
-            value={specialDiseaseName}
-            onChange={(e) => setSpecialDiseaseName(e.target.value)}
-            placeholder="Enter disease name"
-            className="w-64"
-          />
         </div>
-      )}
-    </div>
+      </Card>
 
-  
-</div>
-</Card>
-
-<div>
-    <Card className='mt-8'>
+      {/* Action */}
+      <Card className='mt-8'>
         <div className='p-4'>
-        <div className='flex justify-start pb-4 pl-8 pt-4 text-primary drop-shadow text-lg'>
-            <h1>Approval Form</h1>
+          <h2 className='text-lg text-primary drop-shadow pb-4'>Action</h2>
+          <div className='flex w-1/2 items-center'>
+            <Label className='p-4 pl-8 text-gray-900 w-1/6'>Send To</Label>
+            <Input className='w-1/2' value={sendTo} onChange={(e) => setSendTo(e.target.value)} />
+          </div>
+          <div className='flex justify-end pt-4'>
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
+            </Button>
+          </div>
         </div>
-        <div className='flex'>
-            <div className='flex justify-start w-1/2 items-center'>
-                
-                <Label className='p-4 pl-8 text-gray-900 drop-shadow w-1/2'>Total Claim Requested</Label>
-                <Input className='w-1/2'></Input>
-            </div>
-            <div className='flex'>
-                <Label className='p-4 pl-8 text-gray-900 drop-shadow w-full'>Approved Amount</Label>
-                <Input className='w-full'></Input>
-            </div>
-            </div>
-            </div>
-    </Card>
-</div>
-<div>
-    <Card className='mt-8'>
-        <div className='p-4'>
-        <div className='flex justify-start pb-4 pl-8 pt-4 text-primary drop-shadow text-lg'>
-            <h1>Action</h1>
-            <hr/>
-        </div>
-        
-            <div className='flex justify-start w-1/2 items-center'>
-                
-                <Label className='p-4 pl-8 text-gray-900 drop-shadow w-1/6'>Send to</Label>
-                <Input className='w-1/2'></Input>
-            </div>
-            
-            <div className='flex justify-end '>
-                <Button>Confirm</Button>
-            </div>
-            </div>
-    </Card>
-</div>
+      </Card>
     </div>
   );
 };

@@ -81,8 +81,47 @@ export default function AdvanceApprovalForm({ estimatedAmount, onSubmit, approva
 </CardHeader>
  
       <CardContent>
-<Form {...form}>
-<form onSubmit={form.handleSubmit(handleSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Estimated Amount */}
+            <div className="flex flex-col gap-1">
+              <FormLabel className="text-blue-800 text-sm font-semibold">Estimated Amount</FormLabel>
+              <Input value={`₹ ${estimatedAmount.toLocaleString()}`} disabled className="border border-blue-200 bg-blue-50" />
+            </div>
+
+            {/* Approved Amount */}
+            <FormField
+              control={form.control}
+              name="approvedAmount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-blue-800 text-sm font-semibold">Approved Amount</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter approved amount" type="number" className="border border-blue-200" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Terms and Conditions */}
+            <FormField
+              control={form.control}
+              name="agree"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox id="agree" checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel htmlFor="agree" className="text-sm text-gray-700 font-normal">
+                      I, the undersigned, hereby declare that the information given in this form is correct and complete to the best of my knowledge and belief.
+                    </FormLabel>
+                  </div>
+                  <FormMessage className="ml-7" />
+                </FormItem>
+              )}
+            />
 
             {/* Estimated Amount */}
 <div className="flex flex-col gap-1">

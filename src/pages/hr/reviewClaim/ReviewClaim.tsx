@@ -147,7 +147,7 @@ const ReviewClaim = () => {
       {selectedClaim && showDetails && (
         <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
           <HospitalizationBillView claimDetail={claimDetail} />
-          <ViewClaimDetails claim={selectedClaim} />
+          {/* <ViewClaimDetails claim={selectedClaim} /> */}
         </div>
       )}
     </div>
