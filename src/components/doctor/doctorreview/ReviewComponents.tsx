@@ -4,8 +4,6 @@ import { CheckCircle, Eye, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
-
-
 export const SectionHeader = ({ title, subtitle, className = '' }) => (
   <div className={`mb-4 ${className}`}>
     <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
@@ -21,8 +19,8 @@ export const InfoCard = ({ title, children, className = '' }) => (
 );
 
 export const DisplayField = ({ label, value, className = '', valueClassName = '' }) => (
-  <div className={`flex flex-col ${className}`}>
-    <label className="text-sm font-medium text-gray-600 mb-1">{label}</label>
+  <div className={`flex flex-row items-center gap-4 ${className}`}>
+    <label className="text-sm font-medium text-primary mb-1">{label}</label>
     <div className={`text-sm text-gray-900 py-1 ${valueClassName}`}>{value || '-'}</div>
   </div>
 );
@@ -56,7 +54,6 @@ export const StatusBadge = ({ status, type = 'default' }) => {
   return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${variants[type]}`}>{status}</span>;
 };
 
-
 export const BillItemDisplayRow = ({
   serialNo,
   billType,
@@ -89,17 +86,10 @@ export const BillItemDisplayRow = ({
     </td>
     <td className="px-4 py-3">{clarification || '-'}</td>
     <td className="px-4 py-3">
-      <Input
-        placeholder="Doctor's comment"
-        value={comment}
-        onChange={onCommentChange}
-        className="text-sm"
-      />
+      <Input placeholder="Doctor's comment" value={comment} onChange={onCommentChange} className="text-sm" />
     </td>
   </tr>
 );
-
-
 
 export const PreHospDisplayRow = ({
   serialNo,
@@ -159,16 +149,9 @@ export const PreHospDisplayRow = ({
           </Dialog>
         </td>
         <td className="px-4 py-3">
-          <Input
-            placeholder="Doctor's comment"
-            value={comment}
-            onChange={onCommentChange}
-            className="text-sm"
-          />
+          <Input placeholder="Doctor's comment" value={comment} onChange={onCommentChange} className="text-sm" />
         </td>
       </tr>
     </>
   );
 };
-
-

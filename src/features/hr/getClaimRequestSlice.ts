@@ -1,9 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axiosInstance from "@/services/axiosInstance";
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axiosInstance from '@/services/axiosInstance';
 
-// ---------------- Interfaces ---------------- //
-
-// ✅ Final GetClaimState should be:
 export interface GetClaimState {
   loading: boolean;
   error: string | null;
@@ -47,45 +44,35 @@ const initialState: GetClaimState = {
   claimDetail: null, // 👈 Added
 };
 
-
 // ---------------- Async Thunk ---------------- //
 
 export const getClaimHr = createAsyncThunk<
-  DirectClaim[],             // Return type
-  GetClaimParams,            // Parameter type
-  { rejectValue: string }    // Rejection payload type
->(
-  'claim/getClaimHr',
-  async ({ recipientId, pageId, empId }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get(`/Claim/GetClaimRequest/${recipientId}/${pageId}`, {
-        
-      });
-      return response.data.data;
-    } catch (error: any) {
-      console.error('Error fetching claims:', error);
-      return rejectWithValue('Failed to fetch claims in HR');
-    }
+  DirectClaim[], // Return type
+  GetClaimParams, // Parameter type
+  { rejectValue: string } // Rejection payload type
+>('claim/getClaimHr', async ({ recipientId, pageId, empId }, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get(`/Claim/GetClaimRequest/${recipientId}/${pageId}`, {});
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Error fetching claims:', error);
+    return rejectWithValue('Failed to fetch claims in HR');
   }
-);
+});
 
 export const getClaimDataHr = createAsyncThunk<
   DirectClaim, // 👈 return type
   { advanceid: number }, // 👈 argument
   { rejectValue: string }
->(
-  "claims/details",
-  async ({ advanceid }, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get(`/Claim/GetClaimDetails/${advanceid}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error fetching claims:', error);
-      return rejectWithValue('Failed to fetch claims details in HR');
-    }
+>('claims/details', async ({ advanceid }, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get(`/Claim/GetClaimDetails/${advanceid}`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching claims:', error);
+    return rejectWithValue('Failed to fetch claims details in HR');
   }
-);
-
+});
 
 // ---------------- Slice ---------------- //
 
@@ -116,10 +103,10 @@ const claimSliceHr = createSlice({
         state.success = false;
       })
       .addCase(getClaimDataHr.fulfilled, (state, action: PayloadAction<DirectClaim>) => {
-  state.loading = false;
-  state.success = true;
-  state.claimDetail = action.payload; 
-})
+        state.loading = false;
+        state.success = true;
+        state.claimDetail = action.payload;
+      })
 
       .addCase(getClaimDataHr.rejected, (state, action) => {
         state.loading = false;

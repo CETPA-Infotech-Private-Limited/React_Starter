@@ -2,28 +2,26 @@ import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import HospitalizationBillDetails from '@/components/doctor/doctorreview/HospitalizationBillDetails';
 import { Button } from '@/components/ui/button';
-import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
+import { EyeIcon, FileSearch, EyeOff, Eye } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks'; // Corrected: removed duplicate useAppSelector
 import { RootState } from '@/app/store';
 import { getDoctorClaimListData, postDocReview } from '@/features/doctor/doctorSlice'; // Ensure this path is correct
-import { findEmployeeDetails } from '@/lib/helperFunction';
+import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 import { getClaimDataHr } from '@/features/hr/getClaimRequestSlice';
 import { json } from 'node:stream/consumers';
+import Loader from '@/components/ui/loader';
 
 const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
-  const data = useAppSelector((state: RootState) => state.submitClaimProcessSlice);
-
-  const claimDrData = useAppSelector((state: RootState) => state.submitClaimProcessSlice.response);
+  const [selectedClaim, setSelectedClaim] = useState(null);
+  const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
+  const { claimList, loading } = useAppSelector((state: RootState) => state.submitClaimProcessSlice);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
-  const claimDetail = useAppSelector((state: RootState) => state);
-
-  const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
@@ -38,46 +36,6 @@ const DoctorReviewPage = () => {
     additionalComment: '',
     verified: false,
   });
-
-  const dummyClaimDetail = {
-    advanceBasicDetails: {
-      patientName: 'John Doe',
-      dateOfAdmission: '2024-06-10',
-      dateofDischarge: '2024-06-15',
-      doctorName: 'Dr. Smith',
-      hospitalName: 'City Hospital',
-      hospitalRegNo: 'HOSP12345',
-      treatmentType: 'Surgery',
-      payTo: 'City Hospital Pvt Ltd',
-      directCliamApprovedAmount: 12000,
-    },
-    billDetails: {
-      medicineBill: 5000,
-      medicineClaim: 4500,
-      consultationBill: 3000,
-      consultationClaim: 2800,
-      investigationBill: 2000,
-      investigationClaim: 2000,
-      roomRentBill: 4000,
-      roomRentClaim: 3500,
-      othersBill: 1000,
-      otherClaim: 800,
-    },
-    preHospitalizationExpenses: {
-      medicineBillDate: '2024-06-05',
-      medicineBillAmount: 800,
-      medicineClaimAmount: 700,
-      consultationBillDate: '2024-06-03',
-      consultationBillAmount: 500,
-      consultationClaimAmount: 400,
-      investigationBillDate: '2024-06-02',
-      investigationBillAmount: 600,
-      investigationClaimAmount: 600,
-      othersBillDate: '2024-06-01',
-      otherBillAmount: 300,
-      otherClaimAmount: 200,
-    },
-  };
 
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({
@@ -101,17 +59,6 @@ const DoctorReviewPage = () => {
       });
     }
   }, [showDetails, selectedClaim]);
-
-  // Console log all relevant component state
-  useEffect(() => {
-    console.groupCollapsed('Current Component State (DoctorReviewPage)');
-    console.log('selectedClaim:', selectedClaim);
-    console.log('showDetails:', showDetails);
-    console.log('billComments:', billComments);
-    console.log('preHospComments:', preHospComments);
-    console.log('form:', form);
-    console.groupEnd();
-  }, [selectedClaim, showDetails, billComments, preHospComments, form]);
 
   const handleSubmit = async () => {
     if (!selectedClaim) return;
@@ -150,7 +97,7 @@ const DoctorReviewPage = () => {
     const payload = {
       claimId: selectedClaim.claimId || selectedClaim.id,
       doctorId: user?.EmpCode ?? 0,
-      hrRecipentId: 57, // Replace with actual value if dynamic
+      hrRecipentId: 57,
       claimType: Number(selectedClaim.claimTypeId) || 3,
       claimStatus: 24,
       isSpecailDisease: form.doctorSpecialDisease === 'Yes',
@@ -162,8 +109,7 @@ const DoctorReviewPage = () => {
 
   useEffect(() => {
     if (user?.EmpCode) {
-      // You might want to use the actual user.EmpCode for getDoctorClaimListData
-      dispatch(getDoctorClaimListData(102199)); // Placeholder, consider using user.EmpCode
+      dispatch(getDoctorClaimListData(Number(user?.EmpCode)));
     }
   }, [user?.EmpCode, dispatch]);
 
@@ -173,124 +119,122 @@ const DoctorReviewPage = () => {
     }
   }, [showDetails]);
 
-  const handleViewToggle = (rowData: any) => {
-    const isSame = selectedClaim?.id === rowData.id;
-    if (isSame) {
-      const shouldShow = !showDetails;
-      setShowDetails(shouldShow);
-      if (!shouldShow) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else {
-      setSelectedClaim(rowData);
-      setShowDetails(true);
-      setBillComments({});
-      setPreHospComments({});
-      setForm({
-        postHospitalization: '',
-        postHospComment: '',
-        doctorSpecialDisease: '',
-        doctorComment: '',
-        additionalComment: '',
-        verified: false,
-      });
-
-      if (rowData.claimId || rowData.id) {
-        dispatch(fetchClaimDetails(rowData.claimId || rowData.id));
-        dispatch(getClaimDataHr(rowData.claimId || rowData.id));
-      }
-    }
-  };
-
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'srNo',
-        header: 'Sr. No',
-        cell: ({ row }: any) => row.index + 1,
+        accessorKey: 'sno',
+        header: 'Sr. No.',
+        enableSorting: false,
+        cell: ({ row }: any) => <div className="text-center">{row.index + 1}</div>,
+        className: 'text-center',
       },
       {
-        accessorKey: 'employeeName',
+        accessorKey: 'empId',
         header: 'Employee Name',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const result = findEmployeeDetails(employees, String(row.original.empId));
+          return <div className="text-center">{result?.employee?.empName || ''}</div>;
+        },
+        className: 'text-center',
       },
       {
-        accessorKey: 'patientName',
+        accessorKey: 'patientId',
         header: 'Patient Name',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const result = findEmployeeDetails(employees, String(row.original.patientId));
+          return <div className="text-center">{result?.employee?.empName || ''}</div>;
+        },
+        className: 'text-center',
       },
       {
         accessorKey: 'relation',
         header: 'Relation',
+        enableSorting: false,
+        cell: () => <div className="text-center">Self</div>,
+        className: 'text-center',
       },
       {
-        accessorKey: 'requestedDate',
-        header: 'Requested Date',
+        accessorKey: 'requestDate',
+        header: 'Request Date',
+        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
+        className: 'text-center',
       },
       {
-        accessorKey: 'claimAmount',
-        header: 'Claim Amount (₹)',
-        cell: ({ getValue }: any) => `₹ ${getValue()?.toLocaleString?.() ?? ''}`,
-      },
-      {
-        accessorKey: 'action',
-        header: 'Action',
+        accessorKey: 'advanceAmount',
+        header: 'Claim Amount',
+        enableSorting: false,
         cell: ({ row }: any) => {
-          const rowData = row.original;
-          const isSelected = selectedClaim?.id === rowData.id;
+          const amount = row.original.advanceAmount;
+          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
+        },
+        className: 'text-center',
+      },
+      {
+        accessorKey: 'approvedAmount',
+        header: 'Approved Amount',
+        enableSorting: false,
+        cell: ({ row }: any) => {
+          const amount = row.original.approvedAmount;
+          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
+        },
+        className: 'text-center',
+      },
+      {
+        id: 'actions',
+        header: 'Actions',
+        cell: ({ row }: any) => {
+          const item = row.original;
+          const isSelected = selectedClaim?.claimId === item.claimId;
 
           return (
             <Button
+              variant="link"
               size="sm"
-              onClick={() => handleViewToggle(rowData)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+              className="text-blue-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isSelected) {
+                  setSelectedClaim(null);
+                } else {
+                  setShowDetails(true);
+                  dispatch(fetchClaimDetails(item.claimId));
+                  setSelectedClaim(item);
+                }
+              }}
             >
-              {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-              {isSelected && showDetails ? 'Hide' : 'View'}
+              {isSelected ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+              {isSelected ? 'Hide' : 'View'}
             </Button>
           );
         },
       },
     ],
-    [selectedClaim, showDetails]
+    [employees, dispatch, selectedClaim]
   );
-
-  const empData = findEmployeeDetails(employees, user.EmpCode);
-
-  const claimList = Array.isArray(claimDrData?.data)
-    ? claimDrData.data.map((value) => ({
-        id: value.claimId,
-        claimId: value.claimId,
-        employeeName: empData?.employee?.empName ?? 'Employee',
-        patientName: empData?.employee?.empName ?? 'Patient',
-        relation: 'Self',
-        requestedDate: 'Time',
-        claimAmount: value.cliamAmount,
-        directClaimId: value.directClaimId,
-      }))
-    : [];
 
   return (
     <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
       <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
         <div className="flex items-center gap-2 mb-5">
-          <FileSearch className="text-blue-600 w-6 h-6" />
-          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
+          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Pending Claim Requests</h1>
         </div>
-
-        <ClaimSettlementList columns={columns} claimList={claimList} />
+        {claimList?.length && <ClaimSettlementList columns={columns} claimList={claimList} />}
       </div>
 
-      {selectedClaim && showDetails && (
+      {(loading || detailsLoading) && <Loader />}
+
+      {selectedClaim && claimDetails && (
         <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
-          {/* HospitalizationBillDetails component */}
           <HospitalizationBillDetails
-            claimDetail={claimDetail}
+            claimDetail={claimDetails}
             billComments={billComments}
             setBillComments={setBillComments}
             preHospComments={preHospComments}
             setPreHospComments={setPreHospComments}
           />
 
-          {/* Doctor's Review Form */}
           <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
             <div className="space-y-2">
               <Label className="font-semibold">Post Hospitalization Applicable</Label>

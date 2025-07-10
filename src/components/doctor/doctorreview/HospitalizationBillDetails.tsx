@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  BillItemDisplayRow,
-  DisplayField,
-  DisplayTable,
-  InfoCard,
-  PreHospDisplayRow,
-  SectionHeader
-} from '@/components/doctor/doctorreview/ReviewComponents';
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from '@/components/doctor/doctorreview/ReviewComponents';
 
 const HospitalizationBillDetails = ({
   claimDetail,
@@ -34,10 +27,38 @@ const HospitalizationBillDetails = ({
   ];
 
   const preHospItems = [
-    { id: 1, billType: 'Medicine', billedDate: preHospitalizationExpenses?.medicineBillDate, billedAmount: preHospitalizationExpenses?.medicineBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.medicineClaimAmount ?? 0, hasFiles: 0 },
-    { id: 2, billType: 'Consultation', billedDate: preHospitalizationExpenses?.consultationBillDate, billedAmount: preHospitalizationExpenses?.consultationBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.consultationClaimAmount ?? 0, hasFiles: 0 },
-    { id: 3, billType: 'Investigation', billedDate: preHospitalizationExpenses?.investigationBillDate, billedAmount: preHospitalizationExpenses?.investigationBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.investigationClaimAmount ?? 0, hasFiles: 0 },
-    { id: 4, billType: 'Other', billedDate: preHospitalizationExpenses?.othersBillDate, billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0, claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0, hasFiles: 0 },
+    {
+      id: 1,
+      billType: 'Medicine',
+      billedDate: preHospitalizationExpenses?.medicineBillDate,
+      billedAmount: preHospitalizationExpenses?.medicineBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.medicineClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 2,
+      billType: 'Consultation',
+      billedDate: preHospitalizationExpenses?.consultationBillDate,
+      billedAmount: preHospitalizationExpenses?.consultationBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.consultationClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 3,
+      billType: 'Investigation',
+      billedDate: preHospitalizationExpenses?.investigationBillDate,
+      billedAmount: preHospitalizationExpenses?.investigationBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.investigationClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 4,
+      billType: 'Other',
+      billedDate: preHospitalizationExpenses?.othersBillDate,
+      billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0,
+      hasFiles: 0,
+    },
   ];
 
   const totalBilled = billItems.reduce((sum, item) => sum + item.billedAmount, 0);
@@ -48,9 +69,8 @@ const HospitalizationBillDetails = ({
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Comment'];
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow">
+    <div className="bg-white ">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Hospitalization Claim Details</h1>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <InfoCard title="Patient Info">
           <DisplayField label="Patient Name" value={advanceBasicDetails?.patientName ?? '-'} />
@@ -68,7 +88,7 @@ const HospitalizationBillDetails = ({
       </div>
 
       <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
-      <DisplayTable headers={billHeaders}>
+      {/* <DisplayTable headers={billHeaders}>
         {Array.isArray(billItems) &&
           billItems?.map((item, index) =>
             item ? (
@@ -90,8 +110,7 @@ const HospitalizationBillDetails = ({
               />
             ) : null
           )}
-
-      </DisplayTable>
+      </DisplayTable> */}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
         <div className="text-center">

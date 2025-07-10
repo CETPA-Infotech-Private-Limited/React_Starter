@@ -1,75 +1,61 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance'; // Adjust path as needed
-// import { SubmitClaimProcessPayload } from './types'; // Adjust if stored 
-
+// import { SubmitClaimProcessPayload } from './types'; // Adjust if stored
 
 export interface SubmitClaimProcessPayload {
-  AdvanceId: number;       // int64
-  SenderId: number;        // int64
-  RecipientId: number;     // int64
-  ClaimTypeId: number;     // int32
-  StatusId: number;        // int32
+  AdvanceId: number; // int64
+  SenderId: number; // int64
+  RecipientId: number; // int64
+  ClaimTypeId: number; // int32
+  StatusId: number; // int32
 }
-
 
 interface SubmitClaimState {
   loading: boolean;
   success: boolean;
   error: string | null;
-  response: any; // Replace `any` with a proper response type if known
+  claimList: any;
 }
 
-
-
-
-export const submitClaimProcessByHr = createAsyncThunk(
-  'claim/submitClaimProcessByHr',
-  async (formData:FormData, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post('/Claim/SubmitClaimProcessByHr', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }});
-      return response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Submission failed';
-      return rejectWithValue(message);
-    }
+export const submitClaimProcessByHr = createAsyncThunk('claim/submitClaimProcessByHr', async (formData: FormData, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/Claim/SubmitClaimProcessByHr', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Submission failed';
+    return rejectWithValue(message);
   }
-);
+});
 
-export const postDocReview = createAsyncThunk(
-  'claim/docReview',
-  async (formData:FormData, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.post('/DoctorReview/CreateDoctorReview', formData, {
-      headers: { 'Content-Type': 'application/json' }});
-      return response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Submission failed';
-      return rejectWithValue(message);
-    }
+export const postDocReview = createAsyncThunk('claim/docReview', async (formData: FormData, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/DoctorReview/CreateDoctorReview', formData, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return response.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Submission failed';
+    return rejectWithValue(message);
   }
-);
+});
 
-
-export const getDoctorClaimListData = createAsyncThunk(
-  'Claim/GetDoctorsClaimList/',
-  async (recipientId:Number, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstance.get(`/Claim/GetDoctorsClaimList/${recipientId}`, {
-     });
-      return response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to fetch claim list data';
-      return rejectWithValue(message);
-    }
+export const getDoctorClaimListData = createAsyncThunk('Claim/GetDoctorsClaimList/', async (recipientId: Number, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get(`/Claim/GetDoctorsClaimList/${recipientId}`, {});
+    return response.data.data;
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Failed to fetch claim list data';
+    return rejectWithValue(message);
   }
-);
+});
 
 const initialState: SubmitClaimState = {
   loading: false,
   success: false,
   error: null,
-  response: null,
+  claimList: null,
 };
 
 const submitClaimProcessSlice = createSlice({
@@ -80,7 +66,7 @@ const submitClaimProcessSlice = createSlice({
       state.loading = false;
       state.success = false;
       state.error = null;
-      state.response = null;
+      state.claimList = null;
     },
   },
   extraReducers: (builder) => {
@@ -93,14 +79,14 @@ const submitClaimProcessSlice = createSlice({
       .addCase(submitClaimProcessByHr.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.success = true;
-        state.response = action.payload;
+        state.claimList = action.payload;
       })
       .addCase(submitClaimProcessByHr.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Something went wrong';
       })
-       .addCase(getDoctorClaimListData.pending, (state) => {
+      .addCase(getDoctorClaimListData.pending, (state) => {
         state.loading = true;
         state.success = false;
         state.error = null;
@@ -108,7 +94,7 @@ const submitClaimProcessSlice = createSlice({
       .addCase(getDoctorClaimListData.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.success = true;
-        state.response = action.payload;
+        state.claimList = action.payload;
       })
       .addCase(getDoctorClaimListData.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -123,15 +109,13 @@ const submitClaimProcessSlice = createSlice({
       .addCase(postDocReview.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.success = true;
-        state.response = action.payload;
+        state.claimList = action.payload;
       })
       .addCase(postDocReview.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Something went wrong';
-      })
-      
-      ;
+      });
   },
 });
 
