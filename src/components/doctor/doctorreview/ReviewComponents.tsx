@@ -57,7 +57,6 @@ export const StatusBadge = ({ status, type = 'default' }) => {
 };
 
 
-
 export const BillItemDisplayRow = ({
   serialNo,
   billType,
@@ -65,34 +64,42 @@ export const BillItemDisplayRow = ({
   claimedAmount,
   included,
   clarification,
-}) =>{
-const [comment, setComment] = useState('');
-
-    return (
+  comment,
+  onCommentChange,
+}: {
+  serialNo: number;
+  billType: string;
+  billedAmount: number;
+  claimedAmount: number;
+  included: boolean;
+  clarification: string;
+  comment: string;
+  onCommentChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) => (
   <tr className="hover:bg-gray-50">
-    <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{serialNo}</td>
-    <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billType}</td>
-    <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{billedAmount.toFixed(2)}</td>
-    <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{claimedAmount.toFixed(2)}</td>
-    <td className="px-4 py-3 text-center border-r border-gray-200">
+    <td className="px-4 py-3">{serialNo}</td>
+    <td className="px-4 py-3">{billType}</td>
+    <td className="px-4 py-3 text-right">₹{billedAmount.toFixed(2)}</td>
+    <td className="px-4 py-3 text-right">₹{claimedAmount.toFixed(2)}</td>
+    <td className="px-4 py-3 text-center">
       <div className="flex items-center justify-center gap-2">
         {included ? <CheckCircle className="w-4 h-4 text-green-500" /> : <XCircle className="w-4 h-4 text-red-500" />}
-        <span className="text-xs text-gray-600">{included ? 'Included' : 'Not Included'}</span>
+        <span className="text-xs">{included ? 'Included' : 'Not Included'}</span>
       </div>
     </td>
-    <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">
-      <span className="text-xs text-gray-600">{clarification || '-'}</span> </td>
+    <td className="px-4 py-3">{clarification || '-'}</td>
     <td className="px-4 py-3">
       <Input
         placeholder="Doctor's comment"
         value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        onChange={onCommentChange}
         className="text-sm"
       />
     </td>
   </tr>
 );
-}
+
+
 
 export const PreHospDisplayRow = ({
   serialNo,
@@ -102,6 +109,8 @@ export const PreHospDisplayRow = ({
   claimedAmount,
   hasFiles,
   fileLinks = [],
+  comment,
+  onCommentChange,
 }: {
   serialNo: number;
   billType: string;
@@ -110,25 +119,24 @@ export const PreHospDisplayRow = ({
   claimedAmount: number;
   hasFiles: number;
   fileLinks?: string[];
-  comment?: string;
-  onCommentChange?: (val: string) => void;
+  comment: string;
+  onCommentChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   const [open, setOpen] = useState(false);
-  const [comment,setComment]=useState('')
 
   return (
     <>
       <tr className="hover:bg-gray-50">
-        <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{serialNo}</td>
-        <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billType}</td>
-        <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billedDate || '-'}</td>
-        <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{billedAmount.toFixed(2)}</td>
-        <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{claimedAmount.toFixed(2)}</td>
-        <td className="px-4 py-3 text-center border-r border-gray-200">
+        <td className="px-4 py-3">{serialNo}</td>
+        <td className="px-4 py-3">{billType}</td>
+        <td className="px-4 py-3">{billedDate || '-'}</td>
+        <td className="px-4 py-3 text-right">₹{billedAmount.toFixed(2)}</td>
+        <td className="px-4 py-3 text-right">₹{claimedAmount.toFixed(2)}</td>
+        <td className="px-4 py-3 text-center">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-1 text-blue-600 hover:underline text-sm">
-                <Eye className="w-4 h-4" />
+              <Button variant="ghost" className="text-blue-600 text-sm">
+                <Eye className="w-4 h-4 mr-1" />
                 {hasFiles} file{hasFiles !== 1 && 's'}
               </Button>
             </DialogTrigger>
@@ -136,11 +144,11 @@ export const PreHospDisplayRow = ({
               <DialogHeader>
                 <DialogTitle>Attached Files</DialogTitle>
               </DialogHeader>
-              <div className="space-y-2 mt-4">
-                {fileLinks.length > 0 ? (
-                  fileLinks.map((url, index) => (
-                    <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="block text-blue-600 hover:underline text-sm">
-                      File {index + 1}
+              <div className="mt-2 space-y-2">
+                {fileLinks.length ? (
+                  fileLinks.map((url, i) => (
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline text-sm">
+                      File {i + 1}
                     </a>
                   ))
                 ) : (
@@ -154,7 +162,7 @@ export const PreHospDisplayRow = ({
           <Input
             placeholder="Doctor's comment"
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={onCommentChange}
             className="text-sm"
           />
         </td>
@@ -162,4 +170,5 @@ export const PreHospDisplayRow = ({
     </>
   );
 };
+
 

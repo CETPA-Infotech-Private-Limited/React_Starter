@@ -1,21 +1,29 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import {
   BillItemDisplayRow,
   DisplayField,
   DisplayTable,
   InfoCard,
   PreHospDisplayRow,
-  SectionHeader,
-  StatusBadge
-} from  '@/components/doctor/doctorreview/ReviewComponents';
-import { Textarea } from '@/components/ui/textarea';
+  SectionHeader
+} from '@/components/doctor/doctorreview/ReviewComponents';
 
-const HospitalizationBillDetails = ({ claimDetail }: { claimDetail: any }) => {
+const HospitalizationBillDetails = ({
+  claimDetail,
+  billComments,
+  preHospComments,
+  setBillComments,
+  setPreHospComments,
+}: {
+  claimDetail: any;
+  billComments: Record<number, string>;
+  preHospComments: Record<number, string>;
+  setBillComments: React.Dispatch<React.SetStateAction<Record<number, string>>>;
+  setPreHospComments: React.Dispatch<React.SetStateAction<Record<number, string>>>;
+}) => {
   if (!claimDetail) return null;
 
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
-
 
   const billItems = [
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
@@ -36,16 +44,8 @@ const HospitalizationBillDetails = ({ claimDetail }: { claimDetail: any }) => {
   const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
   const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
 
-  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification','comment'];
-  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents','comment'];
-
-  console.log({claimDetail} ,'this is claim detail object')
-
-const formData = new FormData()
-
-  const handleSendToDoctor = async()=>{
-    formData.append('AdvanceId',aa)
-  }
+  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Comment'];
+  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Comment'];
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
@@ -69,18 +69,28 @@ const formData = new FormData()
 
       <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
       <DisplayTable headers={billHeaders}>
-        {billItems.map((item, index) => (
-          <BillItemDisplayRow
-            key={item.id}
-            serialNo={index + 1}
-            billType={item.billType}
-            billedAmount={item.billedAmount}
-            claimedAmount={item.claimedAmount}
-            included={item.claimedAmount > 0}
-            clarification=""
-            comment={''}
-          />
-        ))}
+        {Array.isArray(billItems) &&
+          billItems?.map((item, index) =>
+            item ? (
+              <BillItemDisplayRow
+                key={item.id ?? index}
+                serialNo={index + 1}
+                billType={item.billType}
+                billedAmount={item.billedAmount}
+                claimedAmount={item.claimedAmount}
+                included={item.claimedAmount > 0}
+                clarification=""
+                comment={billComments[item.id] || ''}
+                onCommentChange={(e) =>
+                  setBillComments((prev) => ({
+                    ...prev,
+                    [item.id]: e.target.value,
+                  }))
+                }
+              />
+            ) : null
+          )}
+
       </DisplayTable>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
@@ -109,8 +119,8 @@ const formData = new FormData()
             billedAmount={item.billedAmount}
             claimedAmount={item.claimedAmount}
             hasFiles={item.hasFiles}
-            comment={''}
-            onCommentChange={() => {}}
+            comment={preHospComments[item.id] || ''}
+            onCommentChange={(e) => setPreHospComments((prev) => ({ ...prev, [item.id]: e.target.value }))}
           />
         ))}
       </DisplayTable>
@@ -118,10 +128,6 @@ const formData = new FormData()
       <div className="text-right mt-2">
         <span className="font-semibold text-sm">Total Pre-Hospital: </span>
         <span className="text-lg font-bold">₹{preHospTotal.toFixed(2)}</span>
-      </div>
-
-      <div className="mt-6">
-       
       </div>
     </div>
   );

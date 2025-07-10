@@ -1,6 +1,3 @@
-
-
-
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance'; // Adjust path as needed
 // import { SubmitClaimProcessPayload } from './types'; // Adjust if stored 
@@ -31,6 +28,20 @@ export const submitClaimProcessByHr = createAsyncThunk(
     try {
       const response = await axiosInstance.post('/Claim/SubmitClaimProcessByHr', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }});
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Submission failed';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const postDocReview = createAsyncThunk(
+  'claim/docReview',
+  async (formData:FormData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/DoctorReview/CreateDoctorReview', formData, {
+      headers: { 'Content-Type': 'application/json' }});
       return response.data;
     } catch (error: any) {
       const message = error.response?.data?.message || 'Submission failed';
@@ -104,7 +115,21 @@ const submitClaimProcessSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Something went wrong';
       })
-      
+      .addCase(postDocReview.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(postDocReview.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.success = true;
+        state.response = action.payload;
+      })
+      .addCase(postDocReview.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Something went wrong';
+      })
       
       ;
   },
