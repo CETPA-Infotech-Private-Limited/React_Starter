@@ -158,7 +158,7 @@ const ApproveAdvancePage = () => {
   const handleBankingDetailsSubmit = () => {
     dispatch(
       submitAdvanceApproval({
-        AdvanceId: Number(selectedAdvance.empId),
+        AdvanceId: Number(selectedAdvance.advanceId),
         SenderId: Number(user.EmpCode),
         RecipientId: selectedAdvance.empId,
         ClaimTypeId: 1,
