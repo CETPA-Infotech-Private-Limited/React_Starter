@@ -13,6 +13,7 @@ import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card } from '../ui/card';
+import InputField from '../common/InputField';
 
 
 const HospitalizationBillView = () => {
@@ -89,9 +90,9 @@ const HospitalizationBillView = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Hospitalization Claim Details</h1>
+      <h1 className="text-2xl font-bold text-primary drop-shadow mb-4">Hospitalization Claim Details</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-primary drop-shadow">
         <InfoCard title="Patient Info">
           <DisplayField label="Patient Name" value={advanceBasicDetails.patientName} />
           <DisplayField label="Date of Admission" value={advanceBasicDetails.dateOfAdmission} />
@@ -203,13 +204,41 @@ const HospitalizationBillView = () => {
 </Card>
 
 <div>
-    <Card>
-        <div>
+    <Card className='mt-8'>
+        <div className='p-4'>
+        <div className='flex justify-start pb-4 pl-8 pt-4 text-primary drop-shadow text-lg'>
             <h1>Approval Form</h1>
         </div>
-        <div>
-            <div>
-                <Label>Total Claim Requested</Label>
+        <div className='flex'>
+            <div className='flex justify-start w-1/2 items-center'>
+                
+                <Label className='p-4 pl-8 text-primary drop-shadow w-1/2'>Total Claim Requested</Label>
+                <Input className='w-1/2'></Input>
+            </div>
+            <div className='flex'>
+                <Label className='p-4 pl-8 text-primary drop-shadow w-full'>Approved Amount</Label>
+                <Input className='w-full'></Input>
+            </div>
+            </div>
+            </div>
+    </Card>
+</div>
+<div>
+    <Card className='mt-8'>
+        <div className='p-4'>
+        <div className='flex justify-start pb-4 pl-8 pt-4 text-primary drop-shadow text-lg'>
+            <h1>Action</h1>
+            <hr/>
+        </div>
+        
+            <div className='flex justify-start w-1/2 items-center'>
+                
+                <Label className='p-4 pl-8 text-primary drop-shadow w-1/6'>Send to</Label>
+                <Input className='w-1/2'></Input>
+            </div>
+            
+            <div className='flex justify-end '>
+                <Button>Confirm</Button>
             </div>
             </div>
     </Card>

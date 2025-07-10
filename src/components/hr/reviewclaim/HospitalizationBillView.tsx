@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   BillItemDisplayRow,
@@ -10,10 +10,14 @@ import {
   StatusBadge
 } from './ReviewComponents';
 import { Textarea } from '@/components/ui/textarea';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
 
 const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
   if (!claimDetail) return null;
-
+const user = useAppSelector((state:RootState)=>state.user)
+const dispatch = useAppDispatch()
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
 
 
@@ -39,12 +43,20 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
 
-  console.log({claimDetail} ,'this is claim detail object')
+  console.log(claimDetail ,'this is claim detail object')
 
 const formData = new FormData()
 
   const handleSendToDoctor = async()=>{
-    formData.append('AdvanceId',aa)
+    formData.append('AdvanceId', String(claimDetail.advanceBasicDetails.claimId))
+    formData.append('SenderId',String(user.EmpCode))
+    formData.append('RecipientId', String(102199))
+    formData.append('ClaimTypeId', String(claimDetail.advanceBasicDetails.claimTypeId))
+    formData.append('StatusId', String(4))
+
+   
+      dispatch(submitClaimProcessByHr(formData))
+    
   }
 
   return (

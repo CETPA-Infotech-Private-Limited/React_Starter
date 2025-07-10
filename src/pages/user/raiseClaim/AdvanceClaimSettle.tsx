@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { submitDirectClaim, getMyClaims } from '@/features/user/claim/claimSlice';
+import { submitDirectClaim, getMyClaims, submitAdvanceClaimSettle } from '@/features/user/claim/claimSlice';
 import type { RootState } from '@/app/store';
-import PatientDetails from './PatientDetails';
-import BillDetailsForm from './BillDetails';
-import PreHospitalizationForm from './PreHospitalizationForm';
-import PostHospitalizationAndDeclaration from './PostHospital';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import Loader from '@/components/ui/loader'; // ✅ Imported loader
+import Loader from '@/components/ui/loader';
+import PatientDetails from '@/components/user/advanceClaim/PatientDetails';
+import PreHospitalizationForm from '@/components/user/advanceClaim/PreHospitalizationForm';
+import BillDetailsForm from '@/components/user/advanceClaim/BillDetails';
+import PostHospitalizationAndDeclaration from '@/components/user/advanceClaim/PostHospital';
 
 interface ClaimRequest {
   IsSpecailDisease: boolean;
@@ -64,11 +64,12 @@ interface ClaimRequest {
   PreHospitalizationExpensesConsultationFiles?: File[];
 }
 
-type RaiseClaimProps = {
+type AdvanceClaimSettleProps = {
   onCloseForm: () => void;
+  defaultData: any;
 };
 
-const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
+const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProps) => {
   const [patientDetails, setPatientDetails] = useState<Partial<ClaimRequest>>({});
   const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
   const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
@@ -130,9 +131,11 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...postHospDetails,
       };
       const formData = new FormData();
-      formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
+      formData.append('Unit', user.unitId || '');
+      formData.append('AdvanceId', user.unitId || '');
+
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
-      formData.append('patientId', String(user.EmpCode || 0));
+      formData.append('patientId', String(defaultData?.selectedAdvanceClaim?.patientId));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
       formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
       formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId || ''); // Added optional chaining and fallback
@@ -256,14 +259,14 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
       }
 
-      await dispatch(submitDirectClaim(formData));
+      await dispatch(submitAdvanceClaimSettle(formData));
       // await dispatch(getMyClaims(user.EmpCode));
 
-      setPatientDetails({});
-      setBillDetails({});
-      setPreHospDetails({});
-      setPostHospDetails({});
-      onCloseForm();
+      // setPatientDetails({});
+      // setBillDetails({});
+      // setPreHospDetails({});
+      // setPostHospDetails({});
+      // onCloseForm();
     } catch (error) {
       console.error('Submit error:', error);
     } finally {
@@ -280,7 +283,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
       ) : (
         <>
           <div className="mt-4">
-            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
+            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} defaultData={defaultData} />
           </div>
           <div className="mt-4">
             <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
@@ -302,4 +305,4 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   );
 };
 
-export default RaiseClaim;
+export default AdvanceClaimSettle;

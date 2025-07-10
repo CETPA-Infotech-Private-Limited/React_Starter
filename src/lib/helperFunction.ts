@@ -55,7 +55,11 @@ export function clearAllStorage(): void {
   }
 }
 
-export const formatRupees = (amount: number): string => {
+export const formatRupees = (amount: number | null | undefined): string => {
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    return '-';
+  }
+
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
