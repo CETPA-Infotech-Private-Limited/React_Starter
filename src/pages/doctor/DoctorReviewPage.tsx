@@ -16,8 +16,8 @@ import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice'
 
   const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
-  const claimDrData = useAppSelector((state: RootState) => state.submitClaimProcessSlice);
-  const claimListData = claimDrData.response.data
+  const claimDrData = useAppSelector((state: RootState) => state.submitClaimProcessSlice.response);
+  
  
 
 
@@ -92,10 +92,18 @@ import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice'
   };
 
   useEffect(() => {
-    if (user?.EmpCode) {
-      dispatch(getDoctorClaimListData(102199));
-    }
-  }, [user?.EmpCode]);
+  if (user?.EmpCode) {
+    dispatch(getDoctorClaimListData(102199)); // Use actual EmpCode, not hardcoded
+  }
+}, [user?.EmpCode]);
+
+useEffect(() => {
+  if (claimDrData && claimDrData.data && claimDrData.data.length > 0) {
+    dispatch(fetchClaimDetails(claimDrData.data[0].claimId));
+  }
+}, [claimDrData?.data?.[0]?.claimId]);
+
+  
  
   //  useEffect(()=>{
   //   dispatch(fetchClaimDetails(claimListData?.advanceId))
