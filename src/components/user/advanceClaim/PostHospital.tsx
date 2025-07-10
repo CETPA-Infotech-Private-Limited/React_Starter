@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UploadCloud, Trash2, X, Upload } from 'lucide-react';
+import { UploadCloud, Trash2, X, Upload, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -126,9 +126,10 @@ interface PostHospitalizationFormProps {
   };
   onChange: (value: any) => void;
   onSubmit: () => void;
+  isSubmitting: boolean;
 }
 
-const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit }: PostHospitalizationFormProps) => {
+const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, isSubmitting }: PostHospitalizationFormProps) => {
   const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
 
   // File upload states
@@ -319,10 +320,20 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
           </Label>
         </div>
 
-        {/* Submit Button */}
         <div className="flex justify-end pt-4">
-          <Button onClick={onSubmit} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2" disabled={!DeclarationChecked}>
-            Submit Claim
+          <Button
+            onClick={onSubmit}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 flex items-center justify-center gap-2"
+            disabled={!DeclarationChecked || isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin w-4 h-4" />
+                Submitting...
+              </>
+            ) : (
+              'Settle Claim'
+            )}
           </Button>
         </div>
       </div>
