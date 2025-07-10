@@ -86,6 +86,7 @@ const HospitalizationBillView = () => {
 
     if (rowData.claimId) {
       dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+      
     }
   };
 
@@ -206,7 +207,7 @@ const HospitalizationBillView = () => {
     // Access pre-hospitalization expenses from `claimDetail.preHospitalizationExpenses`
     const expenses = claimDetail?.preHospitalizationExpenses || {};
     return [
-      { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: expenses.medicineHasFiles ? 1 : 0 },
+      { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: claimDetail.documentLists.pathUrl ? 1 : 0 },
       { id: 2, billType: 'Consultation', billedDate: expenses.consultationBillDate || 'N/A', billedAmount: expenses.consultationBillAmount || 0, claimedAmount: expenses.consultationClaimAmount || 0, hasFiles: expenses.consultationHasFiles ? 1 : 0 },
       { id: 3, billType: 'Investigation', billedDate: expenses.investigationBillDate || 'N/A', billedAmount: expenses.investigationBillAmount || 0, claimedAmount: expenses.investigationClaimAmount || 0, hasFiles: expenses.investigationHasFiles ? 1 : 0 },
       { id: 4, billType: 'Other', billedDate: expenses.othersBillDate || 'N/A', billedAmount: expenses.otherBillAmount || 0, claimedAmount: expenses.otherClaimAmount || 0, hasFiles: expenses.otherHasFiles ? 1 : 0 },
@@ -345,20 +346,21 @@ const HospitalizationBillView = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <Label className=" font-medium text-gray-900">Special Disease</Label>
-                    <RadioGroup
-                      value={isSpecialDisease}
-                      onValueChange={(val: 'yes' | 'no') => setIsSpecialDisease(val)}
-                      className="flex space-x-6"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="special-disease-yes" />
-                        <Label htmlFor="special-disease-yes" className="text-sm">Yes</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="special-disease-no" />
-                        <Label htmlFor="special-disease-no" className="text-sm">No</Label>
-                      </div>
-                    </RadioGroup>
+                      <RadioGroup
+                    value={claimDetail.advanceBasicDetails.isSpecailDisease ? 'yes' : 'no'}
+                       disabled
+                       className="flex space-x-6"
+>
+  <div className="flex items-center space-x-2">
+    <RadioGroupItem value="yes" id="special-disease-yes" />
+    <Label htmlFor="special-disease-yes" className="text-sm">Yes</Label>
+  </div>
+  <div className="flex items-center space-x-2">
+    <RadioGroupItem value="no" id="special-disease-no" />
+    <Label htmlFor="special-disease-no" className="text-sm">No</Label>
+  </div>
+</RadioGroup>
+
                   </div>
                   {isSpecialDisease === 'yes' && (
                     <div className="flex items-center space-x-3 pl-10">
@@ -386,7 +388,8 @@ const HospitalizationBillView = () => {
                       <Label className='p-4 pl-8 text-gray-900 w-1/2'>Total Claim Requested</Label>
                       <Input
                         className='w-1/2'
-                        value={totalRequested}
+                        disabled
+                        value={claimDetail.advanceBasicDetails.claimAmount}
                         onChange={(e) => setTotalRequested(e.target.value)}
                         type="number"
                       />
@@ -405,25 +408,30 @@ const HospitalizationBillView = () => {
               </Card>
 
               {/* Action */}
-              <Card className='mt-8'>
-                <div className='p-4'>
-                  <h2 className='text-lg text-primary drop-shadow pb-4'>Action</h2>
-                  <div className='flex w-1/2 items-center'>
-                    <Label className='p-4 pl-8 text-gray-900 w-1/6'>Send To</Label>
-                    <Input
-                      className='w-1/2'
-                      value={sendTo}
-                      onChange={(e) => setSendTo(e.target.value)}
-                      placeholder="e.g., Finance Dept."
-                    />
-                  </div>
-                  <div className='flex justify-end pt-4'>
-                    <Button onClick={handleSubmit} disabled={loading}>
-                      {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+              <Card className="mt-8">
+  <div className="p-4">
+    <h2 className="text-lg text-primary drop-shadow pb-4">Action</h2>
+
+    {/* Responsive Flex Container */}
+    <div className="flex flex-col md:flex-row md:items-center w-full gap-4">
+      <Label className="md:w-1/6 text-gray-900">Send To</Label>
+      <Input
+        className="w-full md:w-1/2"
+        value={sendTo}
+        onChange={(e) => setSendTo(e.target.value)}
+        placeholder="e.g., Finance Dept."
+      />
+    </div>
+
+    {/* Submit Button */}
+    <div className="flex justify-end pt-4">
+      <Button onClick={handleSubmit} disabled={loading}>
+        {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
+      </Button>
+    </div>
+  </div>
+</Card>
+
             </>
           )}
         </div>
