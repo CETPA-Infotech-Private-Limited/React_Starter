@@ -33,6 +33,46 @@ const DoctorReviewPage = () => {
     verified: false,
   });
 
+  const dummyClaimDetail = {
+    advanceBasicDetails: {
+      patientName: "John Doe",
+      dateOfAdmission: "2024-06-10",
+      dateofDischarge: "2024-06-15",
+      doctorName: "Dr. Smith",
+      hospitalName: "City Hospital",
+      hospitalRegNo: "HOSP12345",
+      treatmentType: "Surgery",
+      payTo: "City Hospital Pvt Ltd",
+      directCliamApprovedAmount: 12000,
+    },
+    billDetails: {
+      medicineBill: 5000,
+      medicineClaim: 4500,
+      consultationBill: 3000,
+      consultationClaim: 2800,
+      investigationBill: 2000,
+      investigationClaim: 2000,
+      roomRentBill: 4000,
+      roomRentClaim: 3500,
+      othersBill: 1000,
+      otherClaim: 800,
+    },
+    preHospitalizationExpenses: {
+      medicineBillDate: "2024-06-05",
+      medicineBillAmount: 800,
+      medicineClaimAmount: 700,
+      consultationBillDate: "2024-06-03",
+      consultationBillAmount: 500,
+      consultationClaimAmount: 400,
+      investigationBillDate: "2024-06-02",
+      investigationBillAmount: 600,
+      investigationClaimAmount: 600,
+      othersBillDate: "2024-06-01",
+      otherBillAmount: 300,
+      otherClaimAmount: 200,
+    }
+  };
+
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({
       ...prev,
@@ -155,7 +195,8 @@ const DoctorReviewPage = () => {
           ref={detailsRef}
           className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6"
         >
-          <HospitalizationBillDetails claimDetail={claimDetail} />
+          {/* ✅ Fallback to dummy data if claimDetail is undefined */}
+          <HospitalizationBillDetails claimDetail={claimDetail ?? dummyClaimDetail} />
 
           <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
             <div className="space-y-2">

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { CheckCircle, Eye, XCircle } from 'lucide-react';
 import { useState } from 'react';
+import { Input } from '@/components/ui/input';
 
 export const SectionHeader = ({ title, subtitle, className = '' }) => (
   <div className={`mb-4 ${className}`}>
@@ -53,19 +54,41 @@ export const StatusBadge = ({ status, type = 'default' }) => {
   return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${variants[type]}`}>{status}</span>;
 };
 
-export const BillItemDisplayRow = ({ serialNo, billType, billedAmount, claimedAmount, included, clarification}) => (
+ const [billComments, setBillComments] = useState<string[]>([]);
+  const [preHospComments, setPreHospComments] = useState<string[]>([]);
+
+
+export const BillItemDisplayRow = ({
+  serialNo,
+  billType,
+  billedAmount,
+  claimedAmount,
+  included,
+  clarification,
+  onCommentChange = () => {},
+  comment = '',
+}) => (
   <tr className="hover:bg-gray-50">
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{serialNo}</td>
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billType}</td>
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{billedAmount.toFixed(2)}</td>
     <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{claimedAmount.toFixed(2)}</td>
-    <td className="px-4 py-3 text-center">
+    <td className="px-4 py-3 text-center border-r border-gray-200">
       <div className="flex items-center justify-center gap-2">
         {included ? <CheckCircle className="w-4 h-4 text-green-500" /> : <XCircle className="w-4 h-4 text-red-500" />}
         <span className="text-xs text-gray-600">{included ? 'Included' : 'Not Included'}</span>
       </div>
     </td>
-    <td className="px-4 py-3 text-sm text-gray-600">{clarification || '-'}</td>
+    <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">
+      <span className="text-xs text-gray-600">{clarification || '-'}</span> </td>
+    <td className="px-4 py-3">
+      <Input
+        placeholder="Doctor's comment"
+        value={comment}
+        onChange={(e) => onCommentChange(e.target.value)}
+        className="text-sm"
+      />
+    </td>
   </tr>
 );
 
@@ -76,7 +99,9 @@ export const PreHospDisplayRow = ({
   billedAmount,
   claimedAmount,
   hasFiles,
-  fileLinks = [], // array of file URLs
+  fileLinks = [],
+  comment = '',
+  onCommentChange = () => {},
 }: {
   serialNo: number;
   billType: string;
@@ -85,6 +110,8 @@ export const PreHospDisplayRow = ({
   claimedAmount: number;
   hasFiles: number;
   fileLinks?: string[];
+  comment?: string;
+  onCommentChange?: (val: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -96,7 +123,7 @@ export const PreHospDisplayRow = ({
         <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200">{billedDate || '-'}</td>
         <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{billedAmount.toFixed(2)}</td>
         <td className="px-4 py-3 text-sm text-gray-900 border-r border-gray-200 text-right">₹{claimedAmount.toFixed(2)}</td>
-        <td className="px-4 py-3 text-center">
+        <td className="px-4 py-3 text-center border-r border-gray-200">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-1 text-blue-600 hover:underline text-sm">
@@ -122,7 +149,16 @@ export const PreHospDisplayRow = ({
             </DialogContent>
           </Dialog>
         </td>
+        <td className="px-4 py-3">
+          <Input
+            placeholder="Doctor's comment"
+            value={comment}
+            onChange={(e) => onCommentChange(e.target.value)}
+            className="text-sm"
+          />
+        </td>
       </tr>
     </>
   );
 };
+

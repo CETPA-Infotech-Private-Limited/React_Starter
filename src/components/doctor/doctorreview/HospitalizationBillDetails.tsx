@@ -36,8 +36,8 @@ const HospitalizationBillDetails = ({ claimDetail }: { claimDetail: any }) => {
   const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
   const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
 
-  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
-  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
+  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification','comment'];
+  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents','comment'];
 
   console.log({claimDetail} ,'this is claim detail object')
 
@@ -78,6 +78,7 @@ const formData = new FormData()
             claimedAmount={item.claimedAmount}
             included={item.claimedAmount > 0}
             clarification=""
+            comment={''}
           />
         ))}
       </DisplayTable>
@@ -108,6 +109,8 @@ const formData = new FormData()
             billedAmount={item.billedAmount}
             claimedAmount={item.claimedAmount}
             hasFiles={item.hasFiles}
+            comment={''}
+            onCommentChange={() => {}}
           />
         ))}
       </DisplayTable>
