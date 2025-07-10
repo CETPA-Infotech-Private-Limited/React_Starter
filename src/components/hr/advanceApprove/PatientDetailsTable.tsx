@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
-type PatientDetailsProps = {
+export type PatientDetailsProps = {
   name: string;
   relation: string;
   dob: string;

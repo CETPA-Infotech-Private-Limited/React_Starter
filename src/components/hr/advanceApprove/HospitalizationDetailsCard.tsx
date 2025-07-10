@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 
-type FileDialogProps = {
+export type FileDialogProps = {
   label: string;
   files: string[];
 };

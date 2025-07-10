@@ -35,6 +35,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           url: '/raise-claim',
           roles: ['user'],
         },
+
+         {
+          title: 'Doctor Review',
+          url: '/doctor-review',
+          roles: ['user'],
+        },
         {
           title: 'Request Advance',
           url: '/request-advance',

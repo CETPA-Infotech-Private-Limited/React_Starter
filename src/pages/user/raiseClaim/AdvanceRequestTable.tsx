@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/button';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
+<<<<<<< HEAD
+import { format } from 'date-fns';
+=======
 import { findEmployeeDetails } from '@/lib/helperFunction';
+>>>>>>> e1c6e810795f824376a94d91536577a3b21bc604
 
 const DirectRequestTable = () => {
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
@@ -113,7 +117,13 @@ const DirectRequestTable = () => {
           employeeName: employee.employee.empName || '',
           patientName: employee.employee.empName|| '',
           relation: value.relation || 'Self',
+<<<<<<< HEAD
+          requestedDate: value.requestedDate
+  ? format(new Date(value.requestedDate), 'dd-MM-yyyy')
+  : format(new Date(), 'dd-MM-yyyy'),
+=======
           requestedDate: value.requestedDate ? new Date(value.requestedDate).toLocaleString() : new Date().toLocaleString(),
+>>>>>>> e1c6e810795f824376a94d91536577a3b21bc604
           claimAmount: value.claimAmount || value.cliamAmount || 0,
         }))
     : [];
