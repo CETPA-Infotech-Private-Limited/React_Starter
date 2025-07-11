@@ -6,11 +6,12 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
 
-const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
+const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
   if (!claimDetail) return null;
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
+  const {loading} = useAppSelector((state:RootState)=>state.submitClaimProcessSlice)
 
   const billItems = [
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },

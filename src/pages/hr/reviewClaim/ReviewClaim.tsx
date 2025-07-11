@@ -1,6 +1,7 @@
+'use client';
+
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
-import ViewClaimDetails from '@/components/hr/reviewClaim/ViewClaimDetails';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewClaim/HospitalizationBillView';
@@ -19,12 +20,20 @@ const ReviewClaim = () => {
   const user = useAppSelector((state: RootState) => state.user);
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const detailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (user?.EmpCode) {
-      dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
-    }
+    const fetchClaims = async () => {
+      if (user?.EmpCode) {
+        setIsSubmitting(true);
+        await dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+        setIsSubmitting(false);
+      }
+    };
+
+    fetchClaims();
   }, [user?.EmpCode]);
 
   useEffect(() => {
@@ -33,8 +42,10 @@ const ReviewClaim = () => {
     }
   }, [showDetails]);
 
-  const handleViewToggle = (rowData: any) => {
+  const handleViewToggle = async (rowData: any) => {
+    setIsSubmitting(true);
     const isSame = selectedClaim?.id === rowData.id;
+
     if (isSame) {
       const shouldShow = !showDetails;
       setShowDetails(shouldShow);
@@ -47,7 +58,8 @@ const ReviewClaim = () => {
     }
 
     if (rowData.claimId) {
-      dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+      await dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+      setIsSubmitting(false);
     }
   };
 

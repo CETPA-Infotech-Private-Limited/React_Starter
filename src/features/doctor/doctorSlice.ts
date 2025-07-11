@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance'; // Adjust path as needed
+import toast from 'react-hot-toast';
 // import { SubmitClaimProcessPayload } from './types'; // Adjust if stored
 
 export interface SubmitClaimProcessPayload {
@@ -34,9 +35,11 @@ export const postDocReview = createAsyncThunk('claim/docReview', async (formData
     const response = await axiosInstance.post('/DoctorReview/CreateDoctorReview', formData, {
       headers: { 'Content-Type': 'application/json' },
     });
+    toast.success("Claim sent successfully!!!")
     return response.data;
   } catch (error: any) {
     const message = error.response?.data?.message || 'Submission failed';
+    toast.error("Oh! There is something wrong.")
     return rejectWithValue(message);
   }
 });
