@@ -205,6 +205,19 @@ const HospitalizationBillView = () => {
     ];
   }, [claimDetail]);
 
+  const notIncludedbillItems = useMemo(() => {
+    // Access bill details from `claimDetail.billDetails`
+    const details = claimDetail?.billDetails || {};
+    return [
+      { id: 1, billType: 'Medicine', billedAmount: details.medicineBill || 0, claimedAmount: details.medicineClaim || 0 },
+      { id: 2, billType: 'Consultation', billedAmount: details.consultationBill || 0, claimedAmount: details.consultationClaim || 0 },
+      { id: 3, billType: 'Investigation', billedAmount: details.investigationBill || 0, claimedAmount: details.investigationClaim || 0 },
+      { id: 4, billType: 'Procedure', billedAmount: details.procedureBill || 0, claimedAmount: details.procedureClaim || 0 },
+      { id: 5, billType: 'Room Rent', billedAmount: details.roomRentBill || 0, claimedAmount: details.roomRentClaim || 0 },
+      { id: 6, billType: 'Other', billedAmount: details.othersBill || 0, claimedAmount: details.otherClaim || 0 },
+    ];
+  }, [claimDetail]);
+
   const preHospItems = useMemo(() => {
     // Access pre-hospitalization expenses from `claimDetail.preHospitalizationExpenses`
     const expenses = claimDetail?.preHospitalizationExpenses || {};
@@ -221,8 +234,8 @@ const HospitalizationBillView = () => {
   const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
   const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
 
-  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
-  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
+  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification','Approval Details'];
+  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents',"Approval Details"];
 
 console.log(approvedAmount,'this is approved')
 
@@ -303,6 +316,21 @@ console.log(approvedAmount,'this is approved')
               </div>
 
               <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
+              <DisplayTable headers={billHeaders}>
+                {billItems.map((item, index) => (
+                  <BillItemDisplayRow
+                    key={item.id}
+                    serialNo={index + 1}
+                    billType={item.billType}
+                    billedAmount={item.billedAmount}
+                    claimedAmount={item.claimedAmount}
+                    included={item.claimedAmount > 0}
+                    clarification="" // Placeholder, should come from data if available
+                  />
+                ))}
+              </DisplayTable>
+
+              <SectionHeader title="NotIncluded Bill Details" subtitle="Not Included in hospitalization bills" className='mt-8' />
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
