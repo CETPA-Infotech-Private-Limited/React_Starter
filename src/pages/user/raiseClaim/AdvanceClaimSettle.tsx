@@ -132,12 +132,12 @@ const AdvanceClaimSettle = ({ onCloseForm, defaultData }: AdvanceClaimSettleProp
         ...preHospDetails,
         ...postHospDetails,
       };
-console.log('rawpayloads', rawPayload)
+      console.log('rawpayloads', rawPayload);
 
       const formData = new FormData();
       formData.append('Unit', user.unitId || '');
       formData.append('AdvanceId', defaultData?.selectedAdvanceClaim?.advanceId || '');
-
+      formData.append('Declaration', 'true');
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
       formData.append('patientId', String(defaultData?.selectedAdvanceClaim?.patientId));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
@@ -148,9 +148,9 @@ console.log('rawpayloads', rawPayload)
       formData.append('Digonosis', rawPayload.Digonosis || '');
       formData.append('DoctorName', rawPayload.DoctorName || '');
       formData.append('DateOfAdmission', rawPayload.DateOfAdmission || '');
-      formData.append('SpecialDiseaseName', rawPayload.SpecialDiseaseName || '')
-      formData.append('IsPostHospitalization', rawPayload.IsPostHospitalization || "false")
-      formData.append('Declaration', rawPayload.PostHopital || '')
+      formData.append('SpecialDiseaseName', rawPayload.SpecialDiseaseName || '');
+      formData.append('IsPostHospitalization', rawPayload.IsPostHospitalization || 'false');
+      formData.append('Declaration', rawPayload.PostHopital || '');
       formData.append('DateofDischarge', rawPayload.DateofDischarge || '');
       formData.append('IsSpecailDisease', String(rawPayload.IsSpecailDisease ?? false)); // Ensure boolean is stringified
       formData.append('IsTaxAble', String(rawPayload.IsTaxAble ?? true));
@@ -273,7 +273,6 @@ console.log('rawpayloads', rawPayload)
     }
   };
 
-  
   useEffect(() => {
     if (advanceSettleSuccess) {
       toast.success('Advance claim settled successfully!');

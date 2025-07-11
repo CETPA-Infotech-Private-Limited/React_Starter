@@ -22,8 +22,10 @@ const HospitalizationBillDetails = ({
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
     { id: 2, billType: 'Consultation', billedAmount: billDetails?.consultationBill ?? 0, claimedAmount: billDetails?.consultationClaim ?? 0 },
     { id: 3, billType: 'Investigation', billedAmount: billDetails?.investigationBill ?? 0, claimedAmount: billDetails?.investigationClaim ?? 0 },
-    { id: 4, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
-    { id: 5, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
+     { id: 4, billType: 'Procedure', billedAmount: billDetails?.procedureBill ?? 0, claimedAmount: billDetails?.procedureClaim ?? 0 },
+
+    { id: 5, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
+    { id: 6, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
   ];
 
   const preHospItems = [
@@ -53,6 +55,14 @@ const HospitalizationBillDetails = ({
     },
     {
       id: 4,
+      billType: 'Procedure',
+      billedDate: preHospitalizationExpenses?.othersBillDate,
+      billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 5,
       billType: 'Other',
       billedDate: preHospitalizationExpenses?.othersBillDate,
       billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
@@ -64,6 +74,8 @@ const HospitalizationBillDetails = ({
   const totalBilled = billItems.reduce((sum, item) => sum + item.billedAmount, 0);
   const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
   const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
+
+  
 
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Comment'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Comment'];
@@ -88,7 +100,7 @@ const HospitalizationBillDetails = ({
       </div>
 
       <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
-      {/* <DisplayTable headers={billHeaders}>
+      <DisplayTable headers={billHeaders}>
         {Array.isArray(billItems) &&
           billItems?.map((item, index) =>
             item ? (
@@ -110,7 +122,7 @@ const HospitalizationBillDetails = ({
               />
             ) : null
           )}
-      </DisplayTable> */}
+      </DisplayTable>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
         <div className="text-center">
