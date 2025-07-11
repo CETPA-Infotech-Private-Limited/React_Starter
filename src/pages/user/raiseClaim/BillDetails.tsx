@@ -305,7 +305,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                   <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium">Claimed Amount</th>
                   <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-40">Included in Final Bill</th>
                   <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-32">Upload Document</th>
-                  <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-24 rounded-tr-md">Action</th>
+                  <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-24 rounded-tr-md">Add Additional Bills</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,7 +380,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                           })()}
                         >
                           <Plus className="w-4 h-4 mr-1" />
-                          Add Bill
+                           Add additional Bills
                         </Button>
                       ) : (
                         <Button
