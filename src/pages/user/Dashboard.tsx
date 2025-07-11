@@ -1,4 +1,5 @@
-import Heading from "@/components/ui/heading";
+import BillClarificationRequestForm from '@/components/common/BillClarificationRequestFrom';
+import Heading from '@/components/ui/heading';
 
 const Dashboard = () => {
   return (
@@ -9,6 +10,7 @@ const Dashboard = () => {
           <p className="text-gray-500">Sub Heading</p>
         </div>
       </div>
+      <BillClarificationRequestForm onSubmit={(e) => console.log(e)} submitting={false} />
     </div>
   );
 };

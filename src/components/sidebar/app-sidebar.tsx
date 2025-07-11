@@ -79,15 +79,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           roles: ['HR1', 'HR2'],
         },
         {
-          title: 'Advance Approve',
-          url: '/approve-advance',
+          title: 'Review Advance Request',
+          url: '/review-approve-advance',
           roles: ['HR1', 'HR2'],
         },
-        {
-          title: 'Approved Claim',
-          url: '/review-claim2',
-          roles: ['HR2'],
-        },
+        // {
+        //   title: 'Approved Claim',
+        //   url: '/review-claim2',
+        //   roles: ['HR2'],
+        // },
       ],
     },
     {
