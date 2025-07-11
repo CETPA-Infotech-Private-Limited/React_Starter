@@ -74,8 +74,8 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
             <FamilyMemberSelect value={patientDetail.MemberId} disabled />
           </div>
 
-          <ReadOnlyField label="Advance Request Amount" value={formatRupees(defaultData.advanceBasicDetails.claimAmount)} />
-          <ReadOnlyField label="Final Approve Amount" value={formatRupees(defaultData.ApprovedAmount)} />
+          <ReadOnlyField label="Advance Request Amount" value={formatRupees(defaultData?.advanceBasicDetails?.claimAmount)} />
+          <ReadOnlyField label="Final Approve Amount" value={formatRupees(defaultData?.ApprovedAmount)} />
 
           {/* Is Hospital Empanelled */}
           <div className="flex flex-col gap-1.5 w-full">

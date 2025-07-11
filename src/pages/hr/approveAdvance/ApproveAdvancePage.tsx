@@ -32,6 +32,16 @@ const ApproveAdvancePage = () => {
     }
   }, [dispatch, user?.EmpCode]);
 
+  // This useEffect will run whenever claimDetails or detailsLoading changes.
+  useEffect(() => {
+    if (!detailsLoading && claimDetails) {
+      console.log('Claim Details:', claimDetails);
+    }
+    if (detailsError) {
+      console.error('Error fetching Claim Details:', detailsError);
+    }
+  }, [claimDetails, detailsLoading, detailsError]); // Dependency array
+
   useEffect(() => {
     if (success) {
       toast.success('Advance approved successfully!');
@@ -43,7 +53,7 @@ const ApproveAdvancePage = () => {
       toast.error(error);
       dispatch(resetAdvanceApprovalState());
     }
-  }, [success, error, dispatch]);
+  }, [success, error, dispatch, user?.EmpCode]); // Added user?.EmpCode to dependency array for fetchAdvanceData
 
   const columns = useMemo(
     () => [
@@ -177,6 +187,10 @@ const ApproveAdvancePage = () => {
           {detailsLoading && <Loader />}
           <h2 className="text-xl font-bold text-blue-700 mb-4">Patient Details & Advance Details</h2>
           <PatientDetailsCard {...patientDetails} />
+
+          {/* This console log will show you what's being passed to the card */}
+          {console.log("Data for HospitalizationDetailsCard:", claimDetails?.advanceBasicDetails)}
+          {console.log("Document Lists for HospitalizationDetailsCard:", claimDetails?.documentLists)}
 
           {claimDetails?.advanceBasicDetails && (
             <HospitalizationDetailsCard
