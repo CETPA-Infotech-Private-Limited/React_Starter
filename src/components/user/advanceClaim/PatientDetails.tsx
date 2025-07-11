@@ -18,14 +18,14 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
   const advance = defaultData?.advanceBasicDetails || {};
   const patientId = defaultData?.selectedAdvanceClaim?.patientId?.toString() || '';
   const selectedAdvanceClaim = defaultData?.selectedAdvanceClaim;
-  console.log('defaultData', selectedAdvanceClaim);
+  console.log('advance', advance);
 
   const initialState = {
     MemberId: patientId,
     AdvanceAmount: safeNumber(advance.advanceAmount),
     ApprovedAmount: safeNumber(advance.advanceClaimApprovedAmount),
     HospitalId: 'sss',
-    HospitalName: advance.hospitalName ?? '',
+    HospitalName: advance?.hospitalName ?? '',
     HospitalRegNo: advance.hospitalRegNo ?? '',
     IsHospitialEmpanpanelled: !!advance.hospitalId,
     DoctorName: advance.doctorName ?? '',
