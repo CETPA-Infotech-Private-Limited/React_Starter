@@ -1,6 +1,7 @@
+'use client';
+
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
-import ViewClaimDetails from '@/components/hr/reviewClaim/ViewClaimDetails';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewClaim/HospitalizationBillView';
@@ -8,23 +9,32 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
+import Loader from '@/components/ui/loader';
 
 const ReviewClaim = () => {
   const dispatch = useAppDispatch();
 
   const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
-  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
+  const {claimDetail, loading} = useAppSelector((state: RootState) => state.getClaimHr);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
 
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const detailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (user?.EmpCode) {
-      dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
-    }
+    const fetchClaims = async () => {
+      if (user?.EmpCode) {
+        setIsSubmitting(true);
+        await dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+        setIsSubmitting(false);
+      }
+    };
+
+    fetchClaims();
   }, [user?.EmpCode]);
 
   useEffect(() => {
@@ -33,8 +43,10 @@ const ReviewClaim = () => {
     }
   }, [showDetails]);
 
-  const handleViewToggle = (rowData: any) => {
+  const handleViewToggle = async (rowData: any) => {
+    setIsSubmitting(true)
     const isSame = selectedClaim?.id === rowData.id;
+
     if (isSame) {
       const shouldShow = !showDetails;
       setShowDetails(shouldShow);
@@ -47,7 +59,9 @@ const ReviewClaim = () => {
     }
 
     if (rowData.claimId) {
-      dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+     
+      await dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+      setIsSubmitting(false);
     }
   };
 
@@ -134,24 +148,29 @@ const ReviewClaim = () => {
     : [];
 
   return (
-    <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
-      <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
-        <div className="flex items-center gap-2 mb-5">
-          <FileSearch className="text-blue-600 w-6 h-6" />
-          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
-        </div>
+    
+        <>
+          <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
+            <div className="flex items-center gap-2 mb-5">
+              <FileSearch className="text-blue-600 w-6 h-6" />
+              <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
+            </div>
 
-        <ClaimSettlementList columns={columns} claimList={claimList} />
-      </div>
-
-      {selectedClaim && showDetails && (
-        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
-          <HospitalizationBillView claimDetail={claimDetail} />
-          {/* <ViewClaimDetails claim={selectedClaim} /> */}
-        </div>
-      )}
-    </div>
-  );
+            <ClaimSettlementList columns={columns} claimList={claimList} />
+          </div>
+          {loading && <Loader/>}
+          
+          {selectedClaim && showDetails && (
+            <div
+              ref={detailsRef}
+              className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6"
+            >
+              <HospitalizationBillView claimDetail={claimDetail} />
+              {/* <ViewClaimDetails claim={selectedClaim} /> */}
+            </div>
+          )}
+        </>
+  )
 };
 
 export default ReviewClaim;

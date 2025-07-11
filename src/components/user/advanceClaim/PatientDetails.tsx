@@ -17,13 +17,15 @@ const safeDate = (val: string) => (val && val !== '01/01/0001' ? new Date(val) :
 const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
   const advance = defaultData?.advanceBasicDetails || {};
   const patientId = defaultData?.selectedAdvanceClaim?.patientId?.toString() || '';
+  const selectedAdvanceClaim = defaultData?.selectedAdvanceClaim;
+  console.log('advance', advance);
 
   const initialState = {
     MemberId: patientId,
     AdvanceAmount: safeNumber(advance.advanceAmount),
     ApprovedAmount: safeNumber(advance.advanceClaimApprovedAmount),
     HospitalId: 'sss',
-    HospitalName: advance.hospitalName ?? '',
+    HospitalName: advance?.hospitalName ?? '',
     HospitalRegNo: advance.hospitalRegNo ?? '',
     IsHospitialEmpanpanelled: !!advance.hospitalId,
     DoctorName: advance.doctorName ?? '',
@@ -60,8 +62,6 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
     patientDetailOnChange(updated);
   };
 
-  console.log('patientDetail.AdvanceAmount', defaultData);
-
   return (
     <div className="w-full bg-white text-black text-xs p-6 rounded-2xl shadow-xl border border-blue-300 animate-fade-in-up font-sans">
       <h2 className="text-xl font-extrabold mb-6 text-center text-primary drop-shadow tracking-tight font-sans">
@@ -74,8 +74,8 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
             <FamilyMemberSelect value={patientDetail.MemberId} disabled />
           </div>
 
-          <ReadOnlyField label="Advance Request Amount" value={formatRupees(defaultData?.advanceBasicDetails?.claimAmount)} />
-          <ReadOnlyField label="Final Approve Amount" value={formatRupees(defaultData?.ApprovedAmount)} />
+          <ReadOnlyField label="Advance Request Amount" value={formatRupees(selectedAdvanceClaim?.advanceAmount)} />
+          <ReadOnlyField label="Final Approve Amount" value={formatRupees(selectedAdvanceClaim?.approvedAmount)} />
 
           {/* Is Hospital Empanelled */}
           <div className="flex flex-col gap-1.5 w-full">

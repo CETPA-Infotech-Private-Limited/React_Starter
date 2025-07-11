@@ -128,7 +128,7 @@ interface PostHospitalizationFormProps {
   onSubmit: () => void;
 }
 
-const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit }: PostHospitalizationFormProps) => {
+const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, isSubmitting }: PostHospitalizationFormProps) => {
   const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
 
   // File upload states
