@@ -14,6 +14,7 @@ import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice'
 import { getClaimDataHr } from '@/features/hr/getClaimRequestSlice';
 import { json } from 'node:stream/consumers';
 import Loader from '@/components/ui/loader';
+import DocumentLinks from '@/components/common/DocumentLinks';
 
 const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
@@ -234,6 +235,7 @@ const DoctorReviewPage = () => {
             preHospComments={preHospComments}
             setPreHospComments={setPreHospComments}
           />
+          {claimDetails?.documentLists.length > 0 && <DocumentLinks documentLists={claimDetails?.documentLists} />}
 
           <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
             <div className="space-y-2">

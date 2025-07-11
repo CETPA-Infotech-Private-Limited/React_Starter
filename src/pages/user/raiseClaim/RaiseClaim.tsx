@@ -102,15 +102,24 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     billDetails?.OtherBill?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
-  const netTotal =
-    hospClaimedAmount +
-    [
-      preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
-    ].reduce((sum, val) => sum + Number(val), 0);
+  const notIncludedClaimedAmount = (billDetails?.NotIncluded?.ClaimedAmount || []).reduce(
+  (sum, item) => sum + Number(item?.ClaimedAmount || item?.claimedAmount || 0),
+  0
+);
+
+const preHospClaimedAmount = [
+    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0)
+
+const netTotal =
+  hospClaimedAmount +
+  preHospClaimedAmount +
+  notIncludedClaimedAmount; // ✅ Add not-included claim amount
+
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,
@@ -129,9 +138,12 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...preHospDetails,
         ...postHospDetails,
       };
+
+      console.log(rawPayload,"this is raw payload")
       const formData = new FormData();
       formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
+      formData.append('IsHospitialEmpanpanelled', rawPayload.IsHospitialEmpanpanelled)
       formData.append('patientId', String(user.EmpCode || 0));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
       formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
@@ -283,7 +295,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
             <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
           </div>
           <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
+            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} preHospClaimedAmount={preHospClaimedAmount}  />
           </div>
           <div className="mt-4">
             <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />

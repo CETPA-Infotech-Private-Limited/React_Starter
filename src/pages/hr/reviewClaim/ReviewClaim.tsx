@@ -8,15 +8,15 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
+import Loader from '@/components/ui/loader';
 
 const ReviewClaim = () => {
   const dispatch = useAppDispatch();
 
   const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
-  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
+  const { claimDetail, loading } = useAppSelector((state: RootState) => state.getClaimHr);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
-
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
@@ -106,11 +106,7 @@ const ReviewClaim = () => {
           const isSelected = selectedClaim?.id === rowData.id;
 
           return (
-            <Button
-              size="sm"
-              onClick={() => handleViewToggle(rowData)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
-            >
+            <Button onClick={() => handleViewToggle(rowData)} variant="link" size="sm" className="text-blue-600">
               {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
               {isSelected && showDetails ? 'Hide' : 'View'}
             </Button>
@@ -140,7 +136,7 @@ const ReviewClaim = () => {
           <FileSearch className="text-blue-600 w-6 h-6" />
           <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
         </div>
-
+        {loading && <Loader />}
         <ClaimSettlementList columns={columns} claimList={claimList} />
       </div>
 

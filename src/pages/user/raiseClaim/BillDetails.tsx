@@ -131,7 +131,7 @@ interface BillDetailsProps {
   preHospBilledAmount?: number;
 }
 
-const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 0 }: BillDetailsProps) => {
+const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 0, preHospClaimedAmount=0 }: BillDetailsProps) => {
   const initialBills: BillItem[] = [
     {
       id: 1,
@@ -413,7 +413,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                 <strong className="text-blue-800">Total Bill (Billed):</strong> {(preHospBilledAmount + billedTotal).toFixed(2)}
               </span>
               <span>
-                <strong className="text-blue-800">Net Total (Claimed):</strong> {claimedTotal.toFixed(2)}
+                <strong className="text-blue-800">Net Total (Claimed):</strong> {(claimedTotal + preHospClaimedAmount).toFixed(2) }
               </span>
             </div>
           </div>

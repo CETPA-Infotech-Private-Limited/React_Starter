@@ -1,12 +1,26 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation, NavLink } from 'react-router';
 import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from './ui/sidebar';
 import { NavItem } from '@/types/types';
-import { NavLink } from 'react-router';
 
 export function NavMain({ items }: { items: NavItem[] }) {
   const { setOpenMobile } = useSidebar();
   const [openItems, setOpenItems] = useState<string[]>([]);
+  const location = useLocation();
+
+  // Automatically open parent if a child is active
+  useEffect(() => {
+    const activeParents: string[] = [];
+
+    items.forEach((item) => {
+      if (item.children?.some((child) => location.pathname === child.url)) {
+        activeParents.push(item.title);
+      }
+    });
+
+    setOpenItems((prev) => Array.from(new Set([...prev, ...activeParents])));
+  }, [location.pathname, items]);
 
   const toggleOpen = (title: string) => {
     setOpenItems((prev) => (prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]));

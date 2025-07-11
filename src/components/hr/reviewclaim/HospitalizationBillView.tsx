@@ -16,8 +16,10 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
     { id: 2, billType: 'Consultation', billedAmount: billDetails?.consultationBill ?? 0, claimedAmount: billDetails?.consultationClaim ?? 0 },
     { id: 3, billType: 'Investigation', billedAmount: billDetails?.investigationBill ?? 0, claimedAmount: billDetails?.investigationClaim ?? 0 },
-    { id: 4, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
-    { id: 5, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
+    { id: 4, billType: 'Procedure', billedAmount: billDetails?.procedureBill ?? 0, claimedAmount: billDetails?.procedureClaim ?? 0 },
+    { id: 5, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
+    { id: 6, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
+    
   ];
 
   const preHospItems = [
@@ -47,6 +49,14 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
     },
     {
       id: 4,
+      billType: 'Procedure',
+      billedDate: preHospitalizationExpenses?.othersBillDate,
+      billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 5,
       billType: 'Other',
       billedDate: preHospitalizationExpenses?.othersBillDate,
       billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
