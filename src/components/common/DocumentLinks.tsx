@@ -14,8 +14,9 @@ type DocumentLinksProps = {
 const DocumentLinks: React.FC<DocumentLinksProps> = ({ documentLists }) => {
   return (
     <div className="p-6 bg-white shadow-md rounded-lg border border-gray-200">
-      <h2 className="text-xl font-semibold text-gray-800 mb-1 flex items-center gap-2">
-        <Paperclip /> Documents Attached
+      <h2 className="text-xl font-semibold text-primary mb-1 flex items-center gap-2">
+        <Paperclip />
+        Documents Attached
       </h2>
       <p className="text-gray-600 mb-4 text-sm">Please find the attached documents below.</p>
 
