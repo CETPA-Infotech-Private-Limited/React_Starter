@@ -5,12 +5,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
+import Loader from '@/components/ui/loader';
 
-const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
+const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
   if (!claimDetail) return null;
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
+  const {loading} = useAppSelector((state:RootState)=>state.submitClaimProcessSlice) // Destructure loading from your slice
 
   const billItems = [
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
@@ -88,6 +90,7 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
+      {loading && <Loader />} {/* Conditionally render the Loader component */}
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Hospitalization Claim Details</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
