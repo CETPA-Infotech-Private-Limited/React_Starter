@@ -203,21 +203,6 @@ const ApproveAdvancePage = () => {
             />
           )}
 
-          {/* {claimDetails?.hospitalAccoundetail && (
-            <BeneficiaryDetailsCard
-              beneficiaryName={claimDetails.hospitalAccoundetail.beneficiaryName}
-              bankName={claimDetails.hospitalAccoundetail.bankName}
-              accountNumber={claimDetails.hospitalAccoundetail.accountNumber}
-              branchName={claimDetails.hospitalAccoundetail.branchName}
-              ifscCode={claimDetails.hospitalAccoundetail.ifscCode}
-              hospitalGSTNo={claimDetails.hospitalAccoundetail.hospitalGSTNo}
-              utrNo={claimDetails.hospitalAccoundetail.utrNo}
-              transactionDate={claimDetails.hospitalAccoundetail.transactionDate}
-              sapRefNumber={claimDetails.hospitalAccoundetail.sapRefNumber}
-              sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
-            />
-          )} */}
-
           <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} />
         </>
       )}
