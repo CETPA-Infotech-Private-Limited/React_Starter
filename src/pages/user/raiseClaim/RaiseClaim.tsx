@@ -143,7 +143,8 @@ const netTotal =
       const formData = new FormData();
       formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
-      formData.append('IsHospitialEmpanpanelled', rawPayload.IsHospitialEmpanpanelled)
+      formData.append('IsHospitialEmpanpanelled', String(rawPayload.IsHospitialEmpanpanelled ?? false));
+
       formData.append('patientId', String(user.EmpCode || 0));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
       formData.append('RequestName', rawPayload.RequestName || 'Claim Request');

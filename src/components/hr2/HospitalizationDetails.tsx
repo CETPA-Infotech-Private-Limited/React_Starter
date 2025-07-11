@@ -2,14 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  BillItemDisplayRow,
-  DisplayField,
-  DisplayTable,
-  InfoCard,
-  PreHospDisplayRow,
-  SectionHeader,
-} from '../hr/reviewclaim/ReviewComponents';
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from './DisplayTable';
 import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -21,15 +14,50 @@ import { RootState } from '@/app/store';
 import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { submitAdvanceApproval } from '@/features/medicalClaim/advanceApprovalSlice';
+import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
 
 const HospitalizationBillView = () => {
   // State for the declaration and approval form
+
+   const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('no');
   const [specialDiseaseName, setSpecialDiseaseName] = useState('');
   const [totalRequested, setTotalRequested] = useState('');
   const [approvedAmount, setApprovedAmount] = useState('');
+
   const [sendTo, setSendTo] = useState('');
   const [loading, setLoading] = useState(false); // For the submit button
+  const [approvalInputs, setApprovalInputs] = useState<{ [key: string]: string }>({});
+  const [approvalSummary, setApprovalSummary] = useState({
+    MedicineAmount: 0,
+    MedicineNotInAmount: 0,
+    ConsultationAmount: 0,
+    ConsultationNotInAmount: 0,
+    InvestigationAmount: 0,
+    InvestigationNotInAmount: 0,
+    RoomRentAmount: 0,
+    ProcedureAmount: 0,
+    OtherAmount: 0,
+    OtherNotInAmount: 0,
+  });
+
+  const [preHospSummary, setPreHospSummary] = useState({
+    MedicineAmount: 0,
+    ConsultationAmount: 0,
+    InvestigationAmount: 0,
+    RoomRentAmount: 0,
+    ProcedureAmount: 0,
+    OtherAmount: 0,
+  });
+
+  const [billPassing, setBillPassing] = useState({
+    ClaimId: claimDetail?.claimId,
+    TopUpId: claimDetail?.topUpId,
+    ReferenceDate: new Date().toISOString(),
+    SapRefNumber: '',
+    AmountPaid: 0,
+    Comment: '',
+  });
 
   // State for managing claim list and details view
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
@@ -39,8 +67,8 @@ const HospitalizationBillView = () => {
   // Redux state
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
-  console.log(claimHrData, ' this is claimhrdata');
-  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail); // This now holds the patient and bill details
+ 
+  // const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail); // This now holds the patient and bill details
 
   console.log(claimDetail, 'theseare claim detail');
   const claimDetailLoading = useAppSelector((state: RootState) => state.getClaimHr.loadingClaimData);
@@ -87,7 +115,6 @@ const HospitalizationBillView = () => {
 
     if (rowData.claimId) {
       dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
-      
     }
   };
 
@@ -222,11 +249,46 @@ const HospitalizationBillView = () => {
     // Access pre-hospitalization expenses from `claimDetail.preHospitalizationExpenses`
     const expenses = claimDetail?.preHospitalizationExpenses || {};
     return [
-      { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0 },
-      { id: 2, billType: 'Consultation', billedDate: expenses.consultationBillDate || 'N/A', billedAmount: expenses.consultationBillAmount || 0, claimedAmount: expenses.consultationClaimAmount || 0, hasFiles: expenses.consultationHasFiles ? 1 : 0 },
-      { id: 3, billType: 'Investigation', billedDate: expenses.investigationBillDate || 'N/A', billedAmount: expenses.investigationBillAmount || 0, claimedAmount: expenses.investigationClaimAmount || 0, hasFiles: expenses.investigationHasFiles ? 1 : 0 },
-      { id: 4, billType: 'Procedure', billedDate: expenses.procedureBillDate || 'N/A', billedAmount: expenses.procedureBillAmount || 0, claimedAmount: expenses.procedureClaimAmount || 0, hasFiles: expenses.procedureHasFiles ? 1 : 0 },
-      { id: 5, billType: 'Other', billedDate: expenses.othersBillDate || 'N/A', billedAmount: expenses.otherBillAmount || 0, claimedAmount: expenses.otherClaimAmount || 0, hasFiles: expenses.otherHasFiles ? 1 : 0 },
+      {
+        id: 1,
+        billType: 'Medicine',
+        billedDate: expenses.medicineBillDate || 'N/A',
+        billedAmount: expenses.medicineBillAmount || 0,
+        claimedAmount: expenses.medicineClaimAmount || 0,
+        hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0,
+      },
+      {
+        id: 2,
+        billType: 'Consultation',
+        billedDate: expenses.consultationBillDate || 'N/A',
+        billedAmount: expenses.consultationBillAmount || 0,
+        claimedAmount: expenses.consultationClaimAmount || 0,
+        hasFiles: expenses.consultationHasFiles ? 1 : 0,
+      },
+      {
+        id: 3,
+        billType: 'Investigation',
+        billedDate: expenses.investigationBillDate || 'N/A',
+        billedAmount: expenses.investigationBillAmount || 0,
+        claimedAmount: expenses.investigationClaimAmount || 0,
+        hasFiles: expenses.investigationHasFiles ? 1 : 0,
+      },
+      {
+        id: 4,
+        billType: 'Procedure',
+        billedDate: expenses.procedureBillDate || 'N/A',
+        billedAmount: expenses.procedureBillAmount || 0,
+        claimedAmount: expenses.procedureClaimAmount || 0,
+        hasFiles: expenses.procedureHasFiles ? 1 : 0,
+      },
+      {
+        id: 5,
+        billType: 'Other',
+        billedDate: expenses.othersBillDate || 'N/A',
+        billedAmount: expenses.otherBillAmount || 0,
+        claimedAmount: expenses.otherClaimAmount || 0,
+        hasFiles: expenses.otherHasFiles ? 1 : 0,
+      },
     ];
   }, [claimDetail]);
 
@@ -234,33 +296,63 @@ const HospitalizationBillView = () => {
   const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
   const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
 
-  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification','Approval Details'];
-  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents',"Approval Details"];
+  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Approval Details'];
+  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Approval Details'];
 
-console.log(approvedAmount,'this is approved')
+  console.log(approvedAmount, 'this is approved');
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      console.log(billPassing,'this is bill passing')
       const payload = {
         AdvanceId: claimDetail.advanceBasicDetails.advanceId,
-        ApprovalAmount: String(approvedAmount),
-        RecipientId: '101002',
         SenderId: user.EmpCode,
+        RecipientId: 101002,
         ClaimTypeId: claimDetail.advanceBasicDetails.claimTypeId,
         StatusId: 4,
-      };
+        ClaimId: claimDetail.claimId,
+        TopUpId: claimDetail.topUpId,
+        ReferenceDate: billPassing.ReferenceDate,
+        SapRefNumber: billPassing.SapRefNumber,
+        AmountPaid: billPassing.AmountPaid,
+        Comment: claimDetail?.billPasingDetails?.comment || 'N/A',
+        ApprovalAmount: approvedAmount,
 
-      
+        // HospitalizationBillApprovelDetails
+        'HospitalizationBillApprovelDetails.MedicineAmount': approvalSummary.MedicineAmount,
+        'HospitalizationBillApprovelDetails.MedicineNotInAmount': approvalSummary.MedicineNotInAmount,
+        'HospitalizationBillApprovelDetails.ConsultationAmount': approvalSummary.ConsultationAmount,
+        'HospitalizationBillApprovelDetails.ConsultationNotInAmount': approvalSummary.ConsultationNotInAmount,
+        'HospitalizationBillApprovelDetails.InvestigationAmount': approvalSummary.InvestigationAmount,
+        'HospitalizationBillApprovelDetails.InvestigationNotInAmount': approvalSummary.InvestigationNotInAmount,
+        'HospitalizationBillApprovelDetails.RoomRentAmount': approvalSummary.RoomRentAmount,
+        'HospitalizationBillApprovelDetails.ProcedureAmount': approvalSummary.ProcedureAmount,
+        'HospitalizationBillApprovelDetails.OtherAmount': approvalSummary.OtherAmount,
+        'HospitalizationBillApprovelDetails.OtherNotInAmount': approvalSummary.OtherNotInAmount,
+
+        // PreHospitalizationExpenses
+        'PreHospitalizationExpenses.MedicineAmount': preHospSummary.MedicineAmount,
+        'PreHospitalizationExpenses.ConsultationAmount': preHospSummary.ConsultationAmount,
+        'PreHospitalizationExpenses.InvestigationAmount': preHospSummary.InvestigationAmount,
+        'PreHospitalizationExpenses.RoomRentAmount': preHospSummary.RoomRentAmount,
+        'PreHospitalizationExpenses.ProcedureAmount': preHospSummary.ProcedureAmount,
+        'PreHospitalizationExpenses.OtherAmount': preHospSummary.OtherAmount,
+
+        // BillPassingDetails
+        'BillPassingDetails.ClaimId': billPassing.ClaimId,
+        'BillPassingDetails.TopUpId': billPassing.TopUpId,
+        'BillPassingDetails.ReferenceDate': billPassing.ReferenceDate,
+        'BillPassingDetails.SapRefNumber': billPassing.SapRefNumber,
+        'BillPassingDetails.AmountPaid': billPassing.AmountPaid,
+        'BillPassingDetails.Comment': claimDetail?.billPasingDetails?.comment || 'N/A',
+      };
 
       // Simulate API call
       // await new Promise((resolve) => setTimeout(resolve, 2000));
       // console.log('Submitting data:', formData);
 
-     
-       await dispatch(submitAdvanceApproval(payload))
-
-      
+      await dispatch(submitClaimProcessByHr(payload));
 
       // Reset form fields after successful submission
       setApprovedAmount('');
@@ -319,28 +411,42 @@ console.log(approvedAmount,'this is approved')
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
-                    key={item.id}
+                    key={item.billType}
                     serialNo={index + 1}
                     billType={item.billType}
                     billedAmount={item.billedAmount}
                     claimedAmount={item.claimedAmount}
                     included={item.claimedAmount > 0}
-                    clarification="" // Placeholder, should come from data if available
+                    clarification="" // if any
+                    approvalDetails={approvalInputs[item.billType] || ''}
+                    onApprovalChange={(val) =>
+                      setApprovalInputs((prev) => ({
+                        ...prev,
+                        [item.billType]: val,
+                      }))
+                    }
                   />
                 ))}
               </DisplayTable>
 
-              <SectionHeader title="NotIncluded Bill Details" subtitle="Not Included in hospitalization bills" className='mt-8' />
+              <SectionHeader title="NotIncluded Bill Details" subtitle="Not Included in hospitalization bills" className="mt-8" />
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
-                    key={item.id}
+                    key={item.billType}
                     serialNo={index + 1}
                     billType={item.billType}
                     billedAmount={item.billedAmount}
                     claimedAmount={item.claimedAmount}
                     included={item.claimedAmount > 0}
-                    clarification="" // Placeholder, should come from data if available
+                    clarification="" // if any
+                    approvalDetails={approvalInputs[item.billType] || ''}
+                    onApprovalChange={(val) =>
+                      setApprovalInputs((prev) => ({
+                        ...prev,
+                        [item.billType]: val,
+                      }))
+                    }
                   />
                 ))}
               </DisplayTable>
@@ -360,17 +466,24 @@ console.log(approvedAmount,'this is approved')
                 </div>
               </div>
 
-              <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className='text-primary' />
-              <DisplayTable headers={preHospHeaders}>
-                {preHospItems.map((item, index) => (
-                  <PreHospDisplayRow
-                    key={item.id}
+              <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className="text-primary" />
+              <DisplayTable headers={billHeaders}>
+                {billItems.map((item, index) => (
+                  <BillItemDisplayRow
+                    key={item.billType}
                     serialNo={index + 1}
                     billType={item.billType}
-                    billedDate={item.billedDate}
                     billedAmount={item.billedAmount}
                     claimedAmount={item.claimedAmount}
-                    hasFiles={!!item.hasFiles} // Convert number (0 or 1) to boolean
+                    included={item.claimedAmount > 0}
+                    clarification="" // if any
+                    approvalDetails={approvalInputs[item.billType] || ''}
+                    onApprovalChange={(val) =>
+                      setApprovalInputs((prev) => ({
+                        ...prev,
+                        [item.billType]: val,
+                      }))
+                    }
                   />
                 ))}
               </DisplayTable>
@@ -381,26 +494,25 @@ console.log(approvedAmount,'this is approved')
               </div>
 
               {/* Declaration Section */}
-              <Card className='p-8 mt-6'>
-                <h2 className='text-lg font-medium text-primary drop-shadow mb-4'>Declaration by Employee</h2>
+              <Card className="p-8 mt-6">
+                <h2 className="text-lg font-medium text-primary drop-shadow mb-4">Declaration by Employee</h2>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <Label className=" font-medium text-gray-900">Special Disease</Label>
-                      <RadioGroup
-                    value={claimDetail?.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no'}
-                       disabled
-                       className="flex space-x-6"
->
-  <div className="flex items-center space-x-2">
-    <RadioGroupItem value="yes" id="special-disease-yes" />
-    <Label htmlFor="special-disease-yes" className="text-sm">Yes</Label>
-  </div>
-  <div className="flex items-center space-x-2">
-    <RadioGroupItem value="no" id="special-disease-no" />
-    <Label htmlFor="special-disease-no" className="text-sm">No</Label>
-  </div>
-</RadioGroup>
-
+                    <RadioGroup value={claimDetail?.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no'} disabled className="flex space-x-6">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id="special-disease-yes" />
+                        <Label htmlFor="special-disease-yes" className="text-sm">
+                          Yes
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="no" id="special-disease-no" />
+                        <Label htmlFor="special-disease-no" className="text-sm">
+                          No
+                        </Label>
+                      </div>
+                    </RadioGroup>
                   </div>
                   {isSpecialDisease === 'yes' && (
                     <div className="flex items-center space-x-3 pl-10">
@@ -421,43 +533,38 @@ console.log(approvedAmount,'this is approved')
 
               {/* Approval Form */}
               <Card className="mt-8">
-  <div className="p-4">
-    <h2 className="text-lg text-primary drop-shadow pb-4">Approval Form</h2>
+                <div className="p-4">
+                  <h2 className="text-lg text-primary drop-shadow pb-4">Approval Form</h2>
 
-    {/* Responsive Flex Layout */}
-    <div className="flex flex-col md:flex-row md:gap-6 gap-4">
-      {/* Total Claim Requested */}
-      <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
-        <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
-        <Input
-          className="w-full"
-          disabled
-          value={claimDetail?.advanceBasicDetails?.claimAmount}
-          onChange={(e) => setTotalRequested(e.target.value)}
-          type="number"
-        />
-      </div>
+                  {/* Responsive Flex Layout */}
+                  <div className="flex flex-col md:flex-row md:gap-6 gap-4">
+                    {/* Total Claim Requested */}
+                    <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+                      <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
+                      <Input
+                        className="w-full"
+                        disabled
+                        value={claimDetail?.advanceBasicDetails?.claimAmount}
+                        onChange={(e) => setTotalRequested(e.target.value)}
+                        type="number"
+                      />
+                    </div>
 
-      {/* Approved Amount */}
-      <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
-        <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
-        <Input
-          className="w-full"
-          value={approvedAmount}
-          onChange={(e) => setApprovedAmount(e.target.value)}
-          type="number"
-        />
-      </div>
-    </div>
+                    {/* Approved Amount */}
+                    <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+                      <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
+                      <Input className="w-full" value={approvedAmount} onChange={(e) => setApprovedAmount(e.target.value)} type="number" />
+                    </div>
+                  </div>
 
-    {/* Submit Button */}
-    <div className="flex justify-end pt-4">
-      <Button onClick={handleSubmit} disabled={loading}>
-        {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
-      </Button>
-    </div>
-  </div>
-</Card>
+                  {/* Submit Button */}
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={handleSubmit} disabled={loading}>
+                      {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
             </>
           )}
         </div>
