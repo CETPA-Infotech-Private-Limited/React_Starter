@@ -38,6 +38,7 @@ const ShadDatePicker: React.FC<ShadDatePickerProps> = ({
   showYearDropdown = false,
   ...props
 }) => {
+  console.log('selected', selected);
   return (
     <DatePicker
       selected={selected}

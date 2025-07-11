@@ -199,8 +199,9 @@ const HospitalizationBillView = () => {
       { id: 1, billType: 'Medicine', billedAmount: details.medicineBill || 0, claimedAmount: details.medicineClaim || 0 },
       { id: 2, billType: 'Consultation', billedAmount: details.consultationBill || 0, claimedAmount: details.consultationClaim || 0 },
       { id: 3, billType: 'Investigation', billedAmount: details.investigationBill || 0, claimedAmount: details.investigationClaim || 0 },
-      { id: 4, billType: 'Room Rent', billedAmount: details.roomRentBill || 0, claimedAmount: details.roomRentClaim || 0 },
-      { id: 5, billType: 'Other', billedAmount: details.othersBill || 0, claimedAmount: details.otherClaim || 0 },
+      { id: 4, billType: 'Procedure', billedAmount: details.procedureBill || 0, claimedAmount: details.procedureClaim || 0 },
+      { id: 5, billType: 'Room Rent', billedAmount: details.roomRentBill || 0, claimedAmount: details.roomRentClaim || 0 },
+      { id: 6, billType: 'Other', billedAmount: details.othersBill || 0, claimedAmount: details.otherClaim || 0 },
     ];
   }, [claimDetail]);
 
@@ -211,7 +212,8 @@ const HospitalizationBillView = () => {
       { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0 },
       { id: 2, billType: 'Consultation', billedDate: expenses.consultationBillDate || 'N/A', billedAmount: expenses.consultationBillAmount || 0, claimedAmount: expenses.consultationClaimAmount || 0, hasFiles: expenses.consultationHasFiles ? 1 : 0 },
       { id: 3, billType: 'Investigation', billedDate: expenses.investigationBillDate || 'N/A', billedAmount: expenses.investigationBillAmount || 0, claimedAmount: expenses.investigationClaimAmount || 0, hasFiles: expenses.investigationHasFiles ? 1 : 0 },
-      { id: 4, billType: 'Other', billedDate: expenses.othersBillDate || 'N/A', billedAmount: expenses.otherBillAmount || 0, claimedAmount: expenses.otherClaimAmount || 0, hasFiles: expenses.otherHasFiles ? 1 : 0 },
+      { id: 4, billType: 'Procedure', billedDate: expenses.procedureBillDate || 'N/A', billedAmount: expenses.procedureBillAmount || 0, claimedAmount: expenses.procedureClaimAmount || 0, hasFiles: expenses.procedureHasFiles ? 1 : 0 },
+      { id: 5, billType: 'Other', billedDate: expenses.othersBillDate || 'N/A', billedAmount: expenses.otherBillAmount || 0, claimedAmount: expenses.otherClaimAmount || 0, hasFiles: expenses.otherHasFiles ? 1 : 0 },
     ];
   }, [claimDetail]);
 

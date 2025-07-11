@@ -8,8 +8,11 @@ import { hospitalList } from '@/constant/static';
 import FamilyMemberSelect from '@/components/common/FamilyMemberSelect';
 import ShadDatePicker from '@/components/common/ShadDatePicker';
 import UploadDialog from '@/components/common/UploadDialog';
-import { ReadOnlyField } from '@/components/common/ReadOnlyField';
 import { formatRupees } from '@/lib/helperFunction';
+import { ReadOnlyField } from '@/components/common/ReadOnlyField';
+
+const safeNumber = (val: any) => (isNaN(Number(val)) ? 0 : Number(val));
+const safeDate = (val: string) => (val && val !== '01/01/0001' ? new Date(val) : null);
 
 const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
   const advance = defaultData?.advanceBasicDetails || {};
@@ -17,26 +20,24 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
 
   const initialState = {
     MemberId: patientId,
-    AdvanceAmount: advance.advanceAmount ?? 0,
-    ApprovedAmount: advance.advanceClaimApprovedAmount ?? 0,
-    HospitalId: '',
+    AdvanceAmount: safeNumber(advance.advanceAmount),
+    ApprovedAmount: safeNumber(advance.advanceClaimApprovedAmount),
+    HospitalId: 'sss',
     HospitalName: advance.hospitalName ?? '',
     HospitalRegNo: advance.hospitalRegNo ?? '',
-    IsHospitialEmpanpanelled: false,
+    IsHospitialEmpanpanelled: !!advance.hospitalId,
     DoctorName: advance.doctorName ?? '',
-    DateOfAdmission: advance.dateOfAdmission !== '01/01/0001' ? advance.dateOfAdmission : '',
-    DateofDischarge: advance.dateofDischarge !== '01/01/0001' ? advance.dateofDischarge : '',
+    DateOfAdmission: advance.dateOfAdmission ?? '',
+    DateofDischarge: advance.dateofDischarge ?? '',
     TreatmentType: advance.treatmentType ?? '',
     Digonosis: advance.digonosis ?? '',
-    FinalHospitalBill: advance.finalHospitalBill ?? '',
+    FinalHospitalBill: safeNumber(advance.finalHospitalBill),
     AdmissionAdviceUpload: [],
     DischargeSummaryUpload: [],
     FinalHospitalBillUpload: [],
     InvestigationReportsUpload: [],
   };
-
   const [patientDetail, setPatientDetail] = useState(initialState);
-
   const [admissionAdviceFiles, setAdmissionAdviceFiles] = useState<File[]>([]);
   const [dischargeSummaryFiles, setDischargeSummaryFiles] = useState<File[]>([]);
   const [finalHospitalBillFiles, setFinalHospitalBillFiles] = useState<File[]>([]);
@@ -59,27 +60,22 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
     patientDetailOnChange(updated);
   };
 
-  // Utility to disable if data exists
-  const isDisabled = (field) => {
-    const val = advance?.[field];
-    return val !== undefined && val !== null && val !== '' && val !== '01/01/0001';
-  };
+  console.log('patientDetail.AdvanceAmount', defaultData);
 
   return (
     <div className="w-full bg-white text-black text-xs p-6 rounded-2xl shadow-xl border border-blue-300 animate-fade-in-up font-sans">
-      <h2 className="text-xl font-extrabold mb-6 text-center text-primary drop-shadow tracking-tight font-sans">Patient and Other Details</h2>
-
+      <h2 className="text-xl font-extrabold mb-6 text-center text-primary drop-shadow tracking-tight font-sans">
+        Fill in the patient and other details to settle your claim
+      </h2>
       <form className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-          {/* Select Member */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Select Member</Label>
-            <FamilyMemberSelect value={patientDetail.MemberId} disabled onOpenChange={() => {}} />
+            <FamilyMemberSelect value={patientDetail.MemberId} disabled />
           </div>
 
-          <InputField label="Advance Request Amount" value={formatRupees(defaultData?.selectedAdvanceClaim?.advanceAmount)} disabled onChange={() => {}} />
-
-          <InputField label="Final Approve Amount" value={formatRupees(defaultData?.selectedAdvanceClaim?.approvedAmount)} disabled onChange={() => {}} />
+          <ReadOnlyField label="Advance Request Amount" value={formatRupees(defaultData.advanceBasicDetails.claimAmount)} />
+          <ReadOnlyField label="Final Approve Amount" value={formatRupees(defaultData.ApprovedAmount)} />
 
           {/* Is Hospital Empanelled */}
           <div className="flex flex-col gap-1.5 w-full">
@@ -96,13 +92,13 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
               className="flex gap-6 mt-1"
             >
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="yes" id="empanelled-yes" disabled={isDisabled('isHospitialEmpanpanelled')} />
+                <RadioGroupItem value="yes" id="empanelled-yes" />
                 <Label htmlFor="empanelled-yes" className="text-xs text-gray-700">
                   Yes
                 </Label>
               </div>
               <div className="flex items-center gap-2">
-                <RadioGroupItem value="no" id="empanelled-no" disabled={isDisabled('isHospitialEmpanpanelled')} />
+                <RadioGroupItem value="no" id="empanelled-no" />
                 <Label htmlFor="empanelled-no" className="text-xs text-gray-700">
                   No
                 </Label>
@@ -110,11 +106,10 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
             </RadioGroup>
           </div>
 
-          {/* Hospital Info */}
           {patientDetail.IsHospitialEmpanpanelled ? (
             <div className="flex flex-col gap-1.5 w-full">
               <Label className="text-blue-800 text-sm font-semibold">Select Hospital</Label>
-              <Select value={patientDetail.HospitalId} onValueChange={(val) => handleChange({ HospitalId: val })} disabled={isDisabled('hospitalId')}>
+              <Select value={patientDetail.HospitalId} onValueChange={(val) => handleChange({ HospitalId: val })}>
                 <SelectTrigger className="border border-blue-200 rounded-lg px-3 py-2 shadow-sm text-xs font-sans">
                   <SelectValue placeholder="Choose hospital" />
                 </SelectTrigger>
@@ -129,48 +124,26 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
             </div>
           ) : (
             <>
-              <InputField
-                label="Hospital Name"
-                value={patientDetail.HospitalName}
-                onChange={(e) => handleChange({ HospitalName: e.target.value })}
-                placeholder="e.g., Apollo"
-                disabled={isDisabled('hospitalName')}
-              />
-              <InputField
-                label="Hospital Regd. No."
-                value={patientDetail.HospitalRegNo}
-                onChange={(e) => handleChange({ HospitalRegNo: e.target.value })}
-                placeholder="L85110TN1979PLC006944"
-                disabled={isDisabled('hospitalRegNo')}
-              />
+              <InputField label="Hospital Name" value={patientDetail.HospitalName} onChange={(e) => handleChange({ HospitalName: e.target.value })} />
+              <InputField label="Hospital Regd. No." value={patientDetail.HospitalRegNo} onChange={(e) => handleChange({ HospitalRegNo: e.target.value })} />
             </>
           )}
 
-          {/* Doctor Name */}
-          <InputField
-            label="Doctor's Name"
-            value={patientDetail.DoctorName}
-            onChange={(e) => handleChange({ DoctorName: e.target.value })}
-            placeholder="Dr. Mathur"
-            disabled={isDisabled('doctorName')}
-          />
+          <InputField label="Doctor's Name" value={patientDetail.DoctorName} onChange={(e) => handleChange({ DoctorName: e.target.value })} />
 
-          {/* Admission Date */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Admission Date</Label>
             <ShadDatePicker
-              selected={patientDetail.DateOfAdmission ? new Date(patientDetail.DateOfAdmission) : null}
+              selected={safeDate(patientDetail.DateOfAdmission)}
               onChange={(date) => handleChange({ DateOfAdmission: date?.toISOString().split('T')[0] || '' })}
               placeholder="Select admission date"
               dateFormat="dd/MM/yyyy"
-              disabled={isDisabled('dateOfAdmission')}
             />
           </div>
 
-          {/* Treatment Type */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Treatment Type</Label>
-            <Select value={patientDetail.TreatmentType} onValueChange={(val) => handleChange({ TreatmentType: val })} disabled={isDisabled('treatmentType')}>
+            <Select value={patientDetail.TreatmentType} onValueChange={(val) => handleChange({ TreatmentType: val })}>
               <SelectTrigger className="border border-blue-200 rounded-lg px-3 py-2 shadow-sm text-xs font-sans">
                 <SelectValue placeholder="Allopathic" />
               </SelectTrigger>
@@ -182,57 +155,45 @@ const PatientDetails = ({ patientDetailOnChange, defaultData }) => {
             </Select>
           </div>
 
-          {/* Diagnosis */}
-          <InputField
-            label="Diagnosis"
-            value={patientDetail.Digonosis}
-            onChange={(e) => handleChange({ Digonosis: e.target.value })}
-            placeholder="e.g., Appendicitis, Fracture"
-            disabled={isDisabled('digonosis')}
-          />
+          <InputField label="Diagnosis" value={patientDetail.Digonosis} onChange={(e) => handleChange({ Digonosis: e.target.value })} />
 
-          {/* Admission Advice Upload */}
+          {/* Uploads */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Admission Advice</Label>
             <UploadDialog title="Upload Advice" files={admissionAdviceFiles} onFilesChange={setAdmissionAdviceFiles} />
           </div>
 
-          {/* Discharge Date */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Date of Discharge</Label>
             <ShadDatePicker
-              selected={patientDetail.DateofDischarge ? new Date(patientDetail.DateofDischarge) : null}
+              selected={safeDate(patientDetail.DateofDischarge)}
               onChange={(date) => handleChange({ DateofDischarge: date?.toISOString().split('T')[0] || '' })}
               placeholder="Select discharge date"
               dateFormat="dd/MM/yyyy"
-              disabled={isDisabled('dateofDischarge')}
             />
           </div>
 
-          {/* Discharge Summary Upload */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Discharge Summary</Label>
             <UploadDialog title="Upload Summary" files={dischargeSummaryFiles} onFilesChange={setDischargeSummaryFiles} />
           </div>
 
-          {/* Final Hospital Bill + Upload */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Final Hospital Bill</Label>
             <div className="flex gap-2 items-center">
               <Input
-                id="final-bill"
                 type="number"
+                inputMode="numeric"
+                onWheel={(e) => (e.target as HTMLInputElement).blur()}
                 placeholder="0.00"
                 value={patientDetail.FinalHospitalBill}
                 onChange={(e) => handleChange({ FinalHospitalBill: e.target.value })}
-                className="border border-blue-200 rounded-lg px-3 py-2 flex-1 focus:ring-1 focus:ring-blue-400 shadow-sm text-xs"
-                disabled={isDisabled('finalHospitalBill')}
+                className="border border-blue-200 rounded-lg px-3 py-2 flex-1 text-xs"
               />
               <UploadDialog title="Upload Bill" files={finalHospitalBillFiles} onFilesChange={setFinalHospitalBillFiles} />
             </div>
           </div>
 
-          {/* Investigation Reports */}
           <div className="flex flex-col gap-1.5 w-full">
             <Label className="text-blue-800 text-sm font-semibold">Investigation Reports</Label>
             <UploadDialog title="Upload Reports" files={investigationReportsFiles} onFilesChange={setInvestigationReportsFiles} />

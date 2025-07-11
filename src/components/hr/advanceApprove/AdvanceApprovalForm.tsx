@@ -17,7 +17,7 @@ const formSchema = z
       .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
         message: 'Enter a valid number greater than 0',
       }),
-    estimatedAmount: z.number(), // internal use only (not user input)
+    estimatedAmount: z.number(),
     agree: z.literal(true, {
       errorMap: () => ({
         message: 'You must accept the declaration',
@@ -45,6 +45,8 @@ export default function AdvanceApprovalForm({ estimatedAmount, onSubmit, approva
       estimatedAmount,
       agree: false,
     },
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
   });
 
   const handleSubmit = (values: FormValues) => {
