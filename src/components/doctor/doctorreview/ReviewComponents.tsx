@@ -3,6 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { CheckCircle, Eye, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 
 export const SectionHeader = ({ title, subtitle, className = '' }) => (
   <div className={`mb-4 ${className}`}>
@@ -153,5 +157,68 @@ export const PreHospDisplayRow = ({
         </td>
       </tr>
     </>
+  );
+};
+type Document = {
+  category: string;
+  remark?: string;
+  pathUrl: string;
+};
+
+interface ClaimDocumentListProps {
+  documents: Document[];
+}
+
+export const ClaimDocumentList: React.FC<ClaimDocumentListProps> = ({ documents }) => {
+  if (!documents || documents.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>No Documents Found</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">There are no documents available for this claim.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-blue-700">Claim Documents</CardTitle>
+      </CardHeader>
+
+      <CardContent>
+        <ScrollArea className="h-[300px] w-full pr-2">
+          <div className="space-y-4">
+            {documents.map((doc, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between border rounded-xl p-3 hover:shadow-md transition-all"
+              >
+                <div>
+                  <Label className="font-semibold">{doc.category}</Label>
+                  {doc.remark && (
+                    <div className="text-muted-foreground text-xs mt-1">{doc.remark}</div>
+                  )}
+                </div>
+
+                <a
+                  href={doc.pathUrl.replace(/\\/g, '/')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="flex gap-1 items-center">
+                    <Eye className="w-4 h-4" />
+                    View
+                  </Button>
+                </a>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 };

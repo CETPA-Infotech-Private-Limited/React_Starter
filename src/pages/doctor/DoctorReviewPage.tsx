@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import HospitalizationBillDetails from '@/components/doctor/doctorreview/HospitalizationBillDetails';
+import{ ClaimDocumentList} from '@/components/doctor/doctorreview/ReviewComponents';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff, Eye } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks'; // Corrected: removed duplicate useAppSelector
@@ -234,6 +235,9 @@ const DoctorReviewPage = () => {
             preHospComments={preHospComments}
             setPreHospComments={setPreHospComments}
           />
+
+          <ClaimDocumentList documents={claimDetails.documentLists} />
+
 
           <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
             <div className="space-y-2">
