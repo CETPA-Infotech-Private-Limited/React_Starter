@@ -14,7 +14,7 @@ import { RootState } from '@/app/store';
 import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { submitAdvanceApproval } from '@/features/medicalClaim/advanceApprovalSlice';
-import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
+import { submitClaimProcess } from '@/features/doctor/doctorSlice';
 
 const HospitalizationBillView = () => {
   // State for the declaration and approval form
@@ -113,7 +113,7 @@ const HospitalizationBillView = () => {
       setShowDetails(true);
     }
 
-    if (rowData.claimId) {
+    if (rowData.advanceId) {
       dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
     }
   };
@@ -311,7 +311,7 @@ const HospitalizationBillView = () => {
         SenderId: user.EmpCode,
         RecipientId: 101002,
         ClaimTypeId: claimDetail.advanceBasicDetails.claimTypeId,
-        StatusId: 4,
+        StatusId: 2,
         ClaimId: claimDetail.claimId,
         TopUpId: claimDetail.topUpId,
         ReferenceDate: billPassing.ReferenceDate,
@@ -353,7 +353,7 @@ const HospitalizationBillView = () => {
       // await new Promise((resolve) => setTimeout(resolve, 2000));
       // console.log('Submitting data:', formData);
 
-      await dispatch(submitClaimProcessByHr(payload));
+      await dispatch(submitClaimProcess(payload));
 
       // Reset form fields after successful submission
       setApprovedAmount('');

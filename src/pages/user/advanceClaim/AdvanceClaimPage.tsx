@@ -127,7 +127,7 @@ const AdvanceClaimPage = () => {
         enableSorting: false,
         cell: ({ row }: any) => (
           <div className="flex justify-center gap-2">
-            <Button
+            {/* <Button
               size="sm"
               variant={row.original.statusId === 2 ? 'default' : 'ghost'}
               disabled={row.original.statusId !== 2}
@@ -138,7 +138,7 @@ const AdvanceClaimPage = () => {
               }}
             >
               Top Up
-            </Button>
+            </Button> */}
           </div>
         ),
         className: 'text-center',
