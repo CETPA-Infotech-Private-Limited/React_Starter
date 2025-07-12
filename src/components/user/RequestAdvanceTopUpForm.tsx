@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import UploadDialog from '@/components/common/UploadDialog';
 import { resetAdvanceTopUpClaimState, submitAdvanceTopUpClaim } from '@/features/user/claim/claimSlice';
 import toast from 'react-hot-toast';
+import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 
 const InputField = ({
   label,
@@ -26,9 +27,13 @@ const InputField = ({
   </div>
 );
 
-const RequestAdvanceTopUpForm = () => {
+const RequestAdvanceTopUpForm = (data) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state: RootState) => state.user);
+
+  console.log(data.claim.advanceId, 'this is claimlist')
+  
+ 
 
   const [advanceId, setAdvanceId] = useState('');
   const [reviseEstimatedAmount, setReviseEstimatedAmount] = useState('');
@@ -49,16 +54,18 @@ const RequestAdvanceTopUpForm = () => {
     gstNumber: '',
   });
 
+  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append('AdvanceId', advanceId);
+    formData.append('AdvanceId', data.claim.advanceId);
     formData.append('EmpId', user.EmpCode?.toString() || '');
     formData.append('ReviseEstimentedAmount', reviseEstimatedAmount);
     formData.append('TopRequiredAmount', topRequiredAmount);
     formData.append('IsHospitialEmpanpanelled', isEmpanelled === 'yes' ? 'true' : 'false');
-    formData.append('HospitalId', hospitalId);
+    formData.append('HospitalId', hospitalId || '57');
 
     formData.append('PayTo', payTo);
     if (payTo === 'hospital') {
@@ -72,6 +79,8 @@ const RequestAdvanceTopUpForm = () => {
 
     estimateFiles.forEach((file) => formData.append('ReviseEstimateFile.Files', file));
     formData.append('ReviseEstimateFile.FileComment', fileComment);
+
+   
 
     dispatch(submitAdvanceTopUpClaim(formData)); // Replace with actual action
   };

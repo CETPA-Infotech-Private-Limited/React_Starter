@@ -132,7 +132,7 @@ const AdvanceClaimPage = () => {
               variant={row.original.statusId === 2 ? 'default' : 'ghost'}
               disabled={row.original.statusId !== 2}
               onClick={() => {
-                setSelectedClaim(row.original);
+                setSelectedClaim(row.original); 
                 setActiveForm('topup');
                 handleScrollToForm();
               }}
@@ -174,6 +174,7 @@ const AdvanceClaimPage = () => {
         <div ref={formRef}>
           <RequestAdvanceTopUpForm
             claim={selectedClaim}
+            data = {claimList}
             onClose={() => {
               setActiveForm(null);
               setSelectedClaim(null);
