@@ -1,54 +1,35 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from './DisplayTable';
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, SectionHeader } from './DisplayTable';
 import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card } from '../ui/card';
-import { EyeIcon, EyeOff, Loader } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { RootState } from '@/app/store';
 import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
-import { submitAdvanceApproval } from '@/features/medicalClaim/advanceApprovalSlice';
-import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
+import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice'; // Assuming this is the correct action
+import Loader from '../ui/loader';
 
 const HospitalizationBillView = () => {
-  // State for the declaration and approval form
-
-   const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
+  const { claimDetail, loading } = useAppSelector((state: RootState) => state.getClaimHr);
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('no');
   const [specialDiseaseName, setSpecialDiseaseName] = useState('');
   const [totalRequested, setTotalRequested] = useState('');
   const [approvedAmount, setApprovedAmount] = useState('');
 
-  const [sendTo, setSendTo] = useState('');
-  const [loading, setLoading] = useState(false); // For the submit button
-  const [approvalInputs, setApprovalInputs] = useState<{ [key: string]: string }>({});
-  const [approvalSummary, setApprovalSummary] = useState({
-    MedicineAmount: 0,
-    MedicineNotInAmount: 0,
-    ConsultationAmount: 0,
-    ConsultationNotInAmount: 0,
-    InvestigationAmount: 0,
-    InvestigationNotInAmount: 0,
-    RoomRentAmount: 0,
-    ProcedureAmount: 0,
-    OtherAmount: 0,
-    OtherNotInAmount: 0,
-  });
+  const [submitLoading, setSubmitLoading] = useState(false);
 
-  const [preHospSummary, setPreHospSummary] = useState({
-    MedicineAmount: 0,
-    ConsultationAmount: 0,
-    InvestigationAmount: 0,
-    RoomRentAmount: 0,
-    ProcedureAmount: 0,
-    OtherAmount: 0,
-  });
+  // Separate states for approval amounts for clarity and correct calculation
+  const [hospitalBillApprovals, setHospitalBillApprovals] = useState<{ [key: string]: string }>({});
+  const [notIncludedBillApprovals, setNotIncludedBillApprovals] = useState<{ [key: string]: string }>({});
+  const [preHospApprovals, setPreHospApprovals] = useState<{ [key: string]: string }>({});
+  const [billPassingComment, setBillPassingComment] = useState(''); // New state for bill passing comment
 
   const [billPassing, setBillPassing] = useState({
     ClaimId: claimDetail?.claimId,
@@ -59,48 +40,73 @@ const HospitalizationBillView = () => {
     Comment: '',
   });
 
-  // State for managing claim list and details view
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  // Redux state
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
- 
-  // const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail); // This now holds the patient and bill details
-
-  console.log(claimDetail, 'theseare claim detail');
-  const claimDetailLoading = useAppSelector((state: RootState) => state.getClaimHr.loadingClaimData);
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
 
-  // Fetch initial list of claims for the HR
   useEffect(() => {
     if (user?.EmpCode) {
       dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 2 }));
     }
   }, [user?.EmpCode, dispatch]);
 
-  // Scroll to details section when details are shown
   useEffect(() => {
     if (showDetails && detailsRef.current) {
       detailsRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [showDetails]);
 
-  // Populate form fields when a new claim detail is loaded (from `claimDetail`)
+  // Populate form fields when a new claim detail is loaded
   useEffect(() => {
     if (claimDetail) {
-      // Assuming 'cliamAmount' is indeed the property name from your backend for requested amount
-      // Now accessing it via advanceBasicDetails if that's where it resides
       setTotalRequested(claimDetail.advanceBasicDetails?.cliamAmount?.toString() || '');
-      // If `claimDetail` also contains a default or previously approved amount, set `approvedAmount` here
-      // For now, it remains an input for the HR to fill.
+      // Initialize approvedAmount with directCliamApprovedAmount if available, otherwise keep it editable
+      setApprovedAmount(claimDetail.advanceBasicDetails?.directCliamApprovedAmount?.toString() || '');
+      setIsSpecialDisease(claimDetail.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no');
+      setSpecialDiseaseName(claimDetail.advanceBasicDetails?.specailDiseaseName || '');
+      setBillPassingComment(claimDetail?.billPasingDetails?.comment || '');
+
+      // Initialize approval inputs from claimDetail if they exist
+      const hospApprovals: { [key: string]: string } = {};
+      if (claimDetail.hospitalizationBillApprovelDetails) {
+        hospApprovals.Medicine = claimDetail.hospitalizationBillApprovelDetails.medicineAmount?.toString() || '';
+        hospApprovals.Consultation = claimDetail.hospitalizationBillApprovelDetails.consultationAmount?.toString() || '';
+        hospApprovals.Investigation = claimDetail.hospitalizationBillApprovelDetails.investigationAmount?.toString() || '';
+        hospApprovals.RoomRent = claimDetail.hospitalizationBillApprovelDetails.roomRentAmount?.toString() || '';
+        hospApprovals.Procedure = claimDetail.hospitalizationBillApprovelDetails.procedureAmount?.toString() || '';
+        hospApprovals.Other = claimDetail.hospitalizationBillApprovelDetails.otherAmount?.toString() || '';
+      }
+      setHospitalBillApprovals(hospApprovals);
+
+      const notIncludedApprovals: { [key: string]: string } = {};
+      if (claimDetail.hospitalizationBillApprovelDetails) {
+        notIncludedApprovals.Medicine = claimDetail.hospitalizationBillApprovelDetails.medicineNotInAmount?.toString() || '';
+        notIncludedApprovals.Consultation = claimDetail.hospitalizationBillApprovelDetails.consultationNotInAmount?.toString() || '';
+        notIncludedApprovals.Investigation = claimDetail.hospitalizationBillApprovelDetails.investigationNotInAmount?.toString() || '';
+        notIncludedApprovals.Other = claimDetail.hospitalizationBillApprovelDetails.otherNotInAmount?.toString() || '';
+      }
+      setNotIncludedBillApprovals(notIncludedApprovals);
+
+
+      const preHospAppr: { [key: string]: string } = {};
+      if (claimDetail.preHospitalizationExpenses) {
+        preHospAppr.Medicine = claimDetail.preHospitalizationExpenses.medicineClaimAmount?.toString() || ''; // Assuming claimAmount is the approved amount here initially
+        preHospAppr.Consultation = claimDetail.preHospitalizationExpenses.consultationClaimAmount?.toString() || '';
+        preHospAppr.Investigation = claimDetail.preHospitalizationExpenses.investigationClaimAmount?.toString() || '';
+        preHospAppr.Procedure = claimDetail.preHospitalizationExpenses.procedureClaimAmount?.toString() || '';
+        preHospAppr.Other = claimDetail.preHospitalizationExpenses.otherClaimAmount?.toString() || '';
+      }
+      setPreHospApprovals(preHospAppr);
+
     }
   }, [claimDetail]);
 
-  const handleViewToggle = (rowData: any) => {
+  const handleViewToggle = useCallback((rowData: any) => {
     const isSame = selectedClaim?.id === rowData.id;
     if (isSame) {
       const shouldShow = !showDetails;
@@ -111,12 +117,11 @@ const HospitalizationBillView = () => {
     } else {
       setSelectedClaim(rowData);
       setShowDetails(true);
+      if (rowData.claimId) {
+        dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
+      }
     }
-
-    if (rowData.claimId) {
-      dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
-    }
-  };
+  }, [selectedClaim, showDetails, dispatch]);
 
   const columns = useMemo(
     () => [
@@ -139,7 +144,6 @@ const HospitalizationBillView = () => {
         header: 'Patient Name',
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.patientId));
-          // Assuming `patientName` might be directly available in `rowData.original` if `patientId` doesn't map to an employee
           return <div className="text-center">{result?.employee?.empName || row.original.patientName || 'N/A'}</div>;
         },
         className: 'text-center',
@@ -148,7 +152,6 @@ const HospitalizationBillView = () => {
         accessorKey: 'relation',
         header: 'Relation',
         cell: ({ row }: any) => {
-          // This should ideally come from claim data
           return <div className="text-center">{row.original.relation || 'Self'}</div>;
         },
         className: 'text-center',
@@ -179,33 +182,36 @@ const HospitalizationBillView = () => {
           return (
             <Button
               size="sm"
+              variant='link'
               onClick={() => handleViewToggle(rowData)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+              className="text-blue-600"
             >
-              {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-              {isSelected && showDetails ? 'Hide' : 'View'}
+              {isSelected ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+              {isSelected ? 'Hide' : 'View'}
             </Button>
           );
         },
       },
     ],
-    [employees, selectedClaim, showDetails]
+    [employees, selectedClaim, handleViewToggle]
   );
 
-  const claimList = Array.isArray(claimHrData)
-    ? claimHrData.map((value) => ({
-        id: value.claimId,
-        empId: value.empId,
-        patientId: value.patientId,
-        relation: value.relation || 'Self',
-        requestedDate: value.requestDate,
-        claimAmount: value.cliamAmount,
-         advanceId: value.advanceId,                              // Keeping 'cliamAmount' as per your provided code
-        claimId: value.claimId,
-      }))
-    : [];
+  const claimList = useMemo(() => {
+    return Array.isArray(claimHrData)
+      ? claimHrData.map((value) => ({
+          id: value.claimId,
+          empId: value.empId,
+          patientId: value.patientId,
+          relation: value.relation || 'Self',
+          requestedDate: value.requestDate,
+          claimAmount: value.cliamAmount,
+          advanceId: value.advanceId,
+          claimId: value.claimId,
+        }))
+      : [];
+  }, [claimHrData]);
 
-  // Derive display data from `claimDetail` and its nested `advanceBasicDetails`
+  // Derive display data from `claimDetail`
   const patientName = claimDetail?.advanceBasicDetails?.patientName || 'N/A';
   const dateOfAdmission = claimDetail?.advanceBasicDetails?.dateOfAdmission
     ? new Date(claimDetail.advanceBasicDetails.dateOfAdmission).toLocaleDateString()
@@ -221,7 +227,6 @@ const HospitalizationBillView = () => {
   const directClaimApprovedAmount = claimDetail?.advanceBasicDetails?.directCliamApprovedAmount || 0;
 
   const billItems = useMemo(() => {
-    // Access bill details from `claimDetail.billDetails`
     const details = claimDetail?.billDetails || {};
     return [
       { id: 1, billType: 'Medicine', billedAmount: details.medicineBill || 0, claimedAmount: details.medicineClaim || 0 },
@@ -233,21 +238,22 @@ const HospitalizationBillView = () => {
     ];
   }, [claimDetail]);
 
+  // Assuming notIncludedBillItems should come from different fields or logic if it's "not included"
+  // For now, I'm creating a dummy structure, you need to populate this based on your actual data structure
   const notIncludedbillItems = useMemo(() => {
-    // Access bill details from `claimDetail.billDetails`
-    const details = claimDetail?.billDetails || {};
+    const details = claimDetail?.billDetails || {}; // Assuming these might come from different fields in billDetails if they are truly "not included"
+    // Example: if your backend has specific 'not included' fields like medicineNotInBill, etc.
     return [
-      { id: 1, billType: 'Medicine', billedAmount: details.medicineBill || 0, claimedAmount: details.medicineClaim || 0 },
-      { id: 2, billType: 'Consultation', billedAmount: details.consultationBill || 0, claimedAmount: details.consultationClaim || 0 },
-      { id: 3, billType: 'Investigation', billedAmount: details.investigationBill || 0, claimedAmount: details.investigationClaim || 0 },
-      { id: 4, billType: 'Procedure', billedAmount: details.procedureBill || 0, claimedAmount: details.procedureClaim || 0 },
-      { id: 5, billType: 'Room Rent', billedAmount: details.roomRentBill || 0, claimedAmount: details.roomRentClaim || 0 },
-      { id: 6, billType: 'Other', billedAmount: details.othersBill || 0, claimedAmount: details.otherClaim || 0 },
+      { id: 1, billType: 'Medicine', billedAmount: details.medicineNotInBill || 0, claimedAmount: details.medicineNotInClaim || 0 }, // Placeholder for different data source
+      { id: 2, billType: 'Consultation', billedAmount: details.consultationNotInBill || 0, claimedAmount: details.consultationNotInClaim || 0 },
+      { id: 3, billType: 'Investigation', billedAmount: details.investigationNotInBill || 0, claimedAmount: details.investigationNotInClaim || 0 },
+      { id: 4, billType: 'Procedure', billedAmount: details.procedureNotInBill || 0, claimedAmount: details.procedureNotInClaim || 0 },
+      { id: 5, billType: 'Room Rent', billedAmount: details.roomRentNotInBill || 0, claimedAmount: details.roomRentNotInClaim || 0 },
+      { id: 6, billType: 'Other', billedAmount: details.othersNotInBill || 0, claimedAmount: details.otherNotInClaim || 0 },
     ];
   }, [claimDetail]);
 
   const preHospItems = useMemo(() => {
-    // Access pre-hospitalization expenses from `claimDetail.preHospitalizationExpenses`
     const expenses = claimDetail?.preHospitalizationExpenses || {};
     return [
       {
@@ -256,7 +262,7 @@ const HospitalizationBillView = () => {
         billedDate: expenses.medicineBillDate || 'N/A',
         billedAmount: expenses.medicineBillAmount || 0,
         claimedAmount: expenses.medicineClaimAmount || 0,
-        hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0,
+        hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0, // This logic seems specific to one document, might need adjustment
       },
       {
         id: 2,
@@ -293,76 +299,97 @@ const HospitalizationBillView = () => {
     ];
   }, [claimDetail]);
 
-  const totalBilled = billItems.reduce((sum, item) => sum + item.billedAmount, 0);
-  const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
-  const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
+  // Calculate totals
+  const totalBilledHospital = billItems.reduce((sum, item) => sum + item.billedAmount, 0);
+  const totalClaimedHospital = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
+
+  const totalBilledNotIncluded = notIncludedbillItems.reduce((sum, item) => sum + item.billedAmount, 0);
+  const totalClaimedNotIncluded = notIncludedbillItems.reduce((sum, item) => sum + item.claimedAmount, 0);
+
+  const totalBilledPreHosp = preHospItems.reduce((sum, item) => sum + item.billedAmount, 0);
+  const totalClaimedPreHosp = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
+
+  const finalTotalBilled = totalBilledHospital + totalBilledNotIncluded + totalBilledPreHosp;
+  const finalTotalClaimed = totalClaimedHospital + totalClaimedNotIncluded + totalClaimedPreHosp;
+
+  // Calculate final approved amount based on individual approval inputs
+  const finalTotalApproved = useMemo(() => {
+    const sumHospital = Object.values(hospitalBillApprovals).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    const sumNotIncluded = Object.values(notIncludedBillApprovals).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    const sumPreHosp = Object.values(preHospApprovals).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    return sumHospital + sumNotIncluded + sumPreHosp;
+  }, [hospitalBillApprovals, notIncludedBillApprovals, preHospApprovals]);
 
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Approval Details'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Approval Details'];
 
-  console.log(approvedAmount, 'this is approved');
-
   const handleSubmit = async () => {
-    setLoading(true);
     try {
-      console.log(billPassing,'this is bill passing')
-      const payload = {
-        AdvanceId: claimDetail.advanceBasicDetails.advanceId,
-        SenderId: user.EmpCode,
-        RecipientId: 101002,
-        ClaimTypeId: claimDetail.advanceBasicDetails.claimTypeId,
-        StatusId: 4,
-        ClaimId: claimDetail.claimId,
-        TopUpId: claimDetail.topUpId,
-        ReferenceDate: billPassing.ReferenceDate,
-        SapRefNumber: billPassing.SapRefNumber,
-        AmountPaid: billPassing.AmountPaid,
-        Comment: claimDetail?.billPasingDetails?.comment || 'N/A',
-        ApprovalAmount: approvedAmount,
+      setSubmitLoading(true);
 
-        // HospitalizationBillApprovelDetails
-        'HospitalizationBillApprovelDetails.MedicineAmount': approvalSummary.MedicineAmount,
-        'HospitalizationBillApprovelDetails.MedicineNotInAmount': approvalSummary.MedicineNotInAmount,
-        'HospitalizationBillApprovelDetails.ConsultationAmount': approvalSummary.ConsultationAmount,
-        'HospitalizationBillApprovelDetails.ConsultationNotInAmount': approvalSummary.ConsultationNotInAmount,
-        'HospitalizationBillApprovelDetails.InvestigationAmount': approvalSummary.InvestigationAmount,
-        'HospitalizationBillApprovelDetails.InvestigationNotInAmount': approvalSummary.InvestigationNotInAmount,
-        'HospitalizationBillApprovelDetails.RoomRentAmount': approvalSummary.RoomRentAmount,
-        'HospitalizationBillApprovelDetails.ProcedureAmount': approvalSummary.ProcedureAmount,
-        'HospitalizationBillApprovelDetails.OtherAmount': approvalSummary.OtherAmount,
-        'HospitalizationBillApprovelDetails.OtherNotInAmount': approvalSummary.OtherNotInAmount,
-
-        // PreHospitalizationExpenses
-        'PreHospitalizationExpenses.MedicineAmount': preHospSummary.MedicineAmount,
-        'PreHospitalizationExpenses.ConsultationAmount': preHospSummary.ConsultationAmount,
-        'PreHospitalizationExpenses.InvestigationAmount': preHospSummary.InvestigationAmount,
-        'PreHospitalizationExpenses.RoomRentAmount': preHospSummary.RoomRentAmount,
-        'PreHospitalizationExpenses.ProcedureAmount': preHospSummary.ProcedureAmount,
-        'PreHospitalizationExpenses.OtherAmount': preHospSummary.OtherAmount,
-
-        // BillPassingDetails
-        'BillPassingDetails.ClaimId': billPassing.ClaimId,
-        'BillPassingDetails.TopUpId': billPassing.TopUpId,
-        'BillPassingDetails.ReferenceDate': billPassing.ReferenceDate,
-        'BillPassingDetails.SapRefNumber': billPassing.SapRefNumber,
-        'BillPassingDetails.AmountPaid': billPassing.AmountPaid,
-        'BillPassingDetails.Comment': claimDetail?.billPasingDetails?.comment || 'N/A',
+      // Construct HospitalizationBillApprovelDetails
+      const hospitalizationBillApprovelDetails = {
+        MedicineAmount: parseFloat(hospitalBillApprovals.Medicine || '0'),
+        MedicineNotInAmount: parseFloat(notIncludedBillApprovals.Medicine || '0'),
+        ConsultationAmount: parseFloat(hospitalBillApprovals.Consultation || '0'),
+        ConsultationNotInAmount: parseFloat(notIncludedBillApprovals.Consultation || '0'),
+        InvestigationAmount: parseFloat(hospitalBillApprovals.Investigation || '0'),
+        InvestigationNotInAmount: parseFloat(notIncludedBillApprovals.Investigation || '0'),
+        RoomRentAmount: parseFloat(hospitalBillApprovals.RoomRent || '0'),
+        ProcedureAmount: parseFloat(hospitalBillApprovals.Procedure || '0'),
+        OtherAmount: parseFloat(hospitalBillApprovals.Other || '0'),
+        OtherNotInAmount: parseFloat(notIncludedBillApprovals.Other || '0'),
       };
 
-      // Simulate API call
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      // console.log('Submitting data:', formData);
+      // Construct PreHospitalizationExpenses (for approval, assuming the claimAmount in preHospApprovals is the approved one)
+      const preHospitalizationExpensesApproval = {
+        MedicineAmount: parseFloat(preHospApprovals.Medicine || '0'),
+        ConsultationAmount: parseFloat(preHospApprovals.Consultation || '0'),
+        InvestigationAmount: parseFloat(preHospApprovals.Investigation || '0'),
+        RoomRentAmount: parseFloat(preHospApprovals.RoomRent || '0'), // This field might not be applicable for pre-hosp, confirm with API
+        ProcedureAmount: parseFloat(preHospApprovals.Procedure || '0'),
+        OtherAmount: parseFloat(preHospApprovals.Other || '0'),
+      };
+
+      const payload = {
+        AdvanceId: claimDetail?.advanceBasicDetails?.advanceId,
+        SenderId: user.EmpCode,
+        RecipientId: 101002, // This seems to be a hardcoded HR ID, confirm if dynamic
+        ClaimTypeId: claimDetail?.advanceBasicDetails?.claimTypeId,
+        StatusId: 4, // Approved status
+        ClaimId: claimDetail?.claimId,
+        TopUpId: claimDetail?.topUpId,
+        ReferenceDate: billPassing.ReferenceDate,
+        SapRefNumber: billPassing.SapRefNumber, // This needs a UI input or derived
+        AmountPaid: parseFloat(approvedAmount), // The overall approved amount
+        Comment: billPassingComment,
+
+        HospitalizationBillApprovelDetails: hospitalizationBillApprovelDetails,
+        PreHospitalizationExpenses: preHospitalizationExpensesApproval, // Send as a nested object
+
+        BillPassingDetails: {
+          ClaimId: billPassing.ClaimId,
+          TopUpId: billPassing.TopUpId,
+          ReferenceDate: billPassing.ReferenceDate,
+          SapRefNumber: billPassing.SapRefNumber,
+          AmountPaid: parseFloat(approvedAmount), // Should match the overall approved amount
+          Comment: billPassingComment,
+        },
+      };
 
       await dispatch(submitClaimProcessByHr(payload));
 
       // Reset form fields after successful submission
       setApprovedAmount('');
       setTotalRequested('');
-      setSendTo('');
       setSpecialDiseaseName('');
       setIsSpecialDisease('no');
       setSelectedClaim(null);
       setShowDetails(false);
+      setHospitalBillApprovals({});
+      setNotIncludedBillApprovals({});
+      setPreHospApprovals({});
+      setBillPassingComment('');
 
       // Refetch the list of claims to update the table
       if (user?.EmpCode) {
@@ -372,202 +399,215 @@ const HospitalizationBillView = () => {
       console.error('Error submitting:', err);
       // Implement user-friendly error feedback here
     } finally {
-      setLoading(false);
+      setSubmitLoading(false);
     }
   };
 
   return (
     <>
-      <ClaimSettlementList columns={columns} claimList={claimList} />
+      <div className='m-4'>
+        <ClaimSettlementList columns={columns} claimList={claimList} />
+      </div>
+      {loading && <Loader />}
 
-      {/* Conditional rendering for claim details */}
-      {selectedClaim && showDetails && (
-        <div ref={detailsRef} className="p-6 bg-white rounded-lg shadow mt-6">
-          {claimDetailLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <Loader className="w-8 h-8 animate-spin text-blue-500" />
-              <span className="ml-2 text-lg text-blue-500">Loading Claim Details...</span>
+      {showDetails && claimDetail && ( // Only render details if showDetails is true and claimDetail is loaded
+        <div ref={detailsRef} className='m-4'>
+          <h1 className="text-2xl font-bold text-primary drop_shadow mb-4">Hospitalization Claim Details</h1>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-primary drop_shadow">
+            <InfoCard title="Patient Info">
+              <DisplayField label="Patient Name" value={patientName} />
+              <DisplayField label="Date of Admission" value={dateOfAdmission} />
+              <DisplayField label="Date of Discharge" value={dateofDischarge} />
+              <DisplayField label="Doctor Name" value={doctorName} />
+            </InfoCard>
+
+            <InfoCard title="Hospital Info">
+              <DisplayField label="Hospital Name" value={hospitalName} />
+              <DisplayField label="Hospital Reg. No." value={hospitalRegNo} />
+              <DisplayField label="Treatment Type" value={treatmentType} />
+              <DisplayField label="Pay To" value={payTo} />
+            </InfoCard>
+          </div>
+
+          <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
+          <DisplayTable headers={billHeaders}>
+            {billItems.map((item, index) => (
+              <BillItemDisplayRow
+                key={`hosp-${item.billType}`}
+                serialNo={index + 1}
+                billType={item.billType}
+                billedAmount={item.billedAmount}
+                claimedAmount={item.claimedAmount}
+                included={item.claimedAmount > 0}
+                clarification="" // if any
+                approvalDetails={hospitalBillApprovals[item.billType] || ''}
+                onApprovalChange={(val) =>
+                  setHospitalBillApprovals((prev) => ({
+                    ...prev,
+                    [item.billType]: val,
+                  }))
+                }
+              />
+            ))}
+          </DisplayTable>
+
+          <SectionHeader title="Not Included Bill Details" subtitle="Not included in hospitalization bills" className="mt-8" />
+          <DisplayTable headers={billHeaders}>
+            {notIncludedbillItems.map((item, index) => (
+              <BillItemDisplayRow
+                key={`not-inc-${item.billType}`}
+                serialNo={index + 1}
+                billType={item.billType}
+                billedAmount={item.billedAmount}
+                claimedAmount={item.claimedAmount}
+                included={item.claimedAmount > 0}
+                clarification="" // if any
+                approvalDetails={notIncludedBillApprovals[item.billType] || ''}
+                onApprovalChange={(val) =>
+                  setNotIncludedBillApprovals((prev) => ({
+                    ...prev,
+                    [item.billType]: val,
+                  }))
+                }
+              />
+            ))}
+          </DisplayTable>
+
+          <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className="text-primary" />
+          <DisplayTable headers={preHospHeaders}> {/* Use preHospHeaders for pre-hospitalization */}
+            {preHospItems.map((item, index) => (
+              <BillItemDisplayRow
+                key={`pre-hosp-${item.billType}`}
+                serialNo={index + 1}
+                billType={item.billType}
+                billedAmount={item.billedAmount}
+                claimedAmount={item.claimedAmount}
+                included={item.claimedAmount > 0}
+                clarification="" // if any
+                approvalDetails={preHospApprovals[item.billType] || ''}
+                onApprovalChange={(val) =>
+                  setPreHospApprovals((prev) => ({
+                    ...prev,
+                    [item.billType]: val,
+                  }))
+                }
+              />
+            ))}
+          </DisplayTable>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
+            <div className="text-center">
+              <p className="text-gray-500">Total Billed (All)</p>
+              <p className="text-lg font-bold">₹{finalTotalBilled.toFixed(2)}</p>
             </div>
-          ) : (
-            <>
-              <h1 className="text-2xl font-bold text-primary drop-shadow mb-4">Hospitalization Claim Details</h1>
+            <div className="text-center">
+              <p className="text-gray-500">Total Claimed (All)</p>
+              <p className="text-lg font-bold text-blue-600">₹{finalTotalClaimed.toFixed(2)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-500">Total Approved</p>
+              <p className="text-lg font-bold text-green-600">₹{finalTotalApproved.toFixed(2)}</p>
+            </div>
+          </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 text-primary drop-shadow">
-                <InfoCard title="Patient Info">
-                  <DisplayField label="Patient Name" value={patientName} />
-                  <DisplayField label="Date of Admission" value={dateOfAdmission} />
-                  <DisplayField label="Date of Discharge" value={dateofDischarge} />
-                  <DisplayField label="Doctor Name" value={doctorName} />
-                </InfoCard>
-
-                <InfoCard title="Hospital Info">
-                  <DisplayField label="Hospital Name" value={hospitalName} />
-                  <DisplayField label="Hospital Reg. No." value={hospitalRegNo} />
-                  <DisplayField label="Treatment Type" value={treatmentType} />
-                  <DisplayField label="Pay To" value={payTo} />
-                </InfoCard>
+          {/* Declaration Section */}
+          <Card className="p-8 mt-6">
+            <h2 className="text-lg font-medium text-primary drop_shadow mb-4">Declaration by Employee</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Label className=" font-medium text-gray-900">Special Disease</Label>
+                <RadioGroup value={isSpecialDisease} onValueChange={(value: 'yes' | 'no') => setIsSpecialDisease(value)} disabled className="flex space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="special-disease-yes" />
+                    <Label htmlFor="special-disease-yes" className="text-sm">
+                      Yes
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="special-disease-no" />
+                    <Label htmlFor="special-disease-no" className="text-sm">
+                      No
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
-
-              <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
-              <DisplayTable headers={billHeaders}>
-                {billItems.map((item, index) => (
-                  <BillItemDisplayRow
-                    key={item.billType}
-                    serialNo={index + 1}
-                    billType={item.billType}
-                    billedAmount={item.billedAmount}
-                    claimedAmount={item.claimedAmount}
-                    included={item.claimedAmount > 0}
-                    clarification="" // if any
-                    approvalDetails={approvalInputs[item.billType] || ''}
-                    onApprovalChange={(val) =>
-                      setApprovalInputs((prev) => ({
-                        ...prev,
-                        [item.billType]: val,
-                      }))
-                    }
+              {isSpecialDisease === 'yes' && (
+                <div className="flex items-center space-x-3 pl-10">
+                  <Label htmlFor="special-disease-name" className="text-sm font-medium text-gray-900">
+                    Special Disease Name
+                  </Label>
+                  <Input
+                    id="special-disease-name"
+                    value={specialDiseaseName}
+                    onChange={(e) => setSpecialDiseaseName(e.target.value)}
+                    placeholder="Enter disease name"
+                    className="w-64"
+                    disabled // Assuming this is also for display from claimDetail
                   />
-                ))}
-              </DisplayTable>
+                </div>
+              )}
+            </div>
+          </Card>
 
-              <SectionHeader title="NotIncluded Bill Details" subtitle="Not Included in hospitalization bills" className="mt-8" />
-              <DisplayTable headers={billHeaders}>
-                {billItems.map((item, index) => (
-                  <BillItemDisplayRow
-                    key={item.billType}
-                    serialNo={index + 1}
-                    billType={item.billType}
-                    billedAmount={item.billedAmount}
-                    claimedAmount={item.claimedAmount}
-                    included={item.claimedAmount > 0}
-                    clarification="" // if any
-                    approvalDetails={approvalInputs[item.billType] || ''}
-                    onApprovalChange={(val) =>
-                      setApprovalInputs((prev) => ({
-                        ...prev,
-                        [item.billType]: val,
-                      }))
-                    }
+          {/* Approval Form */}
+          <Card className="mt-8">
+            <div className="p-4">
+              <h2 className="text-lg text-primary drop_shadow pb-4">Approval Form</h2>
+
+              <div className="flex flex-col md:flex-row md:gap-6 gap-4">
+                <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+                  <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
+                  <Input
+                    className="w-full"
+                    disabled
+                    value={totalRequested} // Use the state variable populated from claimDetail
+                    type="number"
                   />
-                ))}
-              </DisplayTable>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
-                <div className="text-center">
-                  <p className="text-gray-500">Sub Total Billed</p>
-                  <p className="text-lg font-bold">₹{totalBilled.toFixed(2)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-gray-500">Sub Total Claimed</p>
-                  <p className="text-lg font-bold text-blue-600">₹{totalClaimed.toFixed(2)}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-gray-500">Total Approved (Hospitalization)</p>
-                  <p className="text-lg font-bold text-green-600">₹{directClaimApprovedAmount.toFixed(2)}</p>
+                <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+                  <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
+                  <Input
+                    className="w-full"
+                    value={approvedAmount}
+                    onChange={(e) => setApprovedAmount(e.target.value)}
+                    type="number"
+                  />
                 </div>
               </div>
 
-              <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className="text-primary" />
-              <DisplayTable headers={billHeaders}>
-                {billItems.map((item, index) => (
-                  <BillItemDisplayRow
-                    key={item.billType}
-                    serialNo={index + 1}
-                    billType={item.billType}
-                    billedAmount={item.billedAmount}
-                    claimedAmount={item.claimedAmount}
-                    included={item.claimedAmount > 0}
-                    clarification="" // if any
-                    approvalDetails={approvalInputs[item.billType] || ''}
-                    onApprovalChange={(val) =>
-                      setApprovalInputs((prev) => ({
-                        ...prev,
-                        [item.billType]: val,
-                      }))
-                    }
+              <div className="flex flex-col md:flex-row md:gap-6 gap-4 mt-4">
+                <div className="flex flex-col md:flex-row items-center w-full gap-2">
+                  <Label className="md:w-1/4 text-gray-900">SAP Reference Number</Label>
+                  <Input
+                    className="w-full"
+                    value={billPassing.SapRefNumber}
+                    onChange={(e) => setBillPassing({ ...billPassing, SapRefNumber: e.target.value })}
+                    placeholder="Enter SAP Reference Number"
                   />
-                ))}
-              </DisplayTable>
-
-              <div className="text-right mt-8 mb-4">
-                <span className="font-semibold text-lg text-primary drop-shadow p-4 ">Total Pre-Hospital: </span>
-                <span className="text-lg font-bold">₹{preHospTotal.toFixed(2)}</span>
+                </div>
               </div>
 
-              {/* Declaration Section */}
-              <Card className="p-8 mt-6">
-                <h2 className="text-lg font-medium text-primary drop-shadow mb-4">Declaration by Employee</h2>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Label className=" font-medium text-gray-900">Special Disease</Label>
-                    <RadioGroup value={claimDetail?.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no'} disabled className="flex space-x-6">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="yes" id="special-disease-yes" />
-                        <Label htmlFor="special-disease-yes" className="text-sm">
-                          Yes
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="no" id="special-disease-no" />
-                        <Label htmlFor="special-disease-no" className="text-sm">
-                          No
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                  {isSpecialDisease === 'yes' && (
-                    <div className="flex items-center space-x-3 pl-10">
-                      <Label htmlFor="special-disease-name" className="text-sm font-medium text-gray-900">
-                        Special Disease Name
-                      </Label>
-                      <Input
-                        id="special-disease-name"
-                        value={specialDiseaseName}
-                        onChange={(e) => setSpecialDiseaseName(e.target.value)}
-                        placeholder="Enter disease name"
-                        className="w-64"
-                      />
-                    </div>
-                  )}
+              <div className="flex flex-col md:flex-row md:gap-6 gap-4 mt-4">
+                <div className="flex flex-col md:flex-row items-start w-full gap-2">
+                  <Label className="md:w-1/4 text-gray-900">Comment</Label>
+                  <Input
+                    className="w-full"
+                    value={billPassingComment}
+                    onChange={(e) => setBillPassingComment(e.target.value)}
+                    placeholder="Add a comment"
+                  />
                 </div>
-              </Card>
+              </div>
 
-              {/* Approval Form */}
-              <Card className="mt-8">
-                <div className="p-4">
-                  <h2 className="text-lg text-primary drop-shadow pb-4">Approval Form</h2>
-
-                  {/* Responsive Flex Layout */}
-                  <div className="flex flex-col md:flex-row md:gap-6 gap-4">
-                    {/* Total Claim Requested */}
-                    <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
-                      <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
-                      <Input
-                        className="w-full"
-                        disabled
-                        value={claimDetail?.advanceBasicDetails?.claimAmount}
-                        onChange={(e) => setTotalRequested(e.target.value)}
-                        type="number"
-                      />
-                    </div>
-
-                    {/* Approved Amount */}
-                    <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
-                      <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
-                      <Input className="w-full" value={approvedAmount} onChange={(e) => setApprovedAmount(e.target.value)} type="number" />
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="flex justify-end pt-4">
-                    <Button onClick={handleSubmit} disabled={loading}>
-                      {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </>
-          )}
+              <div className="flex justify-end pt-4">
+                <Button onClick={handleSubmit} disabled={submitLoading || loading}>
+                  {submitLoading ? <Loader /> : 'Confirm'}
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
       )}
     </>

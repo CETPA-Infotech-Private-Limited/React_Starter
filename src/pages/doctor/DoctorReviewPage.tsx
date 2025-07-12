@@ -3,23 +3,22 @@ import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList
 import HospitalizationBillDetails from '@/components/doctor/doctorreview/HospitalizationBillDetails';
 import { Button } from '@/components/ui/button';
 import { EyeIcon, FileSearch, EyeOff, Eye } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/app/hooks'; // Corrected: removed duplicate useAppSelector
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
-import { getDoctorClaimListData, postDocReview } from '@/features/doctor/doctorSlice'; // Ensure this path is correct
+import { getDoctorClaimListData, postDocReview } from '@/features/doctor/doctorSlice';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
 import { getClaimDataHr } from '@/features/hr/getClaimRequestSlice';
-import { json } from 'node:stream/consumers';
 import Loader from '@/components/ui/loader';
 
 const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
   const [selectedClaim, setSelectedClaim] = useState(null);
   const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
-  const { claimList, loading } = useAppSelector((state: RootState) => state.submitClaimProcessSlice);
+  const { claimList, loading, postDocReviewSuccess } = useAppSelector((state: RootState) => state.submitClaimProcessSlice); // Assuming postDocReviewSuccess is a state in your slice indicating success
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
   const [showDetails, setShowDetails] = useState(false);
@@ -28,14 +27,15 @@ const DoctorReviewPage = () => {
   const [billComments, setBillComments] = useState<Record<number, string>>({});
   const [preHospComments, setPreHospComments] = useState<Record<number, string>>({});
 
-  const [form, setForm] = useState({
+  const initialFormState = {
     postHospitalization: '',
     postHospComment: '',
     doctorSpecialDisease: '',
     doctorComment: '',
     additionalComment: '',
     verified: false,
-  });
+  };
+  const [form, setForm] = useState(initialFormState);
 
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({
@@ -44,21 +44,32 @@ const DoctorReviewPage = () => {
     }));
   };
 
+  // Function to reset all form fields and comments
+  const resetFormAndComments = () => {
+    setBillComments({});
+    setPreHospComments({});
+    setForm(initialFormState);
+    setSelectedClaim(null); // Deselect the claim after submission
+    setShowDetails(false); // Hide details section
+  };
+
   // Effect to reset form and comments when details are hidden or a new claim is selected
+  // This useEffect will now only handle the case where details are explicitly hidden or a new claim is chosen.
   useEffect(() => {
-    if (!showDetails || !selectedClaim) {
-      setBillComments({});
-      setPreHospComments({});
-      setForm({
-        postHospitalization: '',
-        postHospComment: '',
-        doctorSpecialDisease: '',
-        doctorComment: '',
-        additionalComment: '',
-        verified: false,
-      });
+    if (!showDetails && !selectedClaim) {
+      resetFormAndComments();
     }
   }, [showDetails, selectedClaim]);
+
+  // Effect to clear fields on successful submission
+  useEffect(() => {
+    if (postDocReviewSuccess) { // Listen for the success state from your Redux slice
+      resetFormAndComments();
+      dispatch(getDoctorClaimListData(Number(user?.EmpCode))); // Optionally refetch the list
+      // You might also want to dispatch an action here to reset postDocReviewSuccess in your slice
+      // to avoid triggering this effect again on re-renders if the state isn't reset externally.
+    }
+  }, [postDocReviewSuccess, dispatch, user?.EmpCode]); // Add dispatch and user?.EmpCode to dependencies
 
   const handleSubmit = async () => {
     if (!selectedClaim) return;
@@ -197,6 +208,7 @@ const DoctorReviewPage = () => {
                 e.stopPropagation();
                 if (isSelected) {
                   setSelectedClaim(null);
+                  setShowDetails(false); // Also hide details when deselected
                 } else {
                   setShowDetails(true);
                   dispatch(fetchClaimDetails(item.directClaimId));
@@ -220,7 +232,7 @@ const DoctorReviewPage = () => {
         <div className="flex items-center gap-2 mb-5">
           <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Pending Claim Requests</h1>
         </div>
-        {claimList?.length && <ClaimSettlementList columns={columns} claimList={claimList} />}
+        {claimList?.length ? <ClaimSettlementList columns={columns} claimList={claimList} /> : <p className="text-center text-gray-500">No pending claim requests.</p>}
       </div>
 
       {(loading || detailsLoading) && <Loader />}

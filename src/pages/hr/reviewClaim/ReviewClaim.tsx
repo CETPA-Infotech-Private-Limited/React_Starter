@@ -3,7 +3,7 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
 import { Button } from '@/components/ui/button';
-import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
+import { EyeIcon, FileSearch, EyeOff, Eye } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewClaim/HospitalizationBillView';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
@@ -122,12 +122,15 @@ const ReviewClaim = () => {
           return (
             <Button
               size="sm"
+              variant="link"
               onClick={() => handleViewToggle(rowData)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
+              className="text-blue-600"
             >
-              {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-              {isSelected && showDetails ? 'Hide' : 'View'}
+              {isSelected ? <EyeOff className="w-4 h-4 mr-1" /> : <Eye className="w-4 h-4 mr-1" />}
+                          {isSelected ? 'Hide' : 'View'}
             </Button>
+
+           
           );
         },
       },
