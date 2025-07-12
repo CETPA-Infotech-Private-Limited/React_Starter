@@ -114,7 +114,7 @@ const HospitalizationBillView = () => {
     }
 
     if (rowData.claimId) {
-      dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+      dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
     }
   };
 
@@ -199,7 +199,8 @@ const HospitalizationBillView = () => {
         patientId: value.patientId,
         relation: value.relation || 'Self',
         requestedDate: value.requestDate,
-        claimAmount: value.cliamAmount, // Keeping 'cliamAmount' as per your provided code
+        claimAmount: value.cliamAmount,
+         advanceId: value.advanceId,                              // Keeping 'cliamAmount' as per your provided code
         claimId: value.claimId,
       }))
     : [];

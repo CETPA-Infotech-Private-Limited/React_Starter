@@ -58,9 +58,9 @@ const ReviewClaim = () => {
       setShowDetails(true);
     }
 
-    if (rowData.claimId) {
+    if (rowData.advanceId) {
      
-      await dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+      await dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
       setIsSubmitting(false);
     }
   };
@@ -143,6 +143,7 @@ const ReviewClaim = () => {
         relation: 'Self',
         requestedDate: value.requestDate,
         claimAmount: value.cliamAmount,
+        advanceId:value.advanceId,
         claimId: value.claimId,
       }))
     : [];

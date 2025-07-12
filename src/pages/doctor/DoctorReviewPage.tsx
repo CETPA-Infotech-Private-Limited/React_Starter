@@ -199,7 +199,7 @@ const DoctorReviewPage = () => {
                   setSelectedClaim(null);
                 } else {
                   setShowDetails(true);
-                  dispatch(fetchClaimDetails(item.claimId));
+                  dispatch(fetchClaimDetails(item.directClaimId));
                   setSelectedClaim(item);
                 }
               }}
