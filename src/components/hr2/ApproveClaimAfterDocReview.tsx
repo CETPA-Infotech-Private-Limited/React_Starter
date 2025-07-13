@@ -2,7 +2,11 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD:src/components/hr2/ApproveClaimAfterDocReview.tsx
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from '../hr/reviewclaim/ReviewComponents';
+=======
 import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from './DisplayTable';
+>>>>>>> 53c22729edcf0e7a65527b2a3c6e2f9fd86c913e:src/components/hr2/HospitalizationDetails.tsx
 import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -19,7 +23,7 @@ import { submitClaimProcess } from '@/features/doctor/doctorSlice';
 const ApproveClaimAfterDocReview = () => {
   // State for the declaration and approval form
 
-  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
+   const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('no');
   const [specialDiseaseName, setSpecialDiseaseName] = useState('');
   const [totalRequested, setTotalRequested] = useState('');
@@ -67,7 +71,7 @@ const ApproveClaimAfterDocReview = () => {
   // Redux state
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
-
+ 
   // const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail); // This now holds the patient and bill details
 
   console.log(claimDetail, 'theseare claim detail');
@@ -113,8 +117,13 @@ const ApproveClaimAfterDocReview = () => {
       setShowDetails(true);
     }
 
+<<<<<<< HEAD:src/components/hr2/ApproveClaimAfterDocReview.tsx
+    if (rowData.claimId) {
+      dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+=======
     if (rowData.advanceId) {
       dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
+>>>>>>> 53c22729edcf0e7a65527b2a3c6e2f9fd86c913e:src/components/hr2/HospitalizationDetails.tsx
     }
   };
 
@@ -196,7 +205,7 @@ const ApproveClaimAfterDocReview = () => {
         relation: value.relation || 'Self',
         requestedDate: value.requestDate,
         claimAmount: value.cliamAmount,
-        advanceId: value.advanceId, // Keeping 'cliamAmount' as per your provided code
+         advanceId: value.advanceId,                              // Keeping 'cliamAmount' as per your provided code
         claimId: value.claimId,
       }))
     : [];
@@ -295,13 +304,16 @@ const ApproveClaimAfterDocReview = () => {
 
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Approval Details'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Approval Details'];
+<<<<<<< HEAD:src/components/hr2/ApproveClaimAfterDocReview.tsx
+=======
 
   console.log(approvedAmount, 'this is approved');
+>>>>>>> 53c22729edcf0e7a65527b2a3c6e2f9fd86c913e:src/components/hr2/HospitalizationDetails.tsx
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      console.log(billPassing, 'this is bill passing');
+      console.log(billPassing,'this is bill passing')
       const payload = {
         AdvanceId: claimDetail.advanceBasicDetails.advanceId,
         SenderId: user.EmpCode,
@@ -316,6 +328,9 @@ const ApproveClaimAfterDocReview = () => {
         Comment: claimDetail?.billPasingDetails?.comment || 'N/A',
         ApprovalAmount: approvedAmount,
 
+<<<<<<< HEAD:src/components/hr2/ApproveClaimAfterDocReview.tsx
+      await dispatch(submitAdvanceApproval(payload));
+=======
         // HospitalizationBillApprovelDetails
         'HospitalizationBillApprovelDetails.MedicineAmount': approvalSummary.MedicineAmount,
         'HospitalizationBillApprovelDetails.MedicineNotInAmount': approvalSummary.MedicineNotInAmount,
@@ -350,6 +365,7 @@ const ApproveClaimAfterDocReview = () => {
       // console.log('Submitting data:', formData);
 
       await dispatch(submitClaimProcess(payload));
+>>>>>>> 53c22729edcf0e7a65527b2a3c6e2f9fd86c913e:src/components/hr2/HospitalizationDetails.tsx
 
       // Reset form fields after successful submission
       setApprovedAmount('');
@@ -466,10 +482,17 @@ const ApproveClaimAfterDocReview = () => {
               </div>
 
               <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className="text-primary" />
+<<<<<<< HEAD:src/components/hr2/ApproveClaimAfterDocReview.tsx
+              <DisplayTable headers={preHospHeaders}>
+                {preHospItems.map((item, index) => (
+                  <PreHospDisplayRow
+                    key={item.id}
+=======
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
                     key={item.billType}
+>>>>>>> 53c22729edcf0e7a65527b2a3c6e2f9fd86c913e:src/components/hr2/HospitalizationDetails.tsx
                     serialNo={index + 1}
                     billType={item.billType}
                     billedAmount={item.billedAmount}
@@ -572,4 +595,8 @@ const ApproveClaimAfterDocReview = () => {
   );
 };
 
+<<<<<<< HEAD:src/components/hr2/ApproveClaimAfterDocReview.tsx
 export default ApproveClaimAfterDocReview;
+=======
+export default HospitalizationBillView;
+>>>>>>> 53c22729edcf0e7a65527b2a3c6e2f9fd86c913e:src/components/hr2/HospitalizationDetails.tsx

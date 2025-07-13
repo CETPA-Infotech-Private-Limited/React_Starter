@@ -121,11 +121,7 @@ interface PostHospitalizationFormProps {
   isSubmitting?: boolean;
 }
 
-const PostHospitalizationForm: React.FC<PostHospitalizationFormProps> = ({
-  postHospitalizationAndDeclaration,
-  onChange,
-  onSubmit,
-}) => {
+const PostHospitalizationForm: React.FC<PostHospitalizationFormProps> = ({ postHospitalizationAndDeclaration, onChange, onSubmit }) => {
   const {
     IsPostHospitalization,
     IsSpecailDisease,
@@ -140,12 +136,8 @@ const PostHospitalizationForm: React.FC<PostHospitalizationFormProps> = ({
   const [postHospitalTreatmentAdviseFiles, setPostHospitalTreatmentAdviseFiles] = useState<File[]>(
     postHospitalizationAndDeclaration.PostHospitalTreatmentAdviseUpload || []
   );
-  const [regdCertificateFiles, setRegdCertificateFiles] = useState<File[]>(
-    postHospitalizationAndDeclaration.HospitalRegstrationDetailsFile?.Files || []
-  );
-  const [incomeTaxExemptionFiles, setIncomeTaxExemptionFiles] = useState<File[]>(
-    postHospitalizationAndDeclaration.HospitalIncomeTaxFile?.Files || []
-  );
+  const [regdCertificateFiles, setRegdCertificateFiles] = useState<File[]>(postHospitalizationAndDeclaration.HospitalRegstrationDetailsFile?.Files || []);
+  const [incomeTaxExemptionFiles, setIncomeTaxExemptionFiles] = useState<File[]>(postHospitalizationAndDeclaration.HospitalIncomeTaxFile?.Files || []);
 
   // Calculate totalBill and netTotal whenever relevant expense amounts change
   const totalBill = PreHospitalizationExpenseAmount + HospitalizationExpenseAmount;

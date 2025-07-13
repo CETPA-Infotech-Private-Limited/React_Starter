@@ -86,15 +86,13 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
-  
-
   // Calculate hospitalization billed amount
   const hospBilledAmount = [
     ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Investigation?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.RoomRent?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.Procedure?.map((b) => b.BilledAmount) || []),
+    billDetails?.RoomRent?.BilledAmount,
+    billDetails?.Procedure?.BilledAmount,
     billDetails?.OtherBill?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
@@ -103,22 +101,16 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Investigation?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.RoomRent?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.Procedure?.map((b) => b.ClaimedAmount) || []),
+    billDetails?.RoomRent?.ClaimedAmount,
+    billDetails?.Procedure?.ClaimedAmount,
     billDetails?.OtherBill?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
   // Calculate claimed amount from not-included bills
-  const notIncludedClaimedAmount = (billDetails?.NotIncluded || []).reduce(
-    (sum, item) => sum + Number(item?.ClaimedAmount || item?.claimedAmount || 0),
-    0
-  );
+  const notIncludedClaimedAmount = (billDetails?.NotIncluded || []).reduce((sum, item) => sum + Number(item?.ClaimedAmount || item?.claimedAmount || 0), 0);
 
   // Calculate billed amount from not-included bills (newly added)
-  const notIncludedBilledAmount = (billDetails?.NotIncluded || []).reduce(
-    (sum, item) => sum + Number(item?.BilledAmount || item?.billedAmount || 0),
-    0
-  );
+  const notIncludedBilledAmount = (billDetails?.NotIncluded || []).reduce((sum, item) => sum + Number(item?.BilledAmount || item?.billedAmount || 0), 0);
 
   // Calculate pre-hospitalization claimed amount
   const preHospClaimedAmount = [
@@ -127,14 +119,10 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
     preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
     preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0)
+  ].reduce((sum, val) => sum + Number(val), 0);
 
   // Calculate the net total claimed amount
-  const netTotal =
-    hospClaimedAmount +
-    preHospClaimedAmount+ notIncludedBilledAmount // This now correctly includes the not-included claim amount
-
-
+  const netTotal = hospClaimedAmount + preHospClaimedAmount + notIncludedBilledAmount; // This now correctly includes the not-included claim amount
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,
@@ -142,7 +130,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     HospitalizationExpenseAmount: hospBilledAmount,
     NotIncludedBilledAmount: notIncludedBilledAmount, // Added for summary
     PaidAmount: postHospDetails?.PaidAmount || 0,
-    NetTotal: netTotal,
+    PreHospitalizationClaimAmount: preHospBilledAmount,
   };
 
   const handleSubmit = async () => {
@@ -155,7 +143,9 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...postHospDetails,
       };
 
-      console.log(rawPayload,"this is raw payload")
+      console.log(billDetails, 'something');
+
+      console.log(rawPayload, 'this is raw payload');
       const formData = new FormData();
       formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
@@ -312,17 +302,22 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
             <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
           </div>
           <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} preHospClaimedAmount={preHospClaimedAmount} />
+            <BillDetailsForm
+              billDetails={billDetails}
+              onChange={setBillDetails}
+              preHospBilledAmount={preHospBilledAmount}
+              preHospClaimedAmount={preHospClaimedAmount}
+            />
           </div>
           <div className="mt-4">
             <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
           </div>
           <div>
             <PostHospitalizationAndDeclaration
+              billDetails={billDetails}
               postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-              onChange={setPostHospDetails}
+              onChange={(updatedBillDetails) => setBillDetails(updatedBillDetails)}
               onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
             />
           </div>
         </>

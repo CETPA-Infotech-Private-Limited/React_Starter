@@ -19,6 +19,7 @@ import { Input } from '../ui/input';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
+import { Loader2, Send } from 'lucide-react';
 
 const formSchema = z
   .object({
@@ -285,7 +286,11 @@ export default function RequestAdvanceForm({ setShowForm }: { setShowForm: (v: b
 
         <div>
           <Label>Admission Date *</Label>
-          <Controller name="admissionDate" control={control} render={({ field }) => <ShadDatePicker selected={field.value} onChange={field.onChange} />} />
+          <Controller
+            name="admissionDate"
+            control={control}
+            render={({ field }) => <ShadDatePicker selected={field.value} onChange={field.onChange} minDate={new Date()} />}
+          />
           {errors.admissionDate && <p className="text-red-500 text-xs">{errors.admissionDate.message}</p>}
         </div>
 
@@ -420,7 +425,17 @@ export default function RequestAdvanceForm({ setShowForm }: { setShowForm: (v: b
 
       <div className="text-right mt-6">
         <Button type="submit" disabled={advanceLoading}>
-          {advanceLoading ? 'Submitting...' : 'Submit Request'}
+          {advanceLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin h-4 w-4" />
+              Submitting...
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Send className="h-4 w-4" />
+              Submit Request
+            </div>
+          )}
         </Button>
       </div>
     </form>

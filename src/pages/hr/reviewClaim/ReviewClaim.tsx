@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
 import { Button } from '@/components/ui/button';
-import { EyeIcon, FileSearch, EyeOff } from 'lucide-react';
+import { EyeIcon, FileSearch, EyeOff, Eye } from 'lucide-react';
 import HospitalizationBillView from '@/components/hr/reviewClaim/HospitalizationBillView';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';

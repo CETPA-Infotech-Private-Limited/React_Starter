@@ -9,12 +9,12 @@ import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice'
 import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
-import { PatientDetailsCard } from '@/components/hr/reviewAdvanceRequest/PatientDetailsTable';
-import { HospitalizationDetailsCard } from '@/components/hr/reviewAdvanceRequest/HospitalizationDetailsCard';
-import { BeneficiaryDetailsCard } from '@/components/hr/reviewAdvanceRequest/BeneficiaryDetails';
-import AdvanceApprovalForm from '@/components/hr/reviewAdvanceRequest/AdvanceApprovalForm';
+
 import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
 import toast from 'react-hot-toast';
+import { PatientDetailsCard } from '@/components/hr/reviewAdvanceRequest/PatientDetailsTable';
+import { HospitalizationDetailsCard } from '@/components/hr/reviewAdvanceRequest/HospitalizationDetailsCard';
+import AdvanceApprovalForm from '@/components/hr/reviewAdvanceRequest/AdvanceApprovalForm';
 
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
