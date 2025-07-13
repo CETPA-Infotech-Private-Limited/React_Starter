@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
 import TableList from '@/components/ui/data-table';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -11,21 +11,21 @@ import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import { PatientDetailsCard } from '@/components/hr/advanceApprove/PatientDetailsTable';
 import { HospitalizationDetailsCard } from '@/components/hr/advanceApprove/HospitalizationDetailsCard';
-import { BeneficiaryDetailsCard } from '@/components/hr/advanceApprove/BeneficiaryDetails';
-import AdvanceApprovalForm from '@/components/hr/advanceApprove/AdvanceApprovalForm';
 import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
 import toast from 'react-hot-toast';
-import AdvanceBankingDetailsForm from '@/components/finance/Banking/AdvanceBankingDetailsForm';
-import InputField from '@/components/common/InputField';
 import { ReadOnlyField } from '@/components/common/ReadOnlyField';
 
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
-  const { bankingData, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
-  const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
-  const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
+  const [referenceDate, setReferenceDate] = useState('');
+  const [sapRefNumber, setSapRefNumber] = useState('');
+  const [amountPaid, setAmountPaid] = useState('');
+  const [comment, setComment] = useState('');
 
+  const { bankingData, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
+  const { data: claimDetails, loading: detailsLoading } = useAppSelector((state: RootState) => state.getClaimDetails);
+  const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
   const user = useAppSelector((state: RootState) => state.user);
   const { employees } = useAppSelector((state: RootState) => state.employee);
 
@@ -156,16 +156,24 @@ const ApproveAdvancePage = () => {
   const patientDetails = getPatientDetails();
 
   const handleBankingDetailsSubmit = () => {
+    if (!referenceDate || !sapRefNumber || !amountPaid) {
+      toast.error('Please fill all required fields.');
+      return;
+    }
+
     dispatch(
       submitAdvanceApproval({
         AdvanceId: Number(selectedAdvance.advanceId),
         SenderId: Number(user.EmpCode),
-        RecipientId: selectedAdvance.empId,
-        ClaimTypeId: 1,
-        StatusId: 2,
-        ApprovalAmount: selectedAdvance.approvedAmount,
+        ClaimTypeId: Number(claimDetails.advanceBasicDetails.claimTypeId),
+        ReferenceDate: referenceDate,
+        SapRefNumber: sapRefNumber,
+        AmountPaid: parseFloat(amountPaid),
+        Comment: comment || '',
+        StatusId:2
       })
     );
+    console.log(selectedAdvance,'thisis advace')
   };
 
   return (
@@ -214,29 +222,56 @@ const ApproveAdvancePage = () => {
             />
           )}
 
-          {/* {claimDetails?.hospitalAccoundetail && (
-            <BeneficiaryDetailsCard
-              beneficiaryName={claimDetails.hospitalAccoundetail.beneficiaryName}
-              bankName={claimDetails.hospitalAccoundetail.bankName}
-              accountNumber={claimDetails.hospitalAccoundetail.accountNumber}
-              branchName={claimDetails.hospitalAccoundetail.branchName}
-              ifscCode={claimDetails.hospitalAccoundetail.ifscCode}
-              hospitalGSTNo={claimDetails.hospitalAccoundetail.hospitalGSTNo}
-              utrNo={claimDetails.hospitalAccoundetail.utrNo}
-              transactionDate={claimDetails.hospitalAccoundetail.transactionDate}
-              sapRefNumber={claimDetails.hospitalAccoundetail.sapRefNumber}
-              sapRefDate={claimDetails.hospitalAccoundetail.sapRefDate}
-            />
-          )} */}
-
-          <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white  ">
+          <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
             <h2 className="text-xl font-bold text-blue-700 mb-4">Verify And Approved</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ReadOnlyField label="Advance Request Amount" value={formatRupees(selectedAdvance?.advanceAmount)} />
               <ReadOnlyField label="Final Approve Amount" value={formatRupees(selectedAdvance?.approvedAmount)} />
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">Reference Date</label>
+                <input
+                  type="datetime-local"
+                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  value={referenceDate}
+                  onChange={(e) => setReferenceDate(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">SAP Reference Number</label>
+                <input
+                  type="text"
+                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  value={sapRefNumber}
+                  onChange={(e) => setSapRefNumber(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">Amount Paid</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  value={amountPaid}
+                  onChange={(e) => setAmountPaid(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-700">Comment</label>
+                <textarea
+                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                  rows={2}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
             </div>
-            <div className=" flex justify-end">
-              <Button className=" mt-4" onClick={handleBankingDetailsSubmit}>
+
+            <div className="flex justify-end">
+              <Button className="mt-4" onClick={handleBankingDetailsSubmit}>
                 Verify & Approve
               </Button>
             </div>
