@@ -131,7 +131,7 @@ interface BillDetailsProps {
   preHospBilledAmount?: number;
 }
 
-const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 0, preHospClaimedAmount=0 }: BillDetailsProps) => {
+const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 0, preHospClaimedAmount = 0 }: BillDetailsProps) => {
   const initialBills: BillItem[] = [
     {
       id: 1,
@@ -197,7 +197,6 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
 
   // Filter bills not included in the final bill for the payload
   const notIncludedBills = bills.filter((bill) => !bill.included);
-  
 
   const isBillFilled = (bill: BillItem) => {
     return (
@@ -235,6 +234,9 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
     updateParentBillDetails(updatedBills);
   };
 
+   const totalBill =(preHospBilledAmount + billedTotal).toFixed(2)
+  const totalClaimed = (claimedTotal + preHospClaimedAmount).toFixed(2)
+
   const updateBill = (id: number, field: string, value: string | boolean | File[]) => {
     let errorMsg = '';
     const updatedBills = bills.map((bill) => {
@@ -264,12 +266,14 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
       MedicenBill: [{ BilledAmount: Number(currentBills[0].billedAmount), ClaimedAmount: Number(currentBills[0].claimedAmount) }],
       Consultation: [{ BilledAmount: Number(currentBills[1].billedAmount), ClaimedAmount: Number(currentBills[1].claimedAmount) }],
       Investigation: [{ BilledAmount: Number(currentBills[2].billedAmount), ClaimedAmount: Number(currentBills[2].claimedAmount) }],
-      RoomRent: [{ BilledAmount: Number(currentBills[3].billedAmount), ClaimedAmount: Number(currentBills[3].claimedAmount) }],
-      Procedure: [{ BilledAmount: Number(currentBills[4].billedAmount), ClaimedAmount: Number(currentBills[4].claimedAmount) }],
-      OtherBill: {
-        BilledAmount: Number(currentBills[5].billedAmount),
-        ClaimedAmount: Number(currentBills[5].claimedAmount),
-      },
+      RoomRent: { BilledAmount: Number(currentBills[3].billedAmount), ClaimedAmount: Number(currentBills[3].claimedAmount) },
+      Procedure: { BilledAmount: Number(currentBills[4].billedAmount), ClaimedAmount: Number(currentBills[4].claimedAmount) },
+      OtherBill: [
+        {
+          BilledAmount: Number(currentBills[5].billedAmount),
+          ClaimedAmount: Number(currentBills[5].claimedAmount),
+        },
+      ],
       // Map custom bills and their files if not included
       NotIncluded: currentBills
         .filter((bill) => !bill.included)
@@ -281,10 +285,13 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
           files: bill.files, // Include files for not-included bills
         })),
       claimedTotal: currentBills.reduce((sum, bill) => sum + parseFloat(bill.claimedAmount || '0'), 0),
+      totalBill: parseFloat((preHospBilledAmount + billedTotal).toFixed(2)),
+    totalClaimed: parseFloat((claimedTotal + preHospClaimedAmount).toFixed(2)),
+    billTotal:billedTotal.toFixed(2)
     };
     onChange(apiBillDetails);
   };
-
+ 
   // Effect to call updateParentBillDetails whenever 'bills' state changes
   useEffect(() => {
     updateParentBillDetails(bills);
@@ -381,7 +388,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                           })()}
                         >
                           <Plus className="w-4 h-4 mr-1" />
-                           Add additional Bills
+                          Add additional Bills
                         </Button>
                       ) : (
                         <Button
@@ -411,10 +418,10 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                 <strong className="text-blue-800">Hospitalization Expense (Billed):</strong> {billedTotal.toFixed(2)}
               </span>
               <span>
-                <strong className="text-blue-800">Total Bill (Billed):</strong> {(preHospBilledAmount + billedTotal).toFixed(2)}
+                <strong className="text-blue-800">Total Bill (Billed):</strong> {totalBill}
               </span>
               <span>
-                <strong className="text-blue-800">Net Total (Claimed):</strong> {(claimedTotal + preHospClaimedAmount).toFixed(2) }
+                <strong className="text-blue-800">Net Total (Claimed):</strong> {totalClaimed}
               </span>
             </div>
           </div>

@@ -128,7 +128,7 @@ interface PostHospitalizationFormProps {
   onSubmit: () => void;
 }
 
-const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, netTotal }: PostHospitalizationFormProps) => {
+const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, billDetails }: PostHospitalizationFormProps) => {
   const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
 
   // File upload states
@@ -152,7 +152,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postHospitalTreatmentAdviseFiles, regdCertificateFiles, incomeTaxExemptionFiles]);
-
+console.log(postHospitalizationAndDeclaration,'bill details')
   const preHospAmount = postHospitalizationAndDeclaration.PreHospitalizationExpenseAmount || 0;
   const hospAmount = postHospitalizationAndDeclaration.HospitalizationExpenseAmount || 0;
   const totalBill = preHospAmount + hospAmount;
@@ -291,17 +291,17 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
 
             <div className="flex justify-between items-center py-2 border-b border-gray-200">
               <span className="text-sm text-primary">Hospitalization Expense Amount</span>
-              <span className="text-sm font-medium">{hospAmount}</span>
+              <span className="text-sm font-medium">{billDetails.billTotal}</span>
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-gray-200">
               <span className="text-sm font-medium text-primary">Total Bill</span>
-              <span className="text-sm font-medium">{totalBill}</span>
+              <span className="text-sm font-medium">{billDetails.totalBill}</span>
             </div>
 
             <div className="flex justify-between items-center py-2">
               <span className="text-sm font-semibold text-primary">Net Total (Balance Claim)</span>
-              <span className="text-sm font-semibold">{netTotal}</span>
+              <span className="text-sm font-semibold">{billDetails.totalClaimed}</span>
             </div>
           </div>
         </div>

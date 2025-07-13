@@ -160,9 +160,7 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
       </div>
 
       <div className="mt-6">
-        <Textarea placeholder="Add clarification..." />
-
-        <Button className="mt-2">Seek Clarification</Button>
+       
         <div>
           <Button className="mt-2 pl-6 pr-6" onClick={handleSendToDoctor}>
             Send to Doctor

@@ -1,4 +1,4 @@
-'use client';
+
 
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';

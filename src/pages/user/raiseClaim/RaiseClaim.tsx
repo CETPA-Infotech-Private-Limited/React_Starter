@@ -88,8 +88,8 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Investigation?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.RoomRent?.map((b) => b.BilledAmount) || []),
-    ...(billDetails?.Procedure?.map((b) => b.BilledAmount) || []),
+    billDetails?.RoomRent?.BilledAmount,
+    billDetails?.Procedure?.BilledAmount,
     billDetails?.OtherBill?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
@@ -97,8 +97,8 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Investigation?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.RoomRent?.map((b) => b.ClaimedAmount) || []),
-    ...(billDetails?.Procedure?.map((b) => b.ClaimedAmount) || []),
+    billDetails?.RoomRent?.ClaimedAmount,
+    billDetails?.Procedure?.ClaimedAmount ,
     billDetails?.OtherBill?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
@@ -115,16 +115,15 @@ const preHospClaimedAmount = [
     preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0)
 
-const netTotal =
-  hospClaimedAmount +
-  preHospClaimedAmount +
-  notIncludedClaimedAmount; 
+
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,
     PreHospitalizationExpenseAmount: preHospBilledAmount,
     HospitalizationExpenseAmount: hospBilledAmount,
     PaidAmount: postHospDetails?.PaidAmount || 0,
+    PreHospitalizationClaimAmount: preHospBilledAmount,
+
    
   };
 
@@ -138,7 +137,7 @@ const netTotal =
         ...postHospDetails,
       };
 
-
+console.log(billDetails ,'something')
 
       console.log(rawPayload,"this is raw payload")
       const formData = new FormData();
@@ -304,10 +303,10 @@ const netTotal =
           </div>
           <div>
             <PostHospitalizationAndDeclaration
+            billDetails={billDetails}
               postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-              onChange={setPostHospDetails}
+              onChange={(updatedBillDetails) => setBillDetails(updatedBillDetails)}
               onSubmit={handleSubmit}
-              netTotal ={netTotal}
             />
           </div>
           
