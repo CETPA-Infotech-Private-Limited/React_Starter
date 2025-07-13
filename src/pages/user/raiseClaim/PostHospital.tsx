@@ -121,14 +121,14 @@ interface PostHospitalizationFormProps {
     IsTaxAble?: boolean;
     HospitalRegstrationDetailsFile?: { Files: File[] };
     HospitalIncomeTaxFile?: { Files: File[] };
-    DeclarationChecked?: boolean;
+    
     [key: string]: any;
   };
   onChange: (value: any) => void;
   onSubmit: () => void;
 }
 
-const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, isSubmitting }: PostHospitalizationFormProps) => {
+const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange }: PostHospitalizationFormProps) => {
   const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
 
   // File upload states
@@ -279,52 +279,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
           </div>
         </div>
 
-        {/* Summary Section */}
-        <div className="space-y-4 border-t pt-6">
-          <h2 className="text-lg font-semibold text-primary">Summary</h2>
-
-          <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-              <span className="text-sm text-primary">Pre Hospitalization Expense Amount</span>
-              <span className="text-sm font-medium">{preHospAmount}</span>
-            </div>
-
-            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-              <span className="text-sm text-primary">Hospitalization Expense Amount</span>
-              <span className="text-sm font-medium">{hospAmount}</span>
-            </div>
-
-            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-              <span className="text-sm font-medium text-primary">Total Bill</span>
-              <span className="text-sm font-medium">{totalBill}</span>
-            </div>
-
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-semibold text-primary">Net Total (Balance Claim)</span>
-              <span className="text-sm font-semibold">{netTotal}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Declaration Checkbox */}
-        <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <Checkbox
-            checked={!!DeclarationChecked}
-            onCheckedChange={(checked) => onChange({ ...postHospitalizationAndDeclaration, DeclarationChecked: checked === true })}
-            id="final-declaration"
-            className="mt-0.5"
-          />
-          <Label htmlFor="final-declaration" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-            I the undersigned hereby declare that the information given in this form is correct and complete to the best of my knowledge and belief.
-          </Label>
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex justify-end pt-4">
-          <Button onClick={onSubmit} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2" disabled={!DeclarationChecked}>
-            Submit Claim
-          </Button>
-        </div>
+       
       </div>
     </div>
   );

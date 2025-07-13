@@ -197,6 +197,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
 
   // Filter bills not included in the final bill for the payload
   const notIncludedBills = bills.filter((bill) => !bill.included);
+  
 
   const isBillFilled = (bill: BillItem) => {
     return (
