@@ -7,373 +7,313 @@ import PreHospitalizationForm from './PreHospitalizationForm';
 import PostHospitalizationAndDeclaration from './PostHospital';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import Loader from '@/components/ui/loader'; // ✅ Imported loader
-import { Checkbox } from '@radix-ui/react-checkbox';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 
 interface ClaimRequest {
-  IsSpecailDisease: boolean;
-  IsTaxAble: boolean;
-  SpecialDiseaseName?: string;
-  ClaimAmount?: number;
-  ClaimPdfUpload?: string;
-  AdmissionAdviceUpload?: any[];
-  DischargeSummaryUpload?: any[];
-  InvestigationReportsUpload?: any[];
-  EmpId?: number;
-  Unit?: string;
-  FinalHospitalBill?: number;
-  FinalHospitalBillUpload?: any[];
-  MedicenBill?: { BilledAmount: number; ClaimedAmount: number }[];
-  MedicenNotFinalBill?: { Amount: number; Files: any[]; AmountCliam: number };
-  Consultation?: { BilledAmount: number; ClaimedAmount: number }[];
-  ConsultationNotFinalBill?: { BilledAmount: number; Files: any[]; AmountCliam: number };
-  Investigation?: { BilledAmount: number; ClaimedAmount: number }[];
-  InvestigationNotFinalBill?: { BilledAmount: number; Files: any[]; AmountCliam: number };
-  RoomRent?: { BilledAmount: number; ClaimedAmount: number }[];
-  OtherBill?: { BilledAmount: number; ClaimedAmount: number };
-  Procedure?: { BilledAmount: number; ClaimedAmount: number }[];
-  OtherBillNotFinalBill?: { BilledAmount: number; Files: any[]; ClaimedAmount: number };
-  PatientId?: number;
-  RequestName?: string;
-  Reason?: string;
-  PayTo?: string;
-  HospitalName: string;
-  HospitalRegNo: string;
-  DateOfAdmission: string;
-  DateofDischarge: string;
-  DoctorName?: string;
-  IsPreHospitalizationExpenses: boolean;
-  PreHospitalizationExpensesMedicine?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
-  PreHospitalizationExpensesConsultation?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
-  PreHospitalizationExpensesInvestigation?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
-  PreHospitalizationExpensesOther?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
-  PreHospitalizationProcedure?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
-  PostHospitalTreatmentAdviseUpload?: any[];
-  Digonosis?: string;
-  TreatmentType?: string;
-  IsHospitialEmpanpanelled?: boolean;
-  HospitalId?: string;
-  IsPostHospitalization: boolean;
-  HospitalIncomeTaxFile?: { Files: any[] };
-  HospitalRegstrationDetailsFile?: { Files: any[] };
-  PaidAmount?: number;
-  NotIncluded?: { BilledAmount: number; ClaimedAmount: number; files?: File[] }[];
-  claimedTotal?: number; // Added properties for files to rawPayload for pre-hospitalization forms
-  PreHospitalizationProcedureFiles?: File[];
-  PreHospitalizationExpensesOtherFiles?: File[];
-  PreHospitalizationExpensesMedicineFiles?: File[];
-  PreHospitalizationExpensesInvestigationFiles?: File[];
-  PreHospitalizationExpensesConsultationFiles?: File[];
-  DeclarationChecked?: boolean;
+  IsSpecailDisease: boolean;
+  IsTaxAble: boolean;
+  SpecialDiseaseName?: string;
+  ClaimAmount?: number;
+  ClaimPdfUpload?: string;
+  AdmissionAdviceUpload?: any[];
+  DischargeSummaryUpload?: any[];
+  InvestigationReportsUpload?: any[];
+  EmpId?: number;
+  Unit?: string;
+  FinalHospitalBill?: number;
+  FinalHospitalBillUpload?: any[];
+  MedicenBill?: { BilledAmount: number; ClaimedAmount: number }[];
+  MedicenNotFinalBill?: { Amount: number; Files: any[]; AmountCliam: number };
+  Consultation?: { BilledAmount: number; ClaimedAmount: number }[];
+  ConsultationNotFinalBill?: { BilledAmount: number; Files: any[]; AmountCliam: number };
+  Investigation?: { BilledAmount: number; ClaimedAmount: number }[];
+  InvestigationNotFinalBill?: { BilledAmount: number; Files: any[]; AmountCliam: number };
+  RoomRent?: { BilledAmount: number; ClaimedAmount: number }[];
+  OtherBill?: { BilledAmount: number; ClaimedAmount: number };
+  Procedure?: { BilledAmount: number; ClaimedAmount: number }[];
+  OtherBillNotFinalBill?: { BilledAmount: number; Files: any[]; ClaimedAmount: number };
+  PatientId?: number;
+  RequestName?: string;
+  Reason?: string;
+  PayTo?: string;
+  HospitalName: string;
+  HospitalRegNo: string;
+  DateOfAdmission: string;
+  DateofDischarge: string;
+  DoctorName?: string;
+  IsPreHospitalizationExpenses: boolean;
+  PreHospitalizationExpensesMedicine?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
+  PreHospitalizationExpensesConsultation?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
+  PreHospitalizationExpensesInvestigation?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
+  PreHospitalizationExpensesOther?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
+  PreHospitalizationProcedure?: { BilledAmount: number; Files: any[]; ClaimedAmount: number; ClaimDate: string };
+  PostHospitalTreatmentAdviseUpload?: any[];
+  Digonosis?: string;
+  TreatmentType?: string;
+  IsHospitialEmpanpanelled?: boolean;
+  HospitalId?: string;
+  IsPostHospitalization: boolean;
+  HospitalIncomeTaxFile?: { Files: any[] };
+  HospitalRegstrationDetailsFile?: { Files: any[] };
+  PaidAmount?: number;
+  NotIncluded?: { BilledAmount: number; ClaimedAmount: number; files?: File[] }[];
+  claimedTotal?: number; // Added properties for files to rawPayload for pre-hospitalization forms
+  PreHospitalizationProcedureFiles?: File[];
+  PreHospitalizationExpensesOtherFiles?: File[];
+  PreHospitalizationExpensesMedicineFiles?: File[];
+  PreHospitalizationExpensesInvestigationFiles?: File[];
+  PreHospitalizationExpensesConsultationFiles?: File[];
 }
 
 type RaiseClaimProps = {
-  onCloseForm: () => void;
+  onCloseForm: () => void;
 };
 
 const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
-  const [patientDetails, setPatientDetails] = useState<Partial<ClaimRequest>>({});
-  const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
-  const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
-  const [postHospDetails, setPostHospDetails] = useState<Partial<ClaimRequest>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const user = useAppSelector((state: RootState) => state.user);
-  const dispatch = useAppDispatch();
-  const preHospBilledAmount = [
-    preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesConsultation?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesInvestigation?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationProcedure?.BilledAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0);
+  const [patientDetails, setPatientDetails] = useState<Partial<ClaimRequest>>({});
+  const [billDetails, setBillDetails] = useState<Partial<ClaimRequest>>({});
+  const [preHospDetails, setPreHospDetails] = useState<Partial<ClaimRequest>>({});
+  const [postHospDetails, setPostHospDetails] = useState<Partial<ClaimRequest>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const user = useAppSelector((state: RootState) => state.user);
+  const dispatch = useAppDispatch();
+  const preHospBilledAmount = [
+    preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesConsultation?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesInvestigation?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationProcedure?.BilledAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
 
+  const hospBilledAmount = [
+    ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Investigation?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.RoomRent?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Procedure?.map((b) => b.BilledAmount) || []),
+    billDetails?.OtherBill?.BilledAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
 
-const hospClaimedAmount = [
-  ...(billDetails?.MedicenBill?.filter(b => b.included !== false).map((b) => b.ClaimedAmount) || []),
-  ...(billDetails?.Consultation?.filter(b => b.included !== false).map((b) => b.ClaimedAmount) || []),
-  ...(billDetails?.Investigation?.filter(b => b.included !== false).map((b) => b.ClaimedAmount) || []),
-  ...(billDetails?.RoomRent?.filter(b => b.included !== false).map((b) => b.ClaimedAmount) || []),
-  ...(billDetails?.Procedure?.filter(b => b.included !== false).map((b) => b.ClaimedAmount) || []),
-  (billDetails?.OtherBill?.included !== false ? billDetails?.OtherBill?.ClaimedAmount : 0) || 0,
-].reduce((sum, val) => sum + Number(val), 0);
+  const hospClaimedAmount = [
+    ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Investigation?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.RoomRent?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Procedure?.map((b) => b.ClaimedAmount) || []),
+    billDetails?.OtherBill?.ClaimedAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0);
 
-
-const hospBilledAmount = [
-  ...(billDetails?.MedicenBill?.filter(b => b.included !== false).map((b) => b.BilledAmount) || []),
-  ...(billDetails?.Consultation?.filter(b => b.included !== false).map((b) => b.BilledAmount) || []),
-  ...(billDetails?.Investigation?.filter(b => b.included !== false).map((b) => b.BilledAmount) || []),
-  ...(billDetails?.RoomRent?.filter(b => b.included !== false).map((b) => b.BilledAmount) || []),
-  ...(billDetails?.Procedure?.filter(b => b.included !== false).map((b) => b.BilledAmount) || []),
-  (billDetails?.OtherBill?.included !== false ? billDetails?.OtherBill?.BilledAmount : 0) || 0,
-].reduce((sum, val) => sum + Number(val), 0);
-
-
-
-
-  const notIncludedClaimedAmount = (billDetails?.NotIncluded || []).reduce(
-  (sum, item) => sum + Number(item?.ClaimedAmount || item?.claimedAmount || 0),
-  0
+  const notIncludedClaimedAmount = (billDetails?.NotIncluded?.ClaimedAmount || []).reduce(
+  (sum, item) => sum + Number(item?.ClaimedAmount || item?.claimedAmount || 0),
+  0
 );
-const notIncludedBilledAmount = (billDetails?.NotIncluded || []).reduce(
-  (sum, item) => sum + Number(item?.BilledAmount || item?.billedAmount || 0),
-  0
-);
-
-console.log(notIncludedBilledAmount,"not includedbilled")
 
 const preHospClaimedAmount = [
-    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
-    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
-  ].reduce((sum, val) => sum + Number(val), 0)
+    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0)
 
 const netTotal =
-  hospClaimedAmount +
-  preHospClaimedAmount +
-  notIncludedClaimedAmount; // ✅ Add not-included claim amount
+  hospClaimedAmount +
+  preHospClaimedAmount +
+  notIncludedClaimedAmount; // ✅ Add not-included claim amount
 
 
-  const postHospDetailsWithSummary = {
-    ...postHospDetails,
-    PreHospitalizationExpenseAmount: preHospBilledAmount,
-    HospitalizationExpenseAmount: hospBilledAmount,
-    PaidAmount: postHospDetails?.PaidAmount || 0,
-    NetTotal: netTotal,
-  };
+  const postHospDetailsWithSummary = {
+    ...postHospDetails,
+    PreHospitalizationExpenseAmount: preHospBilledAmount,
+    HospitalizationExpenseAmount: hospBilledAmount,
+    PaidAmount: postHospDetails?.PaidAmount || 0,
+    NetTotal: netTotal,
+  };
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      const rawPayload: Partial<ClaimRequest> = {
-        ...patientDetails,
-        ...billDetails,
-        ...preHospDetails,
-        ...postHospDetails,
-      };
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const rawPayload: Partial<ClaimRequest> = {
+        ...patientDetails,
+        ...billDetails,
+        ...preHospDetails,
+        ...postHospDetails,
+      };
 
-      console.log(rawPayload,"this is raw payload")
-      const formData = new FormData();
-      formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
-      formData.append('PayTo', rawPayload.PayTo || 'Hospital');
-      formData.append('IsHospitialEmpanpanelled', String(rawPayload.IsHospitialEmpanpanelled ?? false));
+      console.log(rawPayload,"this is raw payload")
+      const formData = new FormData();
+      formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
+      formData.append('PayTo', rawPayload.PayTo || 'Hospital');
+      formData.append('IsHospitialEmpanpanelled', String(rawPayload.IsHospitialEmpanpanelled ?? false));
 
-      formData.append('patientId', String(user.EmpCode || 0));
-      formData.append('Reason', rawPayload.Reason || 'This is A Reason');
-      formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
-      formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId || ''); // Added optional chaining and fallback
-      formData.append('HospitalRegNo', rawPayload.HospitalRegNo || rawPayload.HospitalId || ''); // Added optional chaining and fallback
-      formData.append('TreatmentType', rawPayload.TreatmentType || '');
-      formData.append('Digonosis', rawPayload.Digonosis || '');
-      formData.append('DoctorName', rawPayload.DoctorName || '');
-      formData.append('DateOfAdmission', rawPayload.DateOfAdmission || '');
-      formData.append('DateofDischarge', rawPayload.DateofDischarge || '');
-      formData.append('IsSpecailDisease', String(rawPayload.IsSpecailDisease ?? false)); // Ensure boolean is stringified
-      formData.append('IsTaxAble', String(rawPayload.IsTaxAble ?? true));
-      formData.append('IsPreHospitalizationExpenses', String(rawPayload.IsPreHospitalizationExpenses ?? false)); // Pre-hospitalization expenses with optional chaining
+      formData.append('patientId', String(user.EmpCode || 0));
+      formData.append('Reason', rawPayload.Reason || 'This is A Reason');
+      formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
+      formData.append('HospitalName', rawPayload.HospitalName || rawPayload.HospitalId || ''); // Added optional chaining and fallback
+      formData.append('HospitalRegNo', rawPayload.HospitalRegNo || rawPayload.HospitalId || ''); // Added optional chaining and fallback
+      formData.append('TreatmentType', rawPayload.TreatmentType || '');
+      formData.append('Digonosis', rawPayload.Digonosis || '');
+      formData.append('DoctorName', rawPayload.DoctorName || '');
+      formData.append('DateOfAdmission', rawPayload.DateOfAdmission || '');
+      formData.append('DateofDischarge', rawPayload.DateofDischarge || '');
+      formData.append('IsSpecailDisease', String(rawPayload.IsSpecailDisease ?? false)); // Ensure boolean is stringified
+      formData.append('IsTaxAble', String(rawPayload.IsTaxAble ?? true));
+      formData.append('IsPreHospitalizationExpenses', String(rawPayload.IsPreHospitalizationExpenses ?? false)); // Pre-hospitalization expenses with optional chaining
 
-      formData.append('PreHospitalizationExpensesMedicine.BilledAmount', String(rawPayload.PreHospitalizationExpensesMedicine?.BilledAmount || 0));
-      formData.append('PreHospitalizationExpensesMedicine.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0));
-      formData.append('PreHospitalizationExpensesMedicine.ClaimDate', rawPayload.PreHospitalizationExpensesMedicine?.ClaimDate || '');
+      formData.append('PreHospitalizationExpensesMedicine.BilledAmount', String(rawPayload.PreHospitalizationExpensesMedicine?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesMedicine.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesMedicine.ClaimDate', rawPayload.PreHospitalizationExpensesMedicine?.ClaimDate || '');
 
-      formData.append('PreHospitalizationExpensesConsultation.BilledAmount', String(rawPayload.PreHospitalizationExpensesConsultation?.BilledAmount || 0));
-      formData.append('PreHospitalizationExpensesConsultation.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0));
-      formData.append('PreHospitalizationExpensesConsultation.ClaimDate', rawPayload.PreHospitalizationExpensesConsultation?.ClaimDate || '');
-      formData.append('PreHospitalizationExpensesInvestigation.BilledAmount', String(rawPayload.PreHospitalizationExpensesInvestigation?.BilledAmount || 0));
-      formData.append('PreHospitalizationExpensesInvestigation.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0));
-      formData.append('PreHospitalizationExpensesInvestigation.ClaimDate', rawPayload.PreHospitalizationExpensesInvestigation?.ClaimDate || '');
+      formData.append('PreHospitalizationExpensesConsultation.BilledAmount', String(rawPayload.PreHospitalizationExpensesConsultation?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesConsultation.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesConsultation.ClaimDate', rawPayload.PreHospitalizationExpensesConsultation?.ClaimDate || '');
+      formData.append('PreHospitalizationExpensesInvestigation.BilledAmount', String(rawPayload.PreHospitalizationExpensesInvestigation?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesInvestigation.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesInvestigation.ClaimDate', rawPayload.PreHospitalizationExpensesInvestigation?.ClaimDate || '');
 
-      formData.append('PreHospitalizationExpensesOther.BilledAmount', String(rawPayload.PreHospitalizationExpensesOther?.BilledAmount || 0));
-      formData.append('PreHospitalizationExpensesOther.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesOther?.ClaimedAmount || 0));
-      formData.append('PreHospitalizationExpensesOther.ClaimDate', rawPayload.PreHospitalizationExpensesOther?.ClaimDate || '');
+      formData.append('PreHospitalizationExpensesOther.BilledAmount', String(rawPayload.PreHospitalizationExpensesOther?.BilledAmount || 0));
+      formData.append('PreHospitalizationExpensesOther.ClaimedAmount', String(rawPayload.PreHospitalizationExpensesOther?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationExpensesOther.ClaimDate', rawPayload.PreHospitalizationExpensesOther?.ClaimDate || '');
 
-      formData.append('PreHospitalizationProcedure.BilledAmount', String(rawPayload.PreHospitalizationProcedure?.BilledAmount || 0));
-      formData.append('PreHospitalizationProcedure.ClaimedAmount', String(rawPayload.PreHospitalizationProcedure?.ClaimedAmount || 0));
-      formData.append('PreHospitalizationProcedure.ClaimDate', rawPayload.PreHospitalizationProcedure?.ClaimDate || '');
-      rawPayload.PreHospitalizationProcedure?.Files?.forEach((file: File) => formData.append('PreHospitalizationProcedure.Files', file));
-      rawPayload.PreHospitalizationExpensesOther?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesOther.Files', file));
-      rawPayload.PreHospitalizationExpensesMedicine?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesMedicine.Files', file));
-      rawPayload.PreHospitalizationExpensesInvestigation?.Files?.forEach((file: File) =>
-        formData.append('PreHospitalizationExpensesInvestigation.Files', file)
-      );
-      rawPayload.PreHospitalizationExpensesConsultation?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesConsultation.Files', file));
+      formData.append('PreHospitalizationProcedure.BilledAmount', String(rawPayload.PreHospitalizationProcedure?.BilledAmount || 0));
+      formData.append('PreHospitalizationProcedure.ClaimedAmount', String(rawPayload.PreHospitalizationProcedure?.ClaimedAmount || 0));
+      formData.append('PreHospitalizationProcedure.ClaimDate', rawPayload.PreHospitalizationProcedure?.ClaimDate || '');
+      rawPayload.PreHospitalizationProcedure?.Files?.forEach((file: File) => formData.append('PreHospitalizationProcedure.Files', file));
+      rawPayload.PreHospitalizationExpensesOther?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesOther.Files', file));
+      rawPayload.PreHospitalizationExpensesMedicine?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesMedicine.Files', file));
+      rawPayload.PreHospitalizationExpensesInvestigation?.Files?.forEach((file: File) =>
+        formData.append('PreHospitalizationExpensesInvestigation.Files', file)
+      );
+      rawPayload.PreHospitalizationExpensesConsultation?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesConsultation.Files', file));
 
-      formData.append('ClaimAmount', String(netTotal));
-      formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
-      formData.append('EmpId', String(user.EmpCode || 0));
-      formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
+      formData.append('ClaimAmount', String(netTotal));
+      formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
+      formData.append('EmpId', String(user.EmpCode || 0));
+      formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
 
-      rawPayload.AdmissionAdviceUpload?.forEach((file: File) => formData.append('AdmissionAdviceUpload', file));
-      rawPayload.DischargeSummaryUpload?.forEach((file: File) => formData.append('DischargeSummaryUpload', file));
-      rawPayload.InvestigationReportsUpload?.forEach((file: File) => formData.append('InvestigationReportsUpload', file));
-      rawPayload.FinalHospitalBillUpload?.forEach((file: File) => formData.append('FinalHospitalBillUpload', file));
-      rawPayload.PostHospitalTreatmentAdviseUpload?.forEach((file: File) => formData.append('PostHospitalTreatmentAdviseUpload', file));
+      rawPayload.AdmissionAdviceUpload?.forEach((file: File) => formData.append('AdmissionAdviceUpload', file));
+      rawPayload.DischargeSummaryUpload?.forEach((file: File) => formData.append('DischargeSummaryUpload', file));
+      rawPayload.InvestigationReportsUpload?.forEach((file: File) => formData.append('InvestigationReportsUpload', file));
+      rawPayload.FinalHospitalBillUpload?.forEach((file: File) => formData.append('FinalHospitalBillUpload', file));
+      rawPayload.PostHospitalTreatmentAdviseUpload?.forEach((file: File) => formData.append('PostHospitalTreatmentAdviseUpload', file));
 
-      const includedMedicen = (rawPayload.MedicenBill || []).filter((b: any) => b.included !== false);
-      if (includedMedicen[0]) {
-        formData.append('MedicenBill.BilledAmount', String(includedMedicen[0].BilledAmount));
-        formData.append('MedicenBill.ClaimedAmount', String(includedMedicen[0].ClaimedAmount));
-      }
+      const includedMedicen = (rawPayload.MedicenBill || []).filter((b: any) => b.included !== false);
+      if (includedMedicen[0]) {
+        formData.append('MedicenBill.BilledAmount', String(includedMedicen[0].BilledAmount));
+        formData.append('MedicenBill.ClaimedAmount', String(includedMedicen[0].ClaimedAmount));
+      }
 
-      const includedConsultation = (rawPayload.Consultation || []).filter((b: any) => b.included !== false);
-      if (includedConsultation[0]) {
-        formData.append('Consultation.BilledAmount', String(includedConsultation[0].BilledAmount));
-        formData.append('Consultation.ClaimedAmount', String(includedConsultation[0].ClaimedAmount));
-      }
+      const includedConsultation = (rawPayload.Consultation || []).filter((b: any) => b.included !== false);
+      if (includedConsultation[0]) {
+        formData.append('Consultation.BilledAmount', String(includedConsultation[0].BilledAmount));
+        formData.append('Consultation.ClaimedAmount', String(includedConsultation[0].ClaimedAmount));
+      }
 
-      const includedInvestigation = (rawPayload.Investigation || []).filter((b: any) => b.included !== false);
-      if (includedInvestigation[0]) {
-        formData.append('Investigation.BilledAmount', String(includedInvestigation[0].BilledAmount));
-        formData.append('Investigation.ClaimedAmount', String(includedInvestigation[0].ClaimedAmount));
-      }
+      const includedInvestigation = (rawPayload.Investigation || []).filter((b: any) => b.included !== false);
+      if (includedInvestigation[0]) {
+        formData.append('Investigation.BilledAmount', String(includedInvestigation[0].BilledAmount));
+        formData.append('Investigation.ClaimedAmount', String(includedInvestigation[0].ClaimedAmount));
+      }
 
-      const includedProcedure = (rawPayload.Procedure || []).filter((b: any) => b.included !== false);
-      if (includedProcedure[0]) {
-        formData.append('Procedure.BilledAmount', String(includedProcedure[0].BilledAmount));
-        formData.append('Procedure.ClaimedAmount', String(includedProcedure[0].ClaimedAmount));
-      }
+      const includedProcedure = (rawPayload.Procedure || []).filter((b: any) => b.included !== false);
+      if (includedProcedure[0]) {
+        formData.append('Procedure.BilledAmount', String(includedProcedure[0].BilledAmount));
+        formData.append('Procedure.ClaimedAmount', String(includedProcedure[0].ClaimedAmount));
+      }
 
-      const includedRoomRent = (rawPayload.RoomRent || []).filter((b: any) => b.included !== false);
-      if (includedRoomRent[0]) {
-        formData.append('RoomRent.BilledAmount', String(includedRoomRent[0].BilledAmount));
-        formData.append('RoomRent.ClaimedAmount', String(includedRoomRent[0].ClaimedAmount));
-      }
+      const includedRoomRent = (rawPayload.RoomRent || []).filter((b: any) => b.included !== false);
+      if (includedRoomRent[0]) {
+        formData.append('RoomRent.BilledAmount', String(includedRoomRent[0].BilledAmount));
+        formData.append('RoomRent.ClaimedAmount', String(includedRoomRent[0].ClaimedAmount));
+      }
 
-      if (rawPayload.OtherBill && rawPayload.OtherBill.included !== false) {
-        formData.append('OtherBill.BilledAmount', String(rawPayload.OtherBill.BilledAmount));
-        formData.append('OtherBill.ClaimedAmount', String(rawPayload.OtherBill.ClaimedAmount));
-      }
+      if (rawPayload.OtherBill && rawPayload.OtherBill.included !== false) {
+        formData.append('OtherBill.BilledAmount', String(rawPayload.OtherBill.BilledAmount));
+        formData.append('OtherBill.ClaimedAmount', String(rawPayload.OtherBill.ClaimedAmount));
+      }
 
-      const notIncludedArr = Array.isArray(rawPayload.NotIncluded) ? rawPayload.NotIncluded : [];
-      for (let i = 0; i < 4; i++) {
-        const bill = notIncludedArr[i] || {};
-        let prefix = '';
-        switch (i) {
-          case 0:
-            prefix = 'MedicenNotFinalBill';
-            break;
-          case 1:
-            prefix = 'ConsultationNotFinalBill';
-            break;
-          case 2:
-            prefix = 'InvestigationNotFinalBill';
-            break;
-          case 3:
-            prefix = 'OtherNotFinalBill';
-            break;
-        }
-        const billedAmount = bill.billedAmount ?? bill.BilledAmount ?? 0;
-        const claimedAmount = bill.claimedAmount ?? bill.ClaimedAmount ?? 0;
-        if (prefix === 'MedicenNotFinalBill') {
-          formData.append(`${prefix}.Amount`, String(billedAmount));
-          formData.append(`${prefix}.AmountCliam`, String(claimedAmount));
-        } else {
-          formData.append(`${prefix}.BilledAmount`, String(billedAmount));
-          formData.append(`${prefix}.AmountCliam`, String(claimedAmount));
-        }
-        (bill.files || []).forEach((file: File, j: number) => {
-          formData.append(`${prefix}.Files[${j}]`, file);
-        });
-      }
+      const notIncludedArr = Array.isArray(rawPayload.NotIncluded) ? rawPayload.NotIncluded : [];
+      for (let i = 0; i < 4; i++) {
+        const bill = notIncludedArr[i] || {};
+        let prefix = '';
+        switch (i) {
+          case 0:
+            prefix = 'MedicenNotFinalBill';
+            break;
+          case 1:
+            prefix = 'ConsultationNotFinalBill';
+            break;
+          case 2:
+            prefix = 'InvestigationNotFinalBill';
+            break;
+          case 3:
+            prefix = 'OtherNotFinalBill';
+            break;
+        }
+        const billedAmount = bill.billedAmount ?? bill.BilledAmount ?? 0;
+        const claimedAmount = bill.claimedAmount ?? bill.ClaimedAmount ?? 0;
+        if (prefix === 'MedicenNotFinalBill') {
+          formData.append(`${prefix}.Amount`, String(billedAmount));
+          formData.append(`${prefix}.AmountCliam`, String(claimedAmount));
+        } else {
+          formData.append(`${prefix}.BilledAmount`, String(billedAmount));
+          formData.append(`${prefix}.AmountCliam`, String(claimedAmount));
+        }
+        (bill.files || []).forEach((file: File, j: number) => {
+          formData.append(`${prefix}.Files[${j}]`, file);
+        });
+      }
 
-      rawPayload.HospitalIncomeTaxFile?.Files?.forEach((file: File, i: number) => formData.append(`HospitalIncomeTaxFile.Files[${i}]`, file));
-      rawPayload.HospitalRegstrationDetailsFile?.Files?.forEach((file: File, i: number) => formData.append(`HospitalRegstrationDetailsFile.Files[${i}]`, file));
-      if (rawPayload.FinalHospitalBillUpload?.[0]) {
-        formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
-      }
+      rawPayload.HospitalIncomeTaxFile?.Files?.forEach((file: File, i: number) => formData.append(`HospitalIncomeTaxFile.Files[${i}]`, file));
+      rawPayload.HospitalRegstrationDetailsFile?.Files?.forEach((file: File, i: number) => formData.append(`HospitalRegstrationDetailsFile.Files[${i}]`, file));
+      if (rawPayload.FinalHospitalBillUpload?.[0]) {
+        formData.append('ClaimPdfUpload', rawPayload.FinalHospitalBillUpload[0]);
+      }
 
-      await dispatch(submitDirectClaim(formData));
-      // await dispatch(getMyClaims(user.EmpCode));
+      await dispatch(submitDirectClaim(formData));
+      // await dispatch(getMyClaims(user.EmpCode));
 
-      setPatientDetails({});
-      setBillDetails({});
-      setPreHospDetails({});
-      setPostHospDetails({});
-      onCloseForm();
-    } catch (error) {
-      console.error('Submit error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      setPatientDetails({});
+      setBillDetails({});
+      setPreHospDetails({});
+      setPostHospDetails({});
+      onCloseForm();
+    } catch (error) {
+      console.error('Submit error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-  return (
-    <div className=" p-2 min-h-screen">
-      {isSubmitting ? (
-        <div className="flex items-center justify-center h-full py-10">
-          <Loader />
-        </div>
-      ) : (
-        <>
-          <div className="mt-4">
-            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
-          </div>
-          <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} preHospClaimedAmount={preHospClaimedAmount}  />
-          </div>
-          <div className="mt-4">
-            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
-          </div>
-          <div>
-            <PostHospitalizationAndDeclaration
-              postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-              onChange={setPostHospDetails}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-           {/* Summary Section */}
-        <div className="space-y-4 border-t pt-6">
-          <h2 className="text-lg font-semibold text-primary">Summary</h2>
-
-          <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-              <span className="text-sm text-primary">Pre Hospitalization Expense Amount</span>
-              <span className="text-sm font-medium">{preHospBilledAmount}</span>
-            </div>
-
-            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-              <span className="text-sm text-primary">Hospitalization Expense Amount</span>
-              <span className="text-sm font-medium">{hospBilledAmount}</span>
-            </div>
-
-            <div className="flex justify-between items-center py-2 border-b border-gray-200">
-              <span className="text-sm font-medium text-primary">Total Bill</span>
-              <span className="text-sm font-medium">{preHospBilledAmount + hospBilledAmount + notIncludedBilledAmount}</span>
-            </div>
-
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-semibold text-primary">Net Total (Balance Claim)</span>
-              <span className="text-sm font-semibold">{netTotal}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Declaration Checkbox */}
-        <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <Checkbox
-            checked={!!postHospDetails.DeclarationChecked}
-            onCheckedChange={(checked) => setPostHospDetails(prev => ({ ...prev, DeclarationChecked: checked === true }))}
-            id="final-declaration"
-            className="mt-0.5"
-          />
-          <Label htmlFor="final-declaration" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
-            I the undersigned hereby declare that the information given in this form is correct and complete to the best of my knowledge and belief.
-          </Label>
-        </div>
-
-        {/* Submit Button */}
-        <div className="flex justify-end pt-4">
-          <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2" disabled={!postHospDetails.DeclarationChecked}>
-            Submit Claim
-          </Button>
-        </div>
-        </>
-      )}
-    </div>
-  );
+  return (
+    <div className=" p-2 min-h-screen">
+      {isSubmitting ? (
+        <div className="flex items-center justify-center h-full py-10">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          <div className="mt-4">
+            <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
+          </div>
+          <div className="mt-4">
+            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} preHospClaimedAmount={preHospClaimedAmount}  />
+          </div>
+          <div className="mt-4">
+            <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />
+          </div>
+          <div>
+            <PostHospitalizationAndDeclaration
+              postHospitalizationAndDeclaration={postHospDetailsWithSummary}
+              onChange={setPostHospDetails}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+          
+        </>
+      )}
+    </div>
+  );
 };
 
 export default RaiseClaim;
