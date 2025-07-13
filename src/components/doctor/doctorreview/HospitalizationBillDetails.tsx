@@ -88,7 +88,7 @@ const HospitalizationBillDetails = ({
       </div>
 
       <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
-      {/* <DisplayTable headers={billHeaders}>
+      <DisplayTable headers={billHeaders}>
         {Array.isArray(billItems) &&
           billItems?.map((item, index) =>
             item ? (
@@ -110,7 +110,7 @@ const HospitalizationBillDetails = ({
               />
             ) : null
           )}
-      </DisplayTable> */}
+      </DisplayTable>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
         <div className="text-center">

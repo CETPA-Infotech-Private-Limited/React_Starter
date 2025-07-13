@@ -39,12 +39,14 @@ export const fetchAdvanceData = createAsyncThunk('advance/fetchUserAdvanceClaims
 // Fetch for banking claims
 export const fetchBankingAdvanceData = createAsyncThunk('advance/fetchBankingAdvanceClaims', async (empId: number, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`/claim/GetClaimForBankingList/${empId}`);
+    const response = await axiosInstance.get(`/claim/GetClaimForBillPassingList/${empId}`);
     return response.data.data as AdvanceItem[];
   } catch (error: any) {
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch banking data');
   }
 });
+
+
 
 const getAdvanceClaimSlice = createSlice({
   name: 'advance',
