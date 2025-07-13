@@ -131,7 +131,7 @@ interface BillDetailsProps {
   preHospBilledAmount?: number;
 }
 
-const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 0 }: BillDetailsProps) => {
+const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 0, preHospClaimedAmount=0 }: BillDetailsProps) => {
   const initialBills: BillItem[] = [
     {
       id: 1,
@@ -305,7 +305,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                   <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium">Claimed Amount</th>
                   <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-40">Included in Final Bill</th>
                   <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-32">Upload Document</th>
-                  <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-24 rounded-tr-md">Action</th>
+                  <th className="border border-blue-500 px-4 py-3 text-left text-sm font-medium w-24 rounded-tr-md">Add Additional Bills</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,7 +380,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                           })()}
                         >
                           <Plus className="w-4 h-4 mr-1" />
-                          Add Bill
+                           Add additional Bills
                         </Button>
                       ) : (
                         <Button
@@ -413,7 +413,7 @@ const HospitalizationBillForm = ({ billDetails, onChange, preHospBilledAmount = 
                 <strong className="text-blue-800">Total Bill (Billed):</strong> {(preHospBilledAmount + billedTotal).toFixed(2)}
               </span>
               <span>
-                <strong className="text-blue-800">Net Total (Claimed):</strong> {claimedTotal.toFixed(2)}
+                <strong className="text-blue-800">Net Total (Claimed):</strong> {(claimedTotal + preHospClaimedAmount).toFixed(2) }
               </span>
             </div>
           </div>

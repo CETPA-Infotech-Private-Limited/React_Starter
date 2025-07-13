@@ -55,7 +55,7 @@ interface ClaimRequest {
   HospitalIncomeTaxFile?: { Files: any[] };
   HospitalRegstrationDetailsFile?: { Files: any[] };
   PaidAmount?: number;
-  NotIncluded?: { BilledAmount: number; ClaimedAmount: number; files?: File[] }[];
+  NotIncluded?: { BilledAmount?: number; ClaimedAmount?: number; files?: File[]; claimedAmount?: number; billedAmount?: number }[]; // Updated to reflect potential variations
   claimedTotal?: number; // Added properties for files to rawPayload for pre-hospitalization forms
   PreHospitalizationProcedureFiles?: File[];
   PreHospitalizationExpensesOtherFiles?: File[];
@@ -76,6 +76,8 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
+
+  // Calculate pre-hospitalization billed amount
   const preHospBilledAmount = [
     preHospDetails?.PreHospitalizationExpensesMedicine?.BilledAmount || 0,
     preHospDetails?.PreHospitalizationExpensesConsultation?.BilledAmount || 0,
@@ -84,6 +86,9 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
+  
+
+  // Calculate hospitalization billed amount
   const hospBilledAmount = [
     ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
@@ -93,6 +98,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     billDetails?.OtherBill?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
+  // Calculate hospitalization claimed amount
   const hospClaimedAmount = [
     ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
@@ -102,20 +108,39 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     billDetails?.OtherBill?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
+  // Calculate claimed amount from not-included bills
+  const notIncludedClaimedAmount = (billDetails?.NotIncluded || []).reduce(
+    (sum, item) => sum + Number(item?.ClaimedAmount || item?.claimedAmount || 0),
+    0
+  );
+
+  // Calculate billed amount from not-included bills (newly added)
+  const notIncludedBilledAmount = (billDetails?.NotIncluded || []).reduce(
+    (sum, item) => sum + Number(item?.BilledAmount || item?.billedAmount || 0),
+    0
+  );
+
+  // Calculate pre-hospitalization claimed amount
+  const preHospClaimedAmount = [
+    preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
+    preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
+  ].reduce((sum, val) => sum + Number(val), 0)
+
+  // Calculate the net total claimed amount
   const netTotal =
     hospClaimedAmount +
-    [
-      preHospDetails?.PreHospitalizationExpensesMedicine?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationExpensesConsultation?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationExpensesInvestigation?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationProcedure?.ClaimedAmount || 0,
-      preHospDetails?.PreHospitalizationExpensesOther?.ClaimedAmount || 0,
-    ].reduce((sum, val) => sum + Number(val), 0);
+    preHospClaimedAmount+ notIncludedBilledAmount // This now correctly includes the not-included claim amount
+
+
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,
     PreHospitalizationExpenseAmount: preHospBilledAmount,
     HospitalizationExpenseAmount: hospBilledAmount,
+    NotIncludedBilledAmount: notIncludedBilledAmount, // Added for summary
     PaidAmount: postHospDetails?.PaidAmount || 0,
     NetTotal: netTotal,
   };
@@ -129,9 +154,13 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...preHospDetails,
         ...postHospDetails,
       };
+
+      console.log(rawPayload,"this is raw payload")
       const formData = new FormData();
       formData.append('Unit', user.unitId || ''); // Added optional chaining and fallback
       formData.append('PayTo', rawPayload.PayTo || 'Hospital');
+      formData.append('IsHospitialEmpanpanelled', String(rawPayload.IsHospitialEmpanpanelled ?? false));
+
       formData.append('patientId', String(user.EmpCode || 0));
       formData.append('Reason', rawPayload.Reason || 'This is A Reason');
       formData.append('RequestName', rawPayload.RequestName || 'Claim Request');
@@ -172,7 +201,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
       );
       rawPayload.PreHospitalizationExpensesConsultation?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesConsultation.Files', file));
 
-      formData.append('ClaimAmount', String(netTotal));
+      formData.append('ClaimAmount', String(netTotal)); // This now includes not-included amounts
       formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
       formData.append('EmpId', String(user.EmpCode || 0));
       formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
@@ -257,7 +286,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
       }
 
       await dispatch(submitDirectClaim(formData));
-      // await dispatch(getMyClaims(user.EmpCode));
+      // await dispatch(getMyClaims(user.EmpCode)); // Uncomment if needed after submission
 
       setPatientDetails({});
       setBillDetails({});
@@ -283,7 +312,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
             <PatientDetails patientDetail={patientDetails} patientDetailOnChange={setPatientDetails} />
           </div>
           <div className="mt-4">
-            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} />
+            <BillDetailsForm billDetails={billDetails} onChange={setBillDetails} preHospBilledAmount={preHospBilledAmount} preHospClaimedAmount={preHospClaimedAmount} />
           </div>
           <div className="mt-4">
             <PreHospitalizationForm preHospitalizationForm={preHospDetails} onChange={setPreHospDetails} />

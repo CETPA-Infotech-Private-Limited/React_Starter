@@ -5,19 +5,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
+import Loader from '@/components/ui/loader';
 
-const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
+const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
   if (!claimDetail) return null;
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
+  const {loading} = useAppSelector((state:RootState)=>state.submitClaimProcessSlice) // Destructure loading from your slice
 
   const billItems = [
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
     { id: 2, billType: 'Consultation', billedAmount: billDetails?.consultationBill ?? 0, claimedAmount: billDetails?.consultationClaim ?? 0 },
     { id: 3, billType: 'Investigation', billedAmount: billDetails?.investigationBill ?? 0, claimedAmount: billDetails?.investigationClaim ?? 0 },
-    { id: 4, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
-    { id: 5, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
+    { id: 4, billType: 'Procedure', billedAmount: billDetails?.procedureBill ?? 0, claimedAmount: billDetails?.procedureClaim ?? 0 },
+    { id: 5, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
+    { id: 6, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
+    
   ];
 
   const preHospItems = [
@@ -47,6 +51,14 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
     },
     {
       id: 4,
+      billType: 'Procedure',
+      billedDate: preHospitalizationExpenses?.othersBillDate,
+      billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
+      claimedAmount: preHospitalizationExpenses?.otherClaimAmount ?? 0,
+      hasFiles: 0,
+    },
+    {
+      id: 5,
       billType: 'Other',
       billedDate: preHospitalizationExpenses?.othersBillDate,
       billedAmount: preHospitalizationExpenses?.otherBillAmount ?? 0,
@@ -78,6 +90,7 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
+      {loading && <Loader />} {/* Conditionally render the Loader component */}
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Hospitalization Claim Details</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
