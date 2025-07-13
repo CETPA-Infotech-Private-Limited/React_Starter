@@ -127,18 +127,18 @@ const AdvanceClaimPage = () => {
         enableSorting: false,
         cell: ({ row }: any) => (
           <div className="flex justify-center gap-2">
-            <Button
+            {/* <Button
               size="sm"
               variant={row.original.statusId === 2 ? 'default' : 'ghost'}
               disabled={row.original.statusId !== 2}
               onClick={() => {
-                setSelectedClaim(row.original);
+                setSelectedClaim(row.original); 
                 setActiveForm('topup');
                 handleScrollToForm();
               }}
             >
               Top Up
-            </Button>
+            </Button> */}
           </div>
         ),
         className: 'text-center',
@@ -174,6 +174,7 @@ const AdvanceClaimPage = () => {
         <div ref={formRef}>
           <RequestAdvanceTopUpForm
             claim={selectedClaim}
+            data = {claimList}
             onClose={() => {
               setActiveForm(null);
               setSelectedClaim(null);

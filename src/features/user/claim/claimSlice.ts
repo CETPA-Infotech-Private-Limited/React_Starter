@@ -148,7 +148,7 @@ export const submitDirectClaim = createAsyncThunk('claim/submitDirectClaim', asy
 
 export const submitAdvanceTopUpClaim = createAsyncThunk('claim/submitAdvanceTopUpClaim', async (formData: FormData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post('/Claim/AdvanceTop', formData, {
+    const response = await axiosInstance.post('/Claim/AdvanceTopUp', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 

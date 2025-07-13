@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from '../hr/reviewclaim/ReviewComponents';
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from './DisplayTable';
 import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -14,15 +14,50 @@ import { RootState } from '@/app/store';
 import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { submitAdvanceApproval } from '@/features/medicalClaim/advanceApprovalSlice';
+import { submitClaimProcess } from '@/features/doctor/doctorSlice';
 
 const ApproveClaimAfterDocReview = () => {
   // State for the declaration and approval form
+
+  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail);
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('no');
   const [specialDiseaseName, setSpecialDiseaseName] = useState('');
   const [totalRequested, setTotalRequested] = useState('');
   const [approvedAmount, setApprovedAmount] = useState('');
+
   const [sendTo, setSendTo] = useState('');
   const [loading, setLoading] = useState(false); // For the submit button
+  const [approvalInputs, setApprovalInputs] = useState<{ [key: string]: string }>({});
+  const [approvalSummary, setApprovalSummary] = useState({
+    MedicineAmount: 0,
+    MedicineNotInAmount: 0,
+    ConsultationAmount: 0,
+    ConsultationNotInAmount: 0,
+    InvestigationAmount: 0,
+    InvestigationNotInAmount: 0,
+    RoomRentAmount: 0,
+    ProcedureAmount: 0,
+    OtherAmount: 0,
+    OtherNotInAmount: 0,
+  });
+
+  const [preHospSummary, setPreHospSummary] = useState({
+    MedicineAmount: 0,
+    ConsultationAmount: 0,
+    InvestigationAmount: 0,
+    RoomRentAmount: 0,
+    ProcedureAmount: 0,
+    OtherAmount: 0,
+  });
+
+  const [billPassing, setBillPassing] = useState({
+    ClaimId: claimDetail?.claimId,
+    TopUpId: claimDetail?.topUpId,
+    ReferenceDate: new Date().toISOString(),
+    SapRefNumber: '',
+    AmountPaid: 0,
+    Comment: '',
+  });
 
   // State for managing claim list and details view
   const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
@@ -32,8 +67,8 @@ const ApproveClaimAfterDocReview = () => {
   // Redux state
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const claimHrData = useAppSelector((state: RootState) => state.getClaimHr.data);
-  console.log(claimHrData, ' this is claimhrdata');
-  const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail); // This now holds the patient and bill details
+
+  // const claimDetail = useAppSelector((state: RootState) => state.getClaimHr.claimDetail); // This now holds the patient and bill details
 
   console.log(claimDetail, 'theseare claim detail');
   const claimDetailLoading = useAppSelector((state: RootState) => state.getClaimHr.loadingClaimData);
@@ -78,8 +113,8 @@ const ApproveClaimAfterDocReview = () => {
       setShowDetails(true);
     }
 
-    if (rowData.claimId) {
-      dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+    if (rowData.advanceId) {
+      dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
     }
   };
 
@@ -160,7 +195,8 @@ const ApproveClaimAfterDocReview = () => {
         patientId: value.patientId,
         relation: value.relation || 'Self',
         requestedDate: value.requestDate,
-        claimAmount: value.cliamAmount, // Keeping 'cliamAmount' as per your provided code
+        claimAmount: value.cliamAmount,
+        advanceId: value.advanceId, // Keeping 'cliamAmount' as per your provided code
         claimId: value.claimId,
       }))
     : [];
@@ -260,19 +296,60 @@ const ApproveClaimAfterDocReview = () => {
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Approval Details'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Approval Details'];
 
+  console.log(approvedAmount, 'this is approved');
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      console.log(billPassing, 'this is bill passing');
       const payload = {
         AdvanceId: claimDetail.advanceBasicDetails.advanceId,
-        ApprovalAmount: String(approvedAmount),
-        RecipientId: '101002',
         SenderId: user.EmpCode,
+        RecipientId: 101002,
         ClaimTypeId: claimDetail.advanceBasicDetails.claimTypeId,
-        StatusId: 4,
+        StatusId: 2,
+        ClaimId: claimDetail.claimId,
+        TopUpId: claimDetail.topUpId,
+        ReferenceDate: billPassing.ReferenceDate,
+        SapRefNumber: billPassing.SapRefNumber,
+        AmountPaid: billPassing.AmountPaid,
+        Comment: claimDetail?.billPasingDetails?.comment || 'N/A',
+        ApprovalAmount: approvedAmount,
+
+        // HospitalizationBillApprovelDetails
+        'HospitalizationBillApprovelDetails.MedicineAmount': approvalSummary.MedicineAmount,
+        'HospitalizationBillApprovelDetails.MedicineNotInAmount': approvalSummary.MedicineNotInAmount,
+        'HospitalizationBillApprovelDetails.ConsultationAmount': approvalSummary.ConsultationAmount,
+        'HospitalizationBillApprovelDetails.ConsultationNotInAmount': approvalSummary.ConsultationNotInAmount,
+        'HospitalizationBillApprovelDetails.InvestigationAmount': approvalSummary.InvestigationAmount,
+        'HospitalizationBillApprovelDetails.InvestigationNotInAmount': approvalSummary.InvestigationNotInAmount,
+        'HospitalizationBillApprovelDetails.RoomRentAmount': approvalSummary.RoomRentAmount,
+        'HospitalizationBillApprovelDetails.ProcedureAmount': approvalSummary.ProcedureAmount,
+        'HospitalizationBillApprovelDetails.OtherAmount': approvalSummary.OtherAmount,
+        'HospitalizationBillApprovelDetails.OtherNotInAmount': approvalSummary.OtherNotInAmount,
+
+        // PreHospitalizationExpenses
+        'PreHospitalizationExpenses.MedicineAmount': preHospSummary.MedicineAmount,
+        'PreHospitalizationExpenses.ConsultationAmount': preHospSummary.ConsultationAmount,
+        'PreHospitalizationExpenses.InvestigationAmount': preHospSummary.InvestigationAmount,
+        'PreHospitalizationExpenses.RoomRentAmount': preHospSummary.RoomRentAmount,
+        'PreHospitalizationExpenses.ProcedureAmount': preHospSummary.ProcedureAmount,
+        'PreHospitalizationExpenses.OtherAmount': preHospSummary.OtherAmount,
+
+        // BillPassingDetails
+        'BillPassingDetails.ClaimId': billPassing.ClaimId,
+        'BillPassingDetails.TopUpId': billPassing.TopUpId,
+        'BillPassingDetails.ReferenceDate': billPassing.ReferenceDate,
+        'BillPassingDetails.SapRefNumber': billPassing.SapRefNumber,
+        'BillPassingDetails.AmountPaid': billPassing.AmountPaid,
+        'BillPassingDetails.Comment': claimDetail?.billPasingDetails?.comment || 'N/A',
       };
 
-      await dispatch(submitAdvanceApproval(payload));
+      // Simulate API call
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // console.log('Submitting data:', formData);
+
+      await dispatch(submitClaimProcess(payload));
 
       // Reset form fields after successful submission
       setApprovedAmount('');
@@ -333,13 +410,20 @@ const ApproveClaimAfterDocReview = () => {
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
-                    key={item.id}
+                    key={item.billType}
                     serialNo={index + 1}
                     billType={item.billType}
                     billedAmount={item.billedAmount}
                     claimedAmount={item.claimedAmount}
                     included={item.claimedAmount > 0}
-                    clarification="" // Placeholder, should come from data if available
+                    clarification="" // if any
+                    approvalDetails={approvalInputs[item.billType] || ''}
+                    onApprovalChange={(val) =>
+                      setApprovalInputs((prev) => ({
+                        ...prev,
+                        [item.billType]: val,
+                      }))
+                    }
                   />
                 ))}
               </DisplayTable>
@@ -348,13 +432,20 @@ const ApproveClaimAfterDocReview = () => {
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
-                    key={item.id}
+                    key={item.billType}
                     serialNo={index + 1}
                     billType={item.billType}
                     billedAmount={item.billedAmount}
                     claimedAmount={item.claimedAmount}
                     included={item.claimedAmount > 0}
-                    clarification="" // Placeholder, should come from data if available
+                    clarification="" // if any
+                    approvalDetails={approvalInputs[item.billType] || ''}
+                    onApprovalChange={(val) =>
+                      setApprovalInputs((prev) => ({
+                        ...prev,
+                        [item.billType]: val,
+                      }))
+                    }
                   />
                 ))}
               </DisplayTable>
@@ -375,16 +466,23 @@ const ApproveClaimAfterDocReview = () => {
               </div>
 
               <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className="text-primary" />
-              <DisplayTable headers={preHospHeaders}>
-                {preHospItems.map((item, index) => (
-                  <PreHospDisplayRow
-                    key={item.id}
+              <DisplayTable headers={billHeaders}>
+                {billItems.map((item, index) => (
+                  <BillItemDisplayRow
+                    key={item.billType}
                     serialNo={index + 1}
                     billType={item.billType}
-                    billedDate={item.billedDate}
                     billedAmount={item.billedAmount}
                     claimedAmount={item.claimedAmount}
-                    hasFiles={!!item.hasFiles} // Convert number (0 or 1) to boolean
+                    included={item.claimedAmount > 0}
+                    clarification="" // if any
+                    approvalDetails={approvalInputs[item.billType] || ''}
+                    onApprovalChange={(val) =>
+                      setApprovalInputs((prev) => ({
+                        ...prev,
+                        [item.billType]: val,
+                      }))
+                    }
                   />
                 ))}
               </DisplayTable>

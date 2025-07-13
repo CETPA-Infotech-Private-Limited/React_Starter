@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
 import { Button } from '@/components/ui/button';
@@ -57,8 +55,8 @@ const ReviewClaim = () => {
       setShowDetails(true);
     }
 
-    if (rowData.claimId) {
-      await dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
+    if (rowData.advanceId) {
+      await dispatch(getClaimDataHr({ advanceid: rowData.advanceId }));
       setIsSubmitting(false);
     }
   };
@@ -137,6 +135,7 @@ const ReviewClaim = () => {
         relation: 'Self',
         requestedDate: value.requestDate,
         claimAmount: value.cliamAmount,
+        advanceId: value.advanceId,
         claimId: value.claimId,
       }))
     : [];

@@ -159,7 +159,7 @@ const ApproveAdvancePage = () => {
         SenderId: Number(user.EmpCode),
         RecipientId: 101002,
         ClaimTypeId: 1,
-        StatusId: 4,
+        StatusId: 2,
         ApprovalAmount: approvedAmount,
       })
     );
