@@ -118,15 +118,14 @@ const preHospClaimedAmount = [
 const netTotal =
   hospClaimedAmount +
   preHospClaimedAmount +
-  notIncludedClaimedAmount; // ✅ Add not-included claim amount
-
+  notIncludedClaimedAmount; 
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,
     PreHospitalizationExpenseAmount: preHospBilledAmount,
     HospitalizationExpenseAmount: hospBilledAmount,
     PaidAmount: postHospDetails?.PaidAmount || 0,
-    NetTotal: netTotal,
+   
   };
 
   const handleSubmit = async () => {
@@ -138,6 +137,8 @@ const netTotal =
         ...preHospDetails,
         ...postHospDetails,
       };
+
+
 
       console.log(rawPayload,"this is raw payload")
       const formData = new FormData();
@@ -185,7 +186,7 @@ const netTotal =
       );
       rawPayload.PreHospitalizationExpensesConsultation?.Files?.forEach((file: File) => formData.append('PreHospitalizationExpensesConsultation.Files', file));
 
-      formData.append('ClaimAmount', String(netTotal));
+      formData.append('ClaimAmount', String(rawPayload.claimedTotal  + preHospClaimedAmount));
       formData.append('FinalHospitalBill', String(rawPayload.FinalHospitalBill || 0));
       formData.append('EmpId', String(user.EmpCode || 0));
       formData.append('HospitalId', String(rawPayload.HospitalId || '123'));
@@ -306,7 +307,7 @@ const netTotal =
               postHospitalizationAndDeclaration={postHospDetailsWithSummary}
               onChange={setPostHospDetails}
               onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
+              netTotal ={netTotal}
             />
           </div>
           

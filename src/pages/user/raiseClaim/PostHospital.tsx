@@ -128,7 +128,7 @@ interface PostHospitalizationFormProps {
   onSubmit: () => void;
 }
 
-const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, isSubmitting }: PostHospitalizationFormProps) => {
+const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, onSubmit, netTotal }: PostHospitalizationFormProps) => {
   const { IsPostHospitalization, IsSpecailDisease, SpecialDiseaseName, IsTaxAble, DeclarationChecked } = postHospitalizationAndDeclaration;
 
   // File upload states
@@ -156,7 +156,7 @@ const PostHospitalizationForm = ({ postHospitalizationAndDeclaration, onChange, 
   const preHospAmount = postHospitalizationAndDeclaration.PreHospitalizationExpenseAmount || 0;
   const hospAmount = postHospitalizationAndDeclaration.HospitalizationExpenseAmount || 0;
   const totalBill = preHospAmount + hospAmount;
-  const netTotal = postHospitalizationAndDeclaration.NetTotal || 0;
+ 
 
   return (
     <div className="rounded-xl border border-blue-300 shadow-2xl mx-auto p-6 bg-white">
