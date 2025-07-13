@@ -9,7 +9,7 @@ export interface AdvanceApprovalPayload {
   SapRefNumber: string;        // string
   AmountPaid: number;          // number($double)
   Comment?: string;            // optional string
-  StatusId:Number;
+  // StatusId:Number;
 }
 
 
@@ -35,11 +35,11 @@ export const submitAdvanceApproval = createAsyncThunk('advanceApproval/submit', 
      formData.append('ReferenceDate', String(payload.ReferenceDate));
     formData.append('SapRefNumber', String(payload.SapRefNumber));
      formData.append('AmountPaid', String(payload.AmountPaid));
-          formData.append('StatusId', String(payload.StatusId));
+          // formData.append('StatusId', String(payload.StatusId));
 
 
     formData.append('Comment', String(payload.Comment));
-    const response = await axiosInstance.post('/Claim/SubmitAdvanceProcessDetails', formData, {
+    const response = await axiosInstance.post('/Claim/submitClaimORAdvanceBYFinance', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;

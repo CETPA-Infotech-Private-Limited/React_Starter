@@ -170,7 +170,7 @@ const ApproveAdvancePage = () => {
         SapRefNumber: sapRefNumber,
         AmountPaid: parseFloat(amountPaid),
         Comment: comment || '',
-        StatusId:2
+        // StatusId:2
       })
     );
     console.log(selectedAdvance,'thisis advace')
