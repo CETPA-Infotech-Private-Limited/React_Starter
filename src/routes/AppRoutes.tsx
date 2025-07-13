@@ -56,7 +56,6 @@ const AppRoutes = () => {
             <Route path="/review-claim" element={<HRReviewPage />} />
             {/* <Route path="/final-hr-review" element={<ApproveClaimAfterDocReview />} /> */}
             <Route path="/my-claim" element={<MyClaim />} />
-
             <Route path="/request-advance" element={<RequestAdvance />} />
             <Route path="/banking" element={<BankingPage />} />
             <Route path="/doctor-review" element={<DoctorReviewPage />} />

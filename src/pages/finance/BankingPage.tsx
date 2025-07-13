@@ -1,113 +1,104 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
 import TableList from '@/components/ui/data-table';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchAdvanceData, fetchBankingAdvanceData } from '@/features/medicalClaim/getAdvanceClaimSlice';
-import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
-import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
-import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
+import toast from 'react-hot-toast';
+
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { RootState } from '@/app/store';
+import { fetchBankingAdvanceData, fetchAdvanceData } from '@/features/medicalClaim/getAdvanceClaimSlice';
+import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
+import { submitAdvanceApprovalByFinance, resetFinanceStatus } from '@/features/medicalClaim/advanceApprovalSlice';
+import { findEmployeeDetails } from '@/lib/helperFunction';
 import { PatientDetailsCard } from '@/components/hr/reviewAdvanceRequest/PatientDetailsTable';
 import { HospitalizationDetailsCard } from '@/components/hr/reviewAdvanceRequest/HospitalizationDetailsCard';
-import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
-import toast from 'react-hot-toast';
-import { ReadOnlyField } from '@/components/common/ReadOnlyField';
+import AdvanceBankingDetailsForm from '@/components/finance/Banking/AdvanceBankingDetailsForm';
+import { format } from 'date-fns';
 
-const ApproveAdvancePage = () => {
+const BankingPage = () => {
   const dispatch = useAppDispatch();
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
-  const [referenceDate, setReferenceDate] = useState('');
-  const [sapRefNumber, setSapRefNumber] = useState('');
-  const [amountPaid, setAmountPaid] = useState('');
-  const [comment, setComment] = useState('');
 
-  const { bankingData, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
-  const { data: claimDetails, loading: detailsLoading } = useAppSelector((state: RootState) => state.getClaimDetails);
-  const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
-  const user = useAppSelector((state: RootState) => state.user);
-  const { employees } = useAppSelector((state: RootState) => state.employee);
+  const { EmpCode } = useAppSelector((state: RootState) => state.user);
+  const { bankingData, loading: tableLoading } = useAppSelector((state) => state.getAdvanceClaim);
+  const { employees } = useAppSelector((state) => state.employee);
+  const { data: claimDetails, loading: detailsLoading } = useAppSelector((state) => state.getClaimDetails);
+  const { finance } = useAppSelector((state) => state.advanceApproval);
 
   useEffect(() => {
-    if (user?.EmpCode) {
-      dispatch(fetchBankingAdvanceData(Number(user.EmpCode)));
+    if (EmpCode) {
+      dispatch(fetchBankingAdvanceData(Number(EmpCode)));
     }
-  }, [dispatch, user?.EmpCode]);
+  }, [dispatch, EmpCode]);
 
   useEffect(() => {
-    if (success) {
+    if (finance.success) {
       toast.success('Advance approved successfully!');
-      dispatch(resetAdvanceApprovalState());
-      dispatch(fetchAdvanceData(Number(user.EmpCode)));
+      dispatch(resetFinanceStatus());
+      dispatch(fetchBankingAdvanceData(Number(EmpCode)));
       setSelectedAdvance(null);
     }
-    if (error) {
-      toast.error(error);
-      dispatch(resetAdvanceApprovalState());
+
+    if (finance.error) {
+      toast.error(finance.error);
+      dispatch(resetFinanceStatus());
     }
-  }, [success, error, dispatch]);
+  }, [finance.success, finance.error, dispatch, EmpCode]);
 
   const columns = useMemo(
     () => [
       {
         accessorKey: 'sno',
         header: 'Sr. No.',
-        enableSorting: false,
         cell: ({ row }: any) => <div className="text-center">{row.index + 1}</div>,
         className: 'text-center',
       },
       {
         accessorKey: 'empId',
         header: 'Employee Name',
-        enableSorting: false,
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.empId));
           return <div className="text-center">{result?.employee?.empName || 'Unknown'}</div>;
         },
         className: 'text-center',
       },
+
       {
-        accessorKey: 'patientId',
-        header: 'Patient Name',
-        enableSorting: false,
-        cell: ({ row }: any) => {
-          const result = findEmployeeDetails(employees, String(row.original.patientId));
-          return <div className="text-center">{result?.employee?.empName || ''}</div>;
-        },
+        accessorKey: 'claimType',
+        header: 'Claim Type',
+        cell: ({ row }: any) => <div className="text-center"> {row.original.claimType}</div>,
         className: 'text-center',
       },
+
+      // {
+      //   accessorKey: 'patientId',
+      //   header: 'Patient Name',
+      //   cell: ({ row }: any) => {
+      //     const result = findEmployeeDetails(employees, String(row.original.patientId));
+      //     return <div className="text-center">{result?.employee?.empName || ''}</div>;
+      //   },
+      //   className: 'text-center',
+      // },
       {
-        accessorKey: 'relation',
-        header: 'Relation',
-        enableSorting: false,
-        cell: () => <div className="text-center">Self</div>,
-        className: 'text-center',
-      },
-      {
-        accessorKey: 'requestDate',
-        header: 'Request Date',
-        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
+        accessorKey: 'approvedDate',
+        header: 'Approved Date',
+        cell: ({ row }: any) => (
+          <div className="text-center">{row.original.approvedDate ? format(new Date(row.original.approvedDate), 'do MMM yyyy') : '-'}</div>
+        ),
         className: 'text-center',
       },
       {
         accessorKey: 'advanceAmount',
-        header: 'Claim Amount',
-        enableSorting: false,
-        cell: ({ row }: any) => {
-          const amount = row.original.advanceAmount;
-          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
-        },
+        header: 'Advance Amount',
+        cell: ({ row }: any) => <div className="text-center">₹ {row.original.advanceAmount}</div>,
         className: 'text-center',
       },
       {
         accessorKey: 'approvedAmount',
         header: 'Approved Amount',
-        enableSorting: false,
-        cell: ({ row }: any) => {
-          const amount = row.original.approvedAmount;
-          return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
-        },
+        cell: ({ row }: any) => <div className="text-center">₹ {row.original.approvedAmount}</div>,
         className: 'text-center',
       },
       {
@@ -116,7 +107,6 @@ const ApproveAdvancePage = () => {
         cell: ({ row }: any) => {
           const item = row.original;
           const isSelected = selectedAdvance?.advanceId === item.advanceId;
-
           return (
             <Button
               variant="link"
@@ -148,46 +138,41 @@ const ApproveAdvancePage = () => {
     return {
       name: result?.employee?.empName || 'Unknown',
       relation: 'Self',
-      dob: 'Not Available',
-      gender: 'Not Available',
+      dob: 'N/A',
+      gender: 'N/A',
     };
   };
 
-  const patientDetails = getPatientDetails();
-
-  const handleBankingDetailsSubmit = () => {
-    if (!referenceDate || !sapRefNumber || !amountPaid) {
-      toast.error('Please fill all required fields.');
-      return;
-    }
+  const handleBankingSubmit = (data: { SapRefNumber: string; ReferenceDate: string; AmountPaid: number; Comment?: string }) => {
+    if (!selectedAdvance || !EmpCode || !claimDetails?.advanceBasicDetails) return;
 
     dispatch(
-      submitAdvanceApproval({
-        AdvanceId: Number(selectedAdvance.advanceId),
-        SenderId: Number(user.EmpCode),
-        ClaimTypeId: Number(claimDetails.advanceBasicDetails.claimTypeId),
-        ReferenceDate: referenceDate,
-        SapRefNumber: sapRefNumber,
-        AmountPaid: parseFloat(amountPaid),
-        Comment: comment || '',
+      submitAdvanceApprovalByFinance({
+        AdvanceId: selectedAdvance.advanceId,
+        SenderId: Number(EmpCode),
+        ClaimTypeId: claimDetails.advanceBasicDetails.claimTypeId || 1,
+        ReferenceDate: data.ReferenceDate,
+        SapRefNumber: data.SapRefNumber,
+        AmountPaid: data.AmountPaid,
+        Comment: data.Comment || '',
         StatusId: 2,
       })
     );
-    console.log(selectedAdvance, 'thisis advace');
   };
+
+  const patientDetails = getPatientDetails();
 
   return (
     <div className="bg-white text-xs p-8 rounded-2xl font-sans space-y-10">
       <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
         <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Request List</h2>
-        {loading && <Loader />}
+        {tableLoading && <Loader />}
         <TableList
           data={bankingData}
           columns={columns}
           showSearchInput
           showFilter
-          onRowClick={() => {}}
-          rowClassName={(row) => (selectedAdvance?.claimId === row.original.claimId ? 'bg-blue-50 border-l-2 border-blue-600' : '')}
+          rowClassName={(row) => (selectedAdvance?.advanceId === row.original.advanceId ? 'bg-blue-50 border-l-2 border-blue-600' : '')}
         />
       </Card>
 
@@ -201,85 +186,33 @@ const ApproveAdvancePage = () => {
             <HospitalizationDetailsCard
               hospitalName={claimDetails.advanceBasicDetails.hospitalName || '-'}
               regdNo={claimDetails.advanceBasicDetails.hospitalRegNo || '-'}
-              admissionDate={claimDetails.advanceBasicDetails.likelyDate || ''}
+              admissionDate={claimDetails.advanceBasicDetails.likelyDate ? format(new Date(claimDetails.advanceBasicDetails.likelyDate), 'do MMM yyyy') : '-'}
               treatmentType={claimDetails.advanceBasicDetails.treatmentType || '-'}
               diagnosis={claimDetails.advanceBasicDetails.digonosis || '-'}
               estimatedAmount={claimDetails.advanceBasicDetails.estimatedAmount || 0}
               advanceRequested={claimDetails.advanceBasicDetails.advanceAmount || 0}
               doctorName={claimDetails.advanceBasicDetails.doctorName || '-'}
               payTo={claimDetails.advanceBasicDetails.payTo || '-'}
-              estimateFiles={
-                Array.isArray(claimDetails.documentLists)
-                  ? claimDetails.documentLists.filter((doc) => doc.category === 'EstimateAmount').map((doc) => doc.pathUrl)
-                  : []
-              }
-              admissionAdviceFiles={
-                Array.isArray(claimDetails.documentLists)
-                  ? claimDetails.documentLists.filter((doc) => doc.category === 'AdmissionAdviceUpload').map((doc) => doc.pathUrl)
-                  : []
-              }
+              estimateFiles={claimDetails.documentLists?.filter((doc) => doc.category === 'EstimateAmount')?.map((doc) => doc.pathUrl) || []}
+              admissionAdviceFiles={claimDetails.documentLists?.filter((doc) => doc.category === 'AdmissionAdviceUpload')?.map((doc) => doc.pathUrl) || []}
               incomeProofFiles={[]}
             />
           )}
 
-          <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
-            <h2 className="text-xl font-bold text-blue-700 mb-4">Verify And Approved</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ReadOnlyField label="Advance Request Amount" value={formatRupees(selectedAdvance?.advanceAmount)} />
-              <ReadOnlyField label="Final Approve Amount" value={formatRupees(selectedAdvance?.approvedAmount)} />
-
-              <div>
-                <label className="text-sm font-medium text-gray-700">Reference Date</label>
-                <input
-                  type="datetime-local"
-                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                  value={referenceDate}
-                  onChange={(e) => setReferenceDate(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700">SAP Reference Number</label>
-                <input
-                  type="text"
-                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                  value={sapRefNumber}
-                  onChange={(e) => setSapRefNumber(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700">Amount Paid</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                  value={amountPaid}
-                  onChange={(e) => setAmountPaid(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-700">Comment</label>
-                <textarea
-                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                  rows={2}
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button className="mt-4" onClick={handleBankingDetailsSubmit}>
-                Verify & Approve
-              </Button>
-            </div>
-          </Card>
+          <AdvanceBankingDetailsForm
+            initialData={{
+              sapRefNumber: '',
+              referenceDate: new Date(),
+              amountPaid: '',
+              comment: '',
+            }}
+            loading={finance.loading}
+            onSubmit={handleBankingSubmit}
+          />
         </>
       )}
     </div>
   );
 };
 
-export default ApproveAdvancePage;
+export default BankingPage;

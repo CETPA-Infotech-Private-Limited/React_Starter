@@ -25,8 +25,8 @@ const formSchema = z
       }),
     }),
   })
-  .refine((data) => Number(data.approvedAmount) < data.estimatedAmount, {
-    message: 'Approved amount must be less than estimated amount',
+  .refine((data) => Number(data.approvedAmount) <= data.estimatedAmount, {
+    message: 'Approved amount must be less than or equal to estimated amount',
     path: ['approvedAmount'],
   });
 

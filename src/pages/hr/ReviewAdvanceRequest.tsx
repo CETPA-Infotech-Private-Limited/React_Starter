@@ -10,7 +10,7 @@ import { RootState } from '@/app/store';
 import Loader from '@/components/ui/loader';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 
-import { submitAdvanceApproval, resetAdvanceApprovalState } from '@/features/medicalClaim/advanceApprovalSlice';
+import { submitAdvanceApprovalByHR, resetHRStatus } from '@/features/medicalClaim/advanceApprovalSlice';
 import toast from 'react-hot-toast';
 import { PatientDetailsCard } from '@/components/hr/reviewAdvanceRequest/PatientDetailsTable';
 import { HospitalizationDetailsCard } from '@/components/hr/reviewAdvanceRequest/HospitalizationDetailsCard';
@@ -19,41 +19,38 @@ import AdvanceApprovalForm from '@/components/hr/reviewAdvanceRequest/AdvanceApp
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
   const [selectedAdvance, setSelectedAdvance] = useState<any | null>(null);
+
   const { data, loading } = useAppSelector((state: RootState) => state.getAdvanceClaim);
   const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
-  const { loading: approvalLoading, success, error } = useAppSelector((state: RootState) => state.advanceApproval);
-
-  const user = useAppSelector((state: RootState) => state.user);
+  const { hr } = useAppSelector((state: RootState) => state.advanceApproval);
+  const { EmpCode } = useAppSelector((state: RootState) => state.user);
   const { employees } = useAppSelector((state: RootState) => state.employee);
 
   useEffect(() => {
-    if (user?.EmpCode) {
-      dispatch(fetchAdvanceData(Number(user.EmpCode)));
+    if (EmpCode) {
+      dispatch(fetchAdvanceData(Number(EmpCode)));
     }
-  }, [dispatch, user?.EmpCode]);
+  }, [dispatch, EmpCode]);
 
-  // This useEffect will run whenever claimDetails or detailsLoading changes.
   useEffect(() => {
-    if (!detailsLoading && claimDetails) {
-      console.log('Claim Details:', claimDetails);
-    }
     if (detailsError) {
       console.error('Error fetching Claim Details:', detailsError);
     }
-  }, [claimDetails, detailsLoading, detailsError]); // Dependency array
+  }, [detailsError]);
 
   useEffect(() => {
-    if (success) {
+    if (hr.success) {
       toast.success('Advance approved successfully!');
-      dispatch(resetAdvanceApprovalState());
-      dispatch(fetchAdvanceData(Number(user.EmpCode)));
+      dispatch(resetHRStatus());
+      if (EmpCode) dispatch(fetchAdvanceData(Number(EmpCode)));
       setSelectedAdvance(null);
     }
-    if (error) {
-      toast.error(error);
-      dispatch(resetAdvanceApprovalState());
+
+    if (hr.error) {
+      toast.error(hr.error);
+      dispatch(resetHRStatus());
     }
-  }, [success, error, dispatch, user?.EmpCode]); // Added user?.EmpCode to dependency array for fetchAdvanceData
+  }, [hr.success, hr.error, dispatch, EmpCode]);
 
   const columns = useMemo(
     () => [
@@ -67,7 +64,6 @@ const ApproveAdvancePage = () => {
       {
         accessorKey: 'empId',
         header: 'Employee Name',
-        enableSorting: false,
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.empId));
           return <div className="text-center">{result?.employee?.empName || 'Unknown'}</div>;
@@ -77,7 +73,6 @@ const ApproveAdvancePage = () => {
       {
         accessorKey: 'patientId',
         header: 'Patient Name',
-        enableSorting: false,
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.patientId));
           return <div className="text-center">{result?.employee?.empName || ''}</div>;
@@ -87,7 +82,6 @@ const ApproveAdvancePage = () => {
       {
         accessorKey: 'relation',
         header: 'Relation',
-        enableSorting: false,
         cell: () => <div className="text-center">Self</div>,
         className: 'text-center',
       },
@@ -100,7 +94,6 @@ const ApproveAdvancePage = () => {
       {
         accessorKey: 'advanceAmount',
         header: 'Claim Amount',
-        enableSorting: false,
         cell: ({ row }: any) => {
           const amount = row.original.advanceAmount;
           return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
@@ -151,16 +144,16 @@ const ApproveAdvancePage = () => {
   };
 
   const handleSubmitAdvanceRequest = ({ approvedAmount }: { approvedAmount: number }) => {
-    if (!selectedAdvance || !user.EmpCode) return;
+    if (!selectedAdvance || !EmpCode) return;
 
     dispatch(
-      submitAdvanceApproval({
-        AdvanceId: Number(selectedAdvance.advanceId),
-        SenderId: Number(user.EmpCode),
+      submitAdvanceApprovalByHR({
+        AdvanceId: selectedAdvance.advanceId,
+        SenderId: EmpCode,
         RecipientId: 101002,
         ClaimTypeId: 1,
         StatusId: 2,
-        ApprovalAmount: approvedAmount,
+        ApprovalAmount: approvedAmount.toString(),
       })
     );
   };
@@ -188,10 +181,6 @@ const ApproveAdvancePage = () => {
           <h2 className="text-xl font-bold text-blue-700 mb-4">Patient Details & Advance Details</h2>
           <PatientDetailsCard {...patientDetails} />
 
-          {/* This console log will show you what's being passed to the card */}
-          {console.log('Data for HospitalizationDetailsCard:', claimDetails?.advanceBasicDetails)}
-          {console.log('Document Lists for HospitalizationDetailsCard:', claimDetails?.documentLists)}
-
           {claimDetails?.advanceBasicDetails && (
             <HospitalizationDetailsCard
               hospitalName={claimDetails.advanceBasicDetails.hospitalName || '-'}
@@ -217,7 +206,7 @@ const ApproveAdvancePage = () => {
             />
           )}
 
-          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={approvalLoading} />
+          <AdvanceApprovalForm estimatedAmount={selectedAdvance.advanceAmount} onSubmit={handleSubmitAdvanceRequest} approvalLoading={hr.loading} />
         </>
       )}
     </div>
