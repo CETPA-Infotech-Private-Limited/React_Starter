@@ -2,14 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  BillItemDisplayRow,
-  DisplayField,
-  DisplayTable,
-  InfoCard,
-  PreHospDisplayRow,
-  SectionHeader,
-} from '../hr/reviewclaim/ReviewComponents';
+import { BillItemDisplayRow, DisplayField, DisplayTable, InfoCard, PreHospDisplayRow, SectionHeader } from '../hr/reviewclaim/ReviewComponents';
 import { Input } from '../ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -22,7 +15,7 @@ import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { submitAdvanceApproval } from '@/features/medicalClaim/advanceApprovalSlice';
 
-const HospitalizationBillView = () => {
+const ApproveClaimAfterDocReview = () => {
   // State for the declaration and approval form
   const [isSpecialDisease, setIsSpecialDisease] = useState<'yes' | 'no'>('no');
   const [specialDiseaseName, setSpecialDiseaseName] = useState('');
@@ -87,7 +80,6 @@ const HospitalizationBillView = () => {
 
     if (rowData.claimId) {
       dispatch(getClaimDataHr({ advanceid: rowData.claimId }));
-      
     }
   };
 
@@ -150,11 +142,7 @@ const HospitalizationBillView = () => {
           const isSelected = selectedClaim?.id === rowData.id;
 
           return (
-            <Button
-              size="sm"
-              onClick={() => handleViewToggle(rowData)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
-            >
+            <Button size="sm" onClick={() => handleViewToggle(rowData)} variant={'link'} className="text-blue-600">
               {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
               {isSelected && showDetails ? 'Hide' : 'View'}
             </Button>
@@ -222,11 +210,46 @@ const HospitalizationBillView = () => {
     // Access pre-hospitalization expenses from `claimDetail.preHospitalizationExpenses`
     const expenses = claimDetail?.preHospitalizationExpenses || {};
     return [
-      { id: 1, billType: 'Medicine', billedDate: expenses.medicineBillDate || 'N/A', billedAmount: expenses.medicineBillAmount || 0, claimedAmount: expenses.medicineClaimAmount || 0, hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0 },
-      { id: 2, billType: 'Consultation', billedDate: expenses.consultationBillDate || 'N/A', billedAmount: expenses.consultationBillAmount || 0, claimedAmount: expenses.consultationClaimAmount || 0, hasFiles: expenses.consultationHasFiles ? 1 : 0 },
-      { id: 3, billType: 'Investigation', billedDate: expenses.investigationBillDate || 'N/A', billedAmount: expenses.investigationBillAmount || 0, claimedAmount: expenses.investigationClaimAmount || 0, hasFiles: expenses.investigationHasFiles ? 1 : 0 },
-      { id: 4, billType: 'Procedure', billedDate: expenses.procedureBillDate || 'N/A', billedAmount: expenses.procedureBillAmount || 0, claimedAmount: expenses.procedureClaimAmount || 0, hasFiles: expenses.procedureHasFiles ? 1 : 0 },
-      { id: 5, billType: 'Other', billedDate: expenses.othersBillDate || 'N/A', billedAmount: expenses.otherBillAmount || 0, claimedAmount: expenses.otherClaimAmount || 0, hasFiles: expenses.otherHasFiles ? 1 : 0 },
+      {
+        id: 1,
+        billType: 'Medicine',
+        billedDate: expenses.medicineBillDate || 'N/A',
+        billedAmount: expenses.medicineBillAmount || 0,
+        claimedAmount: expenses.medicineClaimAmount || 0,
+        hasFiles: claimDetail?.documentLists?.pathUrl ? 1 : 0,
+      },
+      {
+        id: 2,
+        billType: 'Consultation',
+        billedDate: expenses.consultationBillDate || 'N/A',
+        billedAmount: expenses.consultationBillAmount || 0,
+        claimedAmount: expenses.consultationClaimAmount || 0,
+        hasFiles: expenses.consultationHasFiles ? 1 : 0,
+      },
+      {
+        id: 3,
+        billType: 'Investigation',
+        billedDate: expenses.investigationBillDate || 'N/A',
+        billedAmount: expenses.investigationBillAmount || 0,
+        claimedAmount: expenses.investigationClaimAmount || 0,
+        hasFiles: expenses.investigationHasFiles ? 1 : 0,
+      },
+      {
+        id: 4,
+        billType: 'Procedure',
+        billedDate: expenses.procedureBillDate || 'N/A',
+        billedAmount: expenses.procedureBillAmount || 0,
+        claimedAmount: expenses.procedureClaimAmount || 0,
+        hasFiles: expenses.procedureHasFiles ? 1 : 0,
+      },
+      {
+        id: 5,
+        billType: 'Other',
+        billedDate: expenses.othersBillDate || 'N/A',
+        billedAmount: expenses.otherBillAmount || 0,
+        claimedAmount: expenses.otherClaimAmount || 0,
+        hasFiles: expenses.otherHasFiles ? 1 : 0,
+      },
     ];
   }, [claimDetail]);
 
@@ -234,10 +257,8 @@ const HospitalizationBillView = () => {
   const totalClaimed = billItems.reduce((sum, item) => sum + item.claimedAmount, 0);
   const preHospTotal = preHospItems.reduce((sum, item) => sum + item.claimedAmount, 0);
 
-  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification','Approval Details'];
-  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents',"Approval Details"];
-
-console.log(approvedAmount,'this is approved')
+  const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification', 'Approval Details'];
+  const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents', 'Approval Details'];
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -251,16 +272,7 @@ console.log(approvedAmount,'this is approved')
         StatusId: 4,
       };
 
-      
-
-      // Simulate API call
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      // console.log('Submitting data:', formData);
-
-     
-       await dispatch(submitAdvanceApproval(payload))
-
-      
+      await dispatch(submitAdvanceApproval(payload));
 
       // Reset form fields after successful submission
       setApprovedAmount('');
@@ -271,7 +283,6 @@ console.log(approvedAmount,'this is approved')
       setSelectedClaim(null);
       setShowDetails(false);
 
-      // Refetch the list of claims to update the table
       if (user?.EmpCode) {
         dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 2 }));
       }
@@ -284,8 +295,11 @@ console.log(approvedAmount,'this is approved')
   };
 
   return (
-    <>
-      <ClaimSettlementList columns={columns} claimList={claimList} />
+    <div className="bg-white text-xs p-8 rounded-2xl font-sans space-y-10">
+      <Card className="p-4 border border-blue-200 shadow-sm rounded-xl bg-white">
+        <h2 className="text-xl font-extrabold text-blue-800 mb-4 tracking-tight">Advance Request List</h2>
+        <ClaimSettlementList columns={columns} claimList={claimList} />
+      </Card>
 
       {/* Conditional rendering for claim details */}
       {selectedClaim && showDetails && (
@@ -330,7 +344,7 @@ console.log(approvedAmount,'this is approved')
                 ))}
               </DisplayTable>
 
-              <SectionHeader title="NotIncluded Bill Details" subtitle="Not Included in hospitalization bills" className='mt-8' />
+              <SectionHeader title="NotIncluded Bill Details" subtitle="Not Included in hospitalization bills" className="mt-8" />
               <DisplayTable headers={billHeaders}>
                 {billItems.map((item, index) => (
                   <BillItemDisplayRow
@@ -360,7 +374,7 @@ console.log(approvedAmount,'this is approved')
                 </div>
               </div>
 
-              <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className='text-primary' />
+              <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" className="text-primary" />
               <DisplayTable headers={preHospHeaders}>
                 {preHospItems.map((item, index) => (
                   <PreHospDisplayRow
@@ -381,26 +395,25 @@ console.log(approvedAmount,'this is approved')
               </div>
 
               {/* Declaration Section */}
-              <Card className='p-8 mt-6'>
-                <h2 className='text-lg font-medium text-primary drop-shadow mb-4'>Declaration by Employee</h2>
+              <Card className="p-8 mt-6">
+                <h2 className="text-lg font-medium text-primary drop-shadow mb-4">Declaration by Employee</h2>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <Label className=" font-medium text-gray-900">Special Disease</Label>
-                      <RadioGroup
-                    value={claimDetail?.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no'}
-                       disabled
-                       className="flex space-x-6"
->
-  <div className="flex items-center space-x-2">
-    <RadioGroupItem value="yes" id="special-disease-yes" />
-    <Label htmlFor="special-disease-yes" className="text-sm">Yes</Label>
-  </div>
-  <div className="flex items-center space-x-2">
-    <RadioGroupItem value="no" id="special-disease-no" />
-    <Label htmlFor="special-disease-no" className="text-sm">No</Label>
-  </div>
-</RadioGroup>
-
+                    <RadioGroup value={claimDetail?.advanceBasicDetails?.isSpecailDisease ? 'yes' : 'no'} disabled className="flex space-x-6">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id="special-disease-yes" />
+                        <Label htmlFor="special-disease-yes" className="text-sm">
+                          Yes
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="no" id="special-disease-no" />
+                        <Label htmlFor="special-disease-no" className="text-sm">
+                          No
+                        </Label>
+                      </div>
+                    </RadioGroup>
                   </div>
                   {isSpecialDisease === 'yes' && (
                     <div className="flex items-center space-x-3 pl-10">
@@ -421,49 +434,44 @@ console.log(approvedAmount,'this is approved')
 
               {/* Approval Form */}
               <Card className="mt-8">
-  <div className="p-4">
-    <h2 className="text-lg text-primary drop-shadow pb-4">Approval Form</h2>
+                <div className="p-4">
+                  <h2 className="text-lg text-primary drop-shadow pb-4">Approval Form</h2>
 
-    {/* Responsive Flex Layout */}
-    <div className="flex flex-col md:flex-row md:gap-6 gap-4">
-      {/* Total Claim Requested */}
-      <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
-        <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
-        <Input
-          className="w-full"
-          disabled
-          value={claimDetail?.advanceBasicDetails?.claimAmount}
-          onChange={(e) => setTotalRequested(e.target.value)}
-          type="number"
-        />
-      </div>
+                  {/* Responsive Flex Layout */}
+                  <div className="flex flex-col md:flex-row md:gap-6 gap-4">
+                    {/* Total Claim Requested */}
+                    <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+                      <Label className="md:w-1/2 text-gray-900">Total Claim Requested</Label>
+                      <Input
+                        className="w-full"
+                        disabled
+                        value={claimDetail?.advanceBasicDetails?.claimAmount}
+                        onChange={(e) => setTotalRequested(e.target.value)}
+                        type="number"
+                      />
+                    </div>
 
-      {/* Approved Amount */}
-      <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
-        <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
-        <Input
-          className="w-full"
-          value={approvedAmount}
-          onChange={(e) => setApprovedAmount(e.target.value)}
-          type="number"
-        />
-      </div>
-    </div>
+                    {/* Approved Amount */}
+                    <div className="flex flex-col md:flex-row items-center w-full md:w-1/2 gap-2">
+                      <Label className="md:w-1/2 text-gray-900">Approved Amount</Label>
+                      <Input className="w-full" value={approvedAmount} onChange={(e) => setApprovedAmount(e.target.value)} type="number" />
+                    </div>
+                  </div>
 
-    {/* Submit Button */}
-    <div className="flex justify-end pt-4">
-      <Button onClick={handleSubmit} disabled={loading}>
-        {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
-      </Button>
-    </div>
-  </div>
-</Card>
+                  {/* Submit Button */}
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={handleSubmit} disabled={loading}>
+                      {loading ? <Loader className="w-4 h-4 animate-spin" /> : 'Confirm'}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
             </>
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
-export default HospitalizationBillView;
+export default ApproveClaimAfterDocReview;

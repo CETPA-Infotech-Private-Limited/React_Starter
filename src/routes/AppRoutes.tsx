@@ -17,7 +17,6 @@ import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
 import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
 import UserRoleMapping from '@/pages/admin/UserRoleMapping';
-import ApproveClaim from '@/pages/hr/approveClaim/ApproveClaim';
 import AdvanceClaimPage from '@/pages/user/advanceClaim/AdvanceClaimPage';
 import DirectRequestTable from '@/pages/user/raiseClaim/DirectRequestTable';
 import HospitalManagement from '@/pages/admin/HospitalManagement';
@@ -26,7 +25,8 @@ import BankingPage from '@/pages/finance/BankingPage';
 import MyClaim from '@/pages/user/MyClaim';
 import DoctorReview from '@/pages/doctor/DoctorReviewPage';
 import DoctorReviewPage from '@/pages/doctor/DoctorReviewPage';
-import AfterDocReview from '@/components/hr2/AfterDocReview';
+import ApproveClaimAfterDocReview from '@/components/hr2/ApproveClaimAfterDocReview';
+import HRReviewPage from '@/pages/reviewByHR/HRReviewPage';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -52,9 +52,8 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/raise-claim" element={<DirectRequestTable />} />
             <Route path="/review-approve-advance" element={<ApproveAdvancePage />} />
-            <Route path="/review-claim" element={<ReviewClaim />} />
-            <Route path="/review-claim2" element={<AfterDocReview />} />
-            <Route path="/ClaimAfterDoctorReview" element={<ApproveClaim />} />
+            <Route path="/review-claim" element={<HRReviewPage />} />
+            <Route path="/final-hr-review" element={<ApproveClaimAfterDocReview />} />
             <Route path="/my-claim" element={<MyClaim />} />
 
             <Route path="/request-advance" element={<AdvanceClaimPage />} />
