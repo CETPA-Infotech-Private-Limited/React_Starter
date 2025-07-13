@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileCheck, Loader2 } from 'lucide-react';
 
 const formSchema = z
   .object({
@@ -105,7 +106,17 @@ export default function AdvanceApprovalForm({ estimatedAmount, onSubmit, approva
             {/* Submit Button */}
             <div className="md:col-span-2 text-right">
               <Button type="submit" disabled={approvalLoading}>
-                {approvalLoading ? 'Submitting...' : 'Submit Approval'}
+                {approvalLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="animate-spin h-4 w-4" />
+                    Submitting...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <FileCheck className="h-4 w-4" />
+                    Submit Approval
+                  </div>
+                )}
               </Button>
             </div>
           </form>
