@@ -112,7 +112,7 @@ interface PostHospitalizationFormProps {
     PreHospitalizationExpenseAmount?: number;
     HospitalizationExpenseAmount?: number;
     NotIncludedBilledAmount?: number;
-    NetTotal?: number;
+    NetTotal?: number; // Keep this, but its value will be calculated
     PostHospitalTreatmentAdviseUpload?: File[];
     [key: string]: any;
   };
@@ -135,7 +135,6 @@ const PostHospitalizationForm: React.FC<PostHospitalizationFormProps> = ({
     PreHospitalizationExpenseAmount = 0,
     HospitalizationExpenseAmount = 0,
     NotIncludedBilledAmount = 0,
-    NetTotal = 0,
   } = postHospitalizationAndDeclaration;
 
   const [postHospitalTreatmentAdviseFiles, setPostHospitalTreatmentAdviseFiles] = useState<File[]>(
@@ -148,16 +147,19 @@ const PostHospitalizationForm: React.FC<PostHospitalizationFormProps> = ({
     postHospitalizationAndDeclaration.HospitalIncomeTaxFile?.Files || []
   );
 
+  // Calculate totalBill and netTotal whenever relevant expense amounts change
+  const totalBill = PreHospitalizationExpenseAmount + HospitalizationExpenseAmount;
+  const netTotal = totalBill - NotIncludedBilledAmount; // Correct calculation for Net Total
+
   useEffect(() => {
     onChange({
       ...postHospitalizationAndDeclaration,
       PostHospitalTreatmentAdviseUpload: postHospitalTreatmentAdviseFiles,
       HospitalRegstrationDetailsFile: { Files: regdCertificateFiles },
       HospitalIncomeTaxFile: { Files: incomeTaxExemptionFiles },
+      NetTotal: netTotal, // Update NetTotal in the parent state
     });
-  }, [postHospitalTreatmentAdviseFiles, regdCertificateFiles, incomeTaxExemptionFiles]);
-
-  const totalBill = PreHospitalizationExpenseAmount + HospitalizationExpenseAmount;
+  }, [postHospitalTreatmentAdviseFiles, regdCertificateFiles, incomeTaxExemptionFiles, netTotal, postHospitalizationAndDeclaration]); // Added netTotal and postHospitalizationAndDeclaration to dependency array
 
   return (
     <div className="rounded-xl border border-blue-300 shadow-2xl mx-auto p-6 bg-white space-y-6">
@@ -257,7 +259,7 @@ const PostHospitalizationForm: React.FC<PostHospitalizationFormProps> = ({
           </div>
           <div className="flex justify-between font-semibold">
             <span>Net Total (Balance Claim)</span>
-            <span>{NetTotal}</span>
+            <span>{netTotal}</span> {/* Display the calculated netTotal */}
           </div>
         </div>
       </div>

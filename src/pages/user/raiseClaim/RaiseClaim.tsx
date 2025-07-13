@@ -86,6 +86,8 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     preHospDetails?.PreHospitalizationExpensesOther?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
+  
+
   // Calculate hospitalization billed amount
   const hospBilledAmount = [
     ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
@@ -130,7 +132,9 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
   // Calculate the net total claimed amount
   const netTotal =
     hospClaimedAmount +
-    preHospClaimedAmount  // This now correctly includes the not-included claim amount
+    preHospClaimedAmount+ notIncludedBilledAmount // This now correctly includes the not-included claim amount
+
+
 
   const postHospDetailsWithSummary = {
     ...postHospDetails,

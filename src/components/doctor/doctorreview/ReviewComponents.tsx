@@ -168,7 +168,6 @@ type Document = {
 interface ClaimDocumentListProps {
   documents: Document[];
 }
-
 export const ClaimDocumentList: React.FC<ClaimDocumentListProps> = ({ documents }) => {
   if (!documents || documents.length === 0) {
     return (
@@ -190,34 +189,32 @@ export const ClaimDocumentList: React.FC<ClaimDocumentListProps> = ({ documents 
       </CardHeader>
 
       <CardContent>
-        <ScrollArea className="h-[300px] w-full pr-2">
-          <div className="space-y-4">
-            {documents.map((doc, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between border rounded-xl p-3 hover:shadow-md transition-all"
-              >
-                <div>
-                  <Label className="font-semibold">{doc.category}</Label>
-                  {doc.remark && (
-                    <div className="text-muted-foreground text-xs mt-1">{doc.remark}</div>
-                  )}
-                </div>
-
-                <a
-                  href={doc.pathUrl.replace(/\\/g, '/')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" className="flex gap-1 items-center">
-                    <Eye className="w-4 h-4" />
-                    View
-                  </Button>
-                </a>
+        <div className="space-y-4">
+          {documents.map((doc, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between border rounded-xl p-3 hover:shadow-md transition-all"
+            >
+              <div>
+                <Label className="font-semibold">{doc.category}</Label>
+                {doc.remark && (
+                  <div className="text-muted-foreground text-xs mt-1">{doc.remark}</div>
+                )}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+
+              <a
+                href={doc.pathUrl.replace(/\\/g, '/')}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" className="flex gap-1 items-center">
+                  <Eye className="w-4 h-4" />
+                  View
+                </Button>
+              </a>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
