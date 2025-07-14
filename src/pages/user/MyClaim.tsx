@@ -6,6 +6,7 @@ import Loader from '@/components/ui/loader';
 import MyClaimTable from '@/components/user/familyMagement/MyClaimTable';
 import { findEmployeeDetails, formatRupees } from '@/lib/helperFunction';
 import { getMyClaims } from '@/features/user/claim/claimSlice';
+import { format } from 'date-fns';
 
 const MyClaim = () => {
   const dispatch = useAppDispatch();
@@ -63,7 +64,7 @@ const MyClaim = () => {
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
-        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate || '-'}</div>,
+        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate ? format(new Date(row.original.requestDate), 'do MMM yyyy') : '-'}</div>,
         className: 'text-center',
       },
       {
@@ -78,7 +79,9 @@ const MyClaim = () => {
       {
         accessorKey: 'approvedDate',
         header: 'Approved Date',
-        cell: ({ row }: any) => <div className="text-center">{row.original.approvedDate || '-'}</div>,
+        cell: ({ row }: any) => (
+          <div className="text-center">{row.original.approvedDate ? format(new Date(row.original.approvedDate), 'do MMM yyyy') : '-'}</div>
+        ),
         className: 'text-center',
       },
       {

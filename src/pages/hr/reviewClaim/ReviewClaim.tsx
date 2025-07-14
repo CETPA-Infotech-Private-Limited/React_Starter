@@ -8,6 +8,7 @@ import { RootState } from '@/app/store';
 import { getClaimDataHr, getClaimHr } from '@/features/hr/getClaimRequestSlice';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import Loader from '@/components/ui/loader';
+import { format } from 'date-fns';
 
 const ReviewClaim = () => {
   const dispatch = useAppDispatch();
@@ -95,11 +96,10 @@ const ReviewClaim = () => {
       {
         accessorKey: 'requestedDate',
         header: 'Requested Date',
-        cell: ({ row }: any) => {
-          const dateStr = row.original.requestedDate;
-          const date = dateStr ? new Date(dateStr).toLocaleDateString() : '-';
-          return <div className="text-center">{date}</div>;
-        },
+        cell: ({ row }: any) => (
+          <div className="text-center">{row.original.requestedDate ? format(new Date(row.original.requestedDate), 'do MMM yyyy') : '-'}</div>
+        ),
+
         className: 'text-center',
       },
       {

@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import HospitalizationBillDetails from '@/components/doctor/doctorreview/HospitalizationBillDetails';
-import{ ClaimDocumentList} from '@/components/doctor/doctorreview/ReviewComponents';
+import { ClaimDocumentList } from '@/components/doctor/doctorreview/ReviewComponents';
 import { Button } from '@/components/ui/button';
-import { EyeIcon, FileSearch, EyeOff, Eye } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { getDoctorClaimListData, postDocReview } from '@/features/doctor/doctorSlice';
@@ -12,19 +12,27 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice';
-import { getClaimDataHr } from '@/features/hr/getClaimRequestSlice';
 import Loader from '@/components/ui/loader';
 import DocumentLinks from '@/components/common/DocumentLinks';
+import { format } from 'date-fns';
 
 const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
-  const [selectedClaim, setSelectedClaim] = useState(null);
-  const { data: claimDetails, loading: detailsLoading, error: detailsError } = useAppSelector((state: RootState) => state.getClaimDetails);
-  const { claimList, loading, postDocReviewSuccess } = useAppSelector((state: RootState) => state.submitClaimProcessSlice); // Assuming postDocReviewSuccess is a state in your slice indicating success
+  const [selectedClaim, setSelectedClaim] = useState<any>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const {
+    claimList,
+    loading,
+    docReviewLoading,
+    docReviewSuccess: postDocReviewSuccess,
+    docReviewError,
+  } = useAppSelector((state: RootState) => state.doctorApproval);
+
+  const { data: claimDetails, loading: detailsLoading } = useAppSelector((state: RootState) => state.getClaimDetails);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
-  const [showDetails, setShowDetails] = useState(false);
-  const detailsRef = useRef<HTMLDivElement>(null);
 
   const [billComments, setBillComments] = useState<Record<number, string>>({});
   const [preHospComments, setPreHospComments] = useState<Record<number, string>>({});
@@ -37,6 +45,7 @@ const DoctorReviewPage = () => {
     additionalComment: '',
     verified: false,
   };
+
   const [form, setForm] = useState(initialFormState);
 
   const handleChange = (field: string, value: any) => {
@@ -46,34 +55,28 @@ const DoctorReviewPage = () => {
     }));
   };
 
-  // Function to reset all form fields and comments
   const resetFormAndComments = () => {
     setBillComments({});
     setPreHospComments({});
     setForm(initialFormState);
-    setSelectedClaim(null); // Deselect the claim after submission
-    setShowDetails(false); // Hide details section
+    setSelectedClaim(null);
+    setShowDetails(false);
   };
 
-  // Effect to reset form and comments when details are hidden or a new claim is selected
-  // This useEffect will now only handle the case where details are explicitly hidden or a new claim is chosen.
   useEffect(() => {
     if (!showDetails && !selectedClaim) {
       resetFormAndComments();
     }
   }, [showDetails, selectedClaim]);
 
-  // Effect to clear fields on successful submission
   useEffect(() => {
-    if (postDocReviewSuccess) { // Listen for the success state from your Redux slice
+    if (postDocReviewSuccess) {
       resetFormAndComments();
-      dispatch(getDoctorClaimListData(Number(user?.EmpCode))); // Optionally refetch the list
-      // You might also want to dispatch an action here to reset postDocReviewSuccess in your slice
-      // to avoid triggering this effect again on re-renders if the state isn't reset externally.
+      dispatch(getDoctorClaimListData(Number(user?.EmpCode)));
     }
-  }, [postDocReviewSuccess, dispatch, user?.EmpCode]); // Add dispatch and user?.EmpCode to dependencies
+  }, [postDocReviewSuccess, dispatch, user?.EmpCode]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!selectedClaim) return;
 
     const commentsArray = [];
@@ -139,7 +142,6 @@ const DoctorReviewPage = () => {
         header: 'Sr. No.',
         enableSorting: false,
         cell: ({ row }: any) => <div className="text-center">{row.index + 1}</div>,
-        className: 'text-center',
       },
       {
         accessorKey: 'empId',
@@ -149,7 +151,6 @@ const DoctorReviewPage = () => {
           const result = findEmployeeDetails(employees, String(row.original.empId));
           return <div className="text-center">{result?.employee?.empName || ''}</div>;
         },
-        className: 'text-center',
       },
       {
         accessorKey: 'patientId',
@@ -159,20 +160,17 @@ const DoctorReviewPage = () => {
           const result = findEmployeeDetails(employees, String(row.original.patientId));
           return <div className="text-center">{result?.employee?.empName || ''}</div>;
         },
-        className: 'text-center',
       },
       {
         accessorKey: 'relation',
         header: 'Relation',
         enableSorting: false,
         cell: () => <div className="text-center">Self</div>,
-        className: 'text-center',
       },
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
-        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
-        className: 'text-center',
+        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate ? format(new Date(row.original.requestDate), 'do MMM yyyy') : '-'}</div>,
       },
       {
         accessorKey: 'advanceAmount',
@@ -182,7 +180,6 @@ const DoctorReviewPage = () => {
           const amount = row.original.advanceAmount;
           return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
         },
-        className: 'text-center',
       },
       {
         accessorKey: 'approvedAmount',
@@ -192,7 +189,6 @@ const DoctorReviewPage = () => {
           const amount = row.original.approvedAmount;
           return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
         },
-        className: 'text-center',
       },
       {
         id: 'actions',
@@ -210,7 +206,7 @@ const DoctorReviewPage = () => {
                 e.stopPropagation();
                 if (isSelected) {
                   setSelectedClaim(null);
-                  setShowDetails(false); // Also hide details when deselected
+                  setShowDetails(false);
                 } else {
                   setShowDetails(true);
                   dispatch(fetchClaimDetails(item.directClaimId));
@@ -231,16 +227,14 @@ const DoctorReviewPage = () => {
   return (
     <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
       <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
-        <div className="flex items-center gap-2 mb-5">
-          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Pending Claim Requests</h1>
-        </div>
-        {claimList?.length ? <ClaimSettlementList columns={columns} claimList={claimList} /> : <p className="text-center text-gray-500">No pending claim requests.</p>}
+        <h1 className="text-2xl font-bold text-blue-800 mb-5">Pending Claim Requests</h1>
+        <ClaimSettlementList columns={columns} claimList={claimList} />
       </div>
 
-      {(loading || detailsLoading) && <Loader />}
+      {(loading || docReviewLoading || detailsLoading) && <Loader />}
 
       {selectedClaim && claimDetails && (
-        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
+        <div ref={detailsRef} className="space-y-6 transition-all bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
           <HospitalizationBillDetails
             claimDetail={claimDetails}
             billComments={billComments}
@@ -248,15 +242,18 @@ const DoctorReviewPage = () => {
             preHospComments={preHospComments}
             setPreHospComments={setPreHospComments}
           />
-          {claimDetails?.documentLists.length > 0 && <DocumentLinks documentLists={claimDetails?.documentLists} />}
 
-          <ClaimDocumentList documents={claimDetails.documentLists} />
-
+          {claimDetails?.documentLists?.length > 0 && (
+            <>
+              <DocumentLinks documentLists={claimDetails.documentLists} />
+              <ClaimDocumentList documents={claimDetails.documentLists} />
+            </>
+          )}
 
           <div className="space-y-6 bg-muted/50 p-4 rounded-xl">
-            <div className="space-y-2">
+            <div>
               <Label className="font-semibold">Post Hospitalization Applicable</Label>
-              <div className="flex gap-4">
+              <div className="flex gap-4 mt-2">
                 {['Yes', 'No'].map((opt) => (
                   <label key={opt} className="flex items-center gap-2 text-sm">
                     <input
@@ -315,7 +312,7 @@ const DoctorReviewPage = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div>
               <Label htmlFor="additionalComment" className="font-semibold">
                 Additional Comments / Recommendation
               </Label>
@@ -333,8 +330,8 @@ const DoctorReviewPage = () => {
             </div>
 
             <div className="flex justify-end">
-              <Button className="bg-indigo-600 text-white hover:bg-indigo-700" onClick={handleSubmit}>
-                Submit
+              <Button className="bg-indigo-600 text-white hover:bg-indigo-700" onClick={handleSubmit} disabled={docReviewLoading}>
+                {docReviewLoading ? 'Submitting...' : 'Submit'}
               </Button>
             </div>
           </div>

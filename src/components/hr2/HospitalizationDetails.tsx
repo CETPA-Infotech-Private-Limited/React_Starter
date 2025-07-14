@@ -14,6 +14,7 @@ import { RootState } from '@/app/store';
 import ClaimSettlementList from '../hr/reviewClaim/ClaimSettlementList';
 import { findEmployeeDetails } from '@/lib/helperFunction';
 import { submitClaimProcess } from '@/features/doctor/doctorSlice';
+import { format } from 'date-fns';
 
 const HospitalizationDetails = () => {
   // State for the declaration and approval form
@@ -138,7 +139,6 @@ const HospitalizationDetails = () => {
         header: 'Patient Name',
         cell: ({ row }: any) => {
           const result = findEmployeeDetails(employees, String(row.original.patientId));
-          // Assuming `patientName` might be directly available in `rowData.original` if `patientId` doesn't map to an employee
           return <div className="text-center">{result?.employee?.empName || row.original.patientName || 'N/A'}</div>;
         },
         className: 'text-center',
@@ -155,11 +155,10 @@ const HospitalizationDetails = () => {
       {
         accessorKey: 'requestedDate',
         header: 'Requested Date',
-        cell: ({ row }: any) => {
-          const dateStr = row.original.requestedDate;
-          const date = dateStr ? new Date(dateStr).toLocaleDateString() : '-';
-          return <div className="text-center">{date}</div>;
-        },
+        cell: ({ row }: any) => (
+          <div className="text-center">{row.original.requestedDate ? format(new Date(row.original.requestedDate), 'do MMM yyyy') : '-'}</div>
+        ),
+
         className: 'text-center',
       },
       {
@@ -176,11 +175,7 @@ const HospitalizationDetails = () => {
           const isSelected = selectedClaim?.id === rowData.id;
 
           return (
-            <Button
-              size="sm"
-              onClick={() => handleViewToggle(rowData)}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 flex items-center gap-1 rounded-full px-3 py-1.5 text-xs"
-            >
+            <Button size="sm" variant="link" onClick={() => handleViewToggle(rowData)} className="">
               {isSelected && showDetails ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
               {isSelected && showDetails ? 'Hide' : 'View'}
             </Button>

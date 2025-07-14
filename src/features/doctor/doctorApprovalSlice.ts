@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axiosInstance from '@/services/axiosInstance';
 import toast from 'react-hot-toast';
 
+// Payload Type
 export interface SubmitClaimProcessPayload {
   AdvanceId: number;
   SenderId: number;
@@ -10,31 +11,31 @@ export interface SubmitClaimProcessPayload {
   StatusId: number;
 }
 
+// Slice State
 interface SubmitClaimState {
   loading: boolean;
   success: boolean;
   error: string | null;
   claimList: any;
+
+  docReviewLoading: boolean;
+  docReviewSuccess: boolean;
+  docReviewError: string | null;
 }
 
+// Initial State
 const initialState: SubmitClaimState = {
   loading: false,
   success: false,
   error: null,
   claimList: null,
+
+  docReviewLoading: false,
+  docReviewSuccess: false,
+  docReviewError: null,
 };
 
-export const submitClaimProcessByHr = createAsyncThunk('claim/submitClaimProcessByHr', async (formData: FormData, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post('/Claim/SubmitClaimProcessByHr', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  } catch (error: any) {
-    const message = error.response?.data?.message || 'Submission failed';
-    return rejectWithValue(message);
-  }
-});
+// Thunks
 
 export const submitClaimProcess = createAsyncThunk('claim/submitClaimProcess', async (formData: FormData, { rejectWithValue }) => {
   try {
@@ -48,6 +49,7 @@ export const submitClaimProcess = createAsyncThunk('claim/submitClaimProcess', a
   }
 });
 
+// Doctor Review
 export const postDocReview = createAsyncThunk('claim/docReview', async (formData: FormData, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post('/DoctorReview/CreateDoctorReview', formData, {
@@ -72,8 +74,8 @@ export const getDoctorClaimListData = createAsyncThunk('claim/getDoctorClaimList
   }
 });
 
-// ✅ Unified Slice
-const submitClaimProcessSlice = createSlice({
+// Slice
+const doctorApprovalSlice = createSlice({
   name: 'claim',
   initialState,
   reducers: {
@@ -82,27 +84,16 @@ const submitClaimProcessSlice = createSlice({
       state.success = false;
       state.error = null;
       state.claimList = null;
+
+      state.docReviewLoading = false;
+      state.docReviewSuccess = false;
+      state.docReviewError = null;
     },
   },
   extraReducers: (builder) => {
-    // handle all four async thunks
     builder
-      .addCase(submitClaimProcessByHr.pending, (state) => {
-        state.loading = true;
-        state.success = false;
-        state.error = null;
-      })
-      .addCase(submitClaimProcessByHr.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.success = true;
-        state.claimList = action.payload;
-      })
-      .addCase(submitClaimProcessByHr.rejected, (state, action: PayloadAction<unknown>) => {
-        state.loading = false;
-        state.success = false;
-        state.error = action.payload as string;
-      })
 
+      // Normal Claim
       .addCase(submitClaimProcess.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -119,22 +110,24 @@ const submitClaimProcessSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // Doctor Review
       .addCase(postDocReview.pending, (state) => {
-        state.loading = true;
-        state.success = false;
-        state.error = null;
+        state.docReviewLoading = true;
+        state.docReviewSuccess = false;
+        state.docReviewError = null;
       })
       .addCase(postDocReview.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.success = true;
+        state.docReviewLoading = false;
+        state.docReviewSuccess = true;
         state.claimList = action.payload;
       })
       .addCase(postDocReview.rejected, (state, action: PayloadAction<unknown>) => {
-        state.loading = false;
-        state.success = false;
-        state.error = action.payload as string;
+        state.docReviewLoading = false;
+        state.docReviewSuccess = false;
+        state.docReviewError = action.payload as string;
       })
 
+      // Get Doctor Claim List
       .addCase(getDoctorClaimListData.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -153,5 +146,5 @@ const submitClaimProcessSlice = createSlice({
   },
 });
 
-export const { resetSubmitClaimState } = submitClaimProcessSlice.actions;
-export default submitClaimProcessSlice.reducer;
+export const { resetSubmitClaimState } = doctorApprovalSlice.actions;
+export default doctorApprovalSlice.reducer;

@@ -102,7 +102,7 @@ export const submitAdvanceClaimSettle = createAsyncThunk('claim/submitAdvanceCla
     });
 
     if (response.data.statusCode === 200 || response.data.statusCode === 201) {
-      toast.success('Advance claim settled successfully!');
+      toast.success('Advance claim settle request sent successfully!');
     } else {
       toast.error('Failed to settle claim. Please try again.');
     }

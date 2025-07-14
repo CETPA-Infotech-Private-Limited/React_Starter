@@ -6,7 +6,7 @@ import BillDetailsForm from './BillDetails';
 import PreHospitalizationForm from './PreHospitalizationForm';
 import PostHospitalizationAndDeclaration from './PostHospital';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/ui/loader'; // ✅ Imported loader
 
 interface ClaimRequest {
   IsSpecailDisease: boolean;
@@ -91,8 +91,8 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     ...(billDetails?.MedicenBill?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.BilledAmount) || []),
     ...(billDetails?.Investigation?.map((b) => b.BilledAmount) || []),
-    billDetails?.RoomRent?.BilledAmount,
-    billDetails?.Procedure?.BilledAmount,
+    ...(billDetails?.RoomRent?.map((b) => b.BilledAmount) || []),
+    ...(billDetails?.Procedure?.map((b) => b.BilledAmount) || []),
     billDetails?.OtherBill?.BilledAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
@@ -101,8 +101,8 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     ...(billDetails?.MedicenBill?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Consultation?.map((b) => b.ClaimedAmount) || []),
     ...(billDetails?.Investigation?.map((b) => b.ClaimedAmount) || []),
-    billDetails?.RoomRent?.ClaimedAmount,
-    billDetails?.Procedure?.ClaimedAmount,
+    ...(billDetails?.RoomRent?.map((b) => b.ClaimedAmount) || []),
+    ...(billDetails?.Procedure?.map((b) => b.ClaimedAmount) || []),
     billDetails?.OtherBill?.ClaimedAmount || 0,
   ].reduce((sum, val) => sum + Number(val), 0);
 
@@ -130,7 +130,7 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
     HospitalizationExpenseAmount: hospBilledAmount,
     NotIncludedBilledAmount: notIncludedBilledAmount, // Added for summary
     PaidAmount: postHospDetails?.PaidAmount || 0,
-    PreHospitalizationClaimAmount: preHospBilledAmount,
+    NetTotal: netTotal,
   };
 
   const handleSubmit = async () => {
@@ -142,8 +142,6 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
         ...preHospDetails,
         ...postHospDetails,
       };
-
-      console.log(billDetails, 'something');
 
       console.log(rawPayload, 'this is raw payload');
       const formData = new FormData();
@@ -314,10 +312,10 @@ const RaiseClaim = ({ onCloseForm }: RaiseClaimProps) => {
           </div>
           <div>
             <PostHospitalizationAndDeclaration
-              billDetails={billDetails}
               postHospitalizationAndDeclaration={postHospDetailsWithSummary}
-              onChange={(updatedBillDetails) => setBillDetails(updatedBillDetails)}
+              onChange={setPostHospDetails}
               onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
             />
           </div>
         </>
