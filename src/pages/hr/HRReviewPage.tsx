@@ -5,6 +5,8 @@ import ClaimReview from '@/components/hrReview/ClaimReview';
 import FinalHRReview from '@/components/hrReview/FinalHRReview';
 import { ClipboardList } from 'lucide-react';
 import AppHeading from '@/components/common/AppHeading';
+import ReviewClaim from './reviewClaim/ReviewClaim';
+import AfterDocReview from '@/components/hr2/AfterDocReview';
 
 const HRReviewPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,17 +33,14 @@ const HRReviewPage = () => {
 
         <TabsContent value="review">
           <div className="bg-white p-4 rounded-md shadow-sm">
-            <ClaimReview />
+            <ReviewClaim />
           </div>
         </TabsContent>
 
         <TabsContent value="approve">
-          <div className="bg-white p-4 rounded-md shadow-sm">
-            <FinalHRReview />
-          </div>
+          <AfterDocReview />
         </TabsContent>
       </Tabs>
-      <div>lorem2000</div>
     </div>
   );
 };

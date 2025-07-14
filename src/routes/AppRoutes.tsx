@@ -25,7 +25,7 @@ import MyClaim from '@/pages/user/MyClaim';
 import DoctorReview from '@/pages/doctor/DoctorReviewPage';
 import DoctorReviewPage from '@/pages/doctor/DoctorReviewPage';
 import ApproveClaimAfterDocReview from '@/components/hr2/ApproveClaimAfterDocReview';
-import HRReviewPage from '@/pages/reviewByHR/HRReviewPage';
+import HRReviewPage from '@/pages/hr/HRReviewPage';
 import RequestAdvance from '@/pages/user/RequestAdvance';
 import ReviewAdvanceRequest from '@/pages/hr/ReviewAdvanceRequest';
 
@@ -51,7 +51,7 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['user']} />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            {/* <Route path="/raise-claim" element={<DirectRequestTable />} /> */}
+            <Route path="/raise-claim" element={<DirectRequestTable />} />
             <Route path="/review-approve-advance" element={<ReviewAdvanceRequest />} />
             <Route path="/review-claim" element={<HRReviewPage />} />
             {/* <Route path="/final-hr-review" element={<ApproveClaimAfterDocReview />} /> */}

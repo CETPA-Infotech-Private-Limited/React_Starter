@@ -6,7 +6,7 @@ import BillDetailsForm from './BillDetails';
 import PreHospitalizationForm from './PreHospitalizationForm';
 import PostHospitalizationAndDeclaration from './PostHospital';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import Loader from '@/components/ui/loader'; // ✅ Imported loader
+import Loader from '@/components/ui/loader';
 
 interface ClaimRequest {
   IsSpecailDisease: boolean;

@@ -50,7 +50,7 @@ const DirectRequestTable = () => {
     }, 100);
   };
 
-  const filteredClaims = useMemo(() => claimData?.filter((claim) => claim.claimTypeName === 'Advance' && claim.statusId === 2) || [], [claimData]);
+  const filteredClaims = useMemo(() => claimData?.filter((claim) => claim.statusId === 25) || [], [claimData]);
 
   const columns = useMemo(
     () => [
@@ -117,8 +117,8 @@ const DirectRequestTable = () => {
             <div className="flex justify-center gap-2">
               <Button
                 size="sm"
-                variant={row.original.statusId === 2 ? 'default' : 'ghost'}
-                disabled={row.original.statusId !== 2}
+                variant={row.original.statusId === 25 ? 'default' : 'ghost'}
+                disabled={row.original.statusId !== 25}
                 onClick={() => {
                   if (isSelected) {
                     setSelectedAdvanceClaim(null);

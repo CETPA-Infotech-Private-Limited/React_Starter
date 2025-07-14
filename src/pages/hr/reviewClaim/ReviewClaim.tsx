@@ -141,18 +141,13 @@ const ReviewClaim = () => {
     : [];
 
   return (
-    <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
-      <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
-        <div className="flex items-center gap-2 mb-5">
-          <FileSearch className="text-blue-600 w-6 h-6" />
-          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">Review Claim Requests</h1>
-        </div>
+    <div>
+      <div>
         {loading && <Loader />}
         <ClaimSettlementList columns={columns} claimList={claimList} />
       </div>
-
       {selectedClaim && showDetails && (
-        <div ref={detailsRef} className="space-y-6 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
+        <div ref={detailsRef} className="space-y-6 mt-4 transition-all duration-300 bg-white border border-blue-200 rounded-2xl shadow-lg p-6">
           <HospitalizationBillView claimDetail={claimDetail} />
           {/* <ViewClaimDetails claim={selectedClaim} /> */}
         </div>

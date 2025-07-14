@@ -151,7 +151,7 @@ export default function TableList({
 
       <div className="overflow-auto rounded-2xl border border-blue-200 shadow-lg">
         <table className="min-w-full text-sm text-left text-gray-800 font-sans">
-          <thead className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs font-semibold uppercase tracking-wider">
+          <thead className="bg-primary text-white text-xs font-semibold uppercase tracking-wider">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (

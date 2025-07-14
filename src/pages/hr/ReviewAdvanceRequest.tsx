@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { PatientDetailsCard } from '@/components/hr/reviewAdvanceRequest/PatientDetailsTable';
 import { HospitalizationDetailsCard } from '@/components/hr/reviewAdvanceRequest/HospitalizationDetailsCard';
 import AdvanceApprovalForm from '@/components/hr/reviewAdvanceRequest/AdvanceApprovalForm';
+import { format } from 'date-fns';
 
 const ApproveAdvancePage = () => {
   const dispatch = useAppDispatch();
@@ -88,7 +89,11 @@ const ApproveAdvancePage = () => {
       {
         accessorKey: 'requestDate',
         header: 'Request Date',
-        cell: ({ row }: any) => <div className="text-center">{row.original.requestDate}</div>,
+        cell: ({ row }: any) => {
+          const rawDate = row.original.requestDate;
+          const formatted = rawDate ? format(new Date(rawDate), 'do MMM yyyy') : '-';
+          return <div className="text-center">{formatted}</div>;
+        },
         className: 'text-center',
       },
       {

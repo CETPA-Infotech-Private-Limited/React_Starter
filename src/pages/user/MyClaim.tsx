@@ -55,7 +55,7 @@ const MyClaim = () => {
         accessorKey: 'claimAmount',
         header: 'Claim Amount',
         cell: ({ row }: any) => {
-          const amount = row.original.claimAmount;
+          const amount = row.original.cliamAmount;
           return <div className="text-center">{amount ? formatRupees(amount) : '-'}</div>;
         },
         className: 'text-center',
