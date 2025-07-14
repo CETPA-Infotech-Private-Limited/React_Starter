@@ -1,5 +1,4 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
-import ClaimSettlementList from '@/components/hr/reviewclaim/ClaimSettlementList';
 import HospitalizationBillDetails from '@/components/doctor/doctorreview/HospitalizationBillDetails';
 import { ClaimDocumentList } from '@/components/doctor/doctorreview/ReviewComponents';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,7 @@ import { fetchClaimDetails } from '@/features/medicalClaim/getClaimDetailsSlice'
 import Loader from '@/components/ui/loader';
 import DocumentLinks from '@/components/common/DocumentLinks';
 import { format } from 'date-fns';
+import ClaimSettlementList from '@/components/hr/reviewClaim/ClaimSettlementList';
 
 const DoctorReviewPage = () => {
   const dispatch = useAppDispatch();
@@ -33,7 +33,6 @@ const DoctorReviewPage = () => {
   const { data: claimDetails, loading: detailsLoading } = useAppSelector((state: RootState) => state.getClaimDetails);
   const { employees } = useAppSelector((state: RootState) => state.employee);
   const user = useAppSelector((state: RootState) => state.user);
-
   const [billComments, setBillComments] = useState<Record<number, string>>({});
   const [preHospComments, setPreHospComments] = useState<Record<number, string>>({});
 
@@ -228,10 +227,10 @@ const DoctorReviewPage = () => {
     <div className="p-6 bg-gradient-to-br from-white via-blue-50 to-white min-h-screen font-sans">
       <div className="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mb-6">
         <h1 className="text-2xl font-bold text-blue-800 mb-5">Pending Claim Requests</h1>
-        <ClaimSettlementList columns={columns} claimList={claimList} />
-      </div>
+        {(loading || docReviewLoading || detailsLoading) && <Loader />}
 
-      {(loading || docReviewLoading || detailsLoading) && <Loader />}
+        <ClaimSettlementList columns={columns} claimList={claimList?.length > 0 ? claimList : []} />
+      </div>
 
       {selectedClaim && claimDetails && (
         <div ref={detailsRef} className="space-y-6 transition-all bg-white border border-blue-200 rounded-2xl shadow-lg p-6">

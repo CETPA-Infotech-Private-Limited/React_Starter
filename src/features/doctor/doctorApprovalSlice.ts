@@ -28,7 +28,7 @@ const initialState: SubmitClaimState = {
   loading: false,
   success: false,
   error: null,
-  claimList: null,
+  claimList: [],
 
   docReviewLoading: false,
   docReviewSuccess: false,

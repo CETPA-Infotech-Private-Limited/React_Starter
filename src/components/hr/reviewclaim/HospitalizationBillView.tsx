@@ -6,13 +6,15 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { submitClaimProcessByHr } from '@/features/doctor/doctorSlice';
 import Loader from '@/components/ui/loader';
+import { getClaimHr } from '@/features/hr/getClaimRequestSlice';
+import { Loader2, Send } from 'lucide-react';
 
-const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
+const HospitalizationBillView = ({ claimDetail }: { claimDetail: any }) => {
   if (!claimDetail) return null;
   const user = useAppSelector((state: RootState) => state.user);
   const dispatch = useAppDispatch();
   const { advanceBasicDetails, billDetails, preHospitalizationExpenses } = claimDetail;
-  const {loading} = useAppSelector((state:RootState)=>state.submitClaimProcessSlice) // Destructure loading from your slice
+  const { loading, submitByHr } = useAppSelector((state: RootState) => state.submitClaimProcessSlice); // Destructure loading from your slice
 
   const billItems = [
     { id: 1, billType: 'Medicine', billedAmount: billDetails?.medicineBill ?? 0, claimedAmount: billDetails?.medicineClaim ?? 0 },
@@ -21,7 +23,6 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
     { id: 4, billType: 'Procedure', billedAmount: billDetails?.procedureBill ?? 0, claimedAmount: billDetails?.procedureClaim ?? 0 },
     { id: 5, billType: 'Room Rent', billedAmount: billDetails?.roomRentBill ?? 0, claimedAmount: billDetails?.roomRentClaim ?? 0 },
     { id: 6, billType: 'Other', billedAmount: billDetails?.othersBill ?? 0, claimedAmount: billDetails?.otherClaim ?? 0 },
-    
   ];
 
   const preHospItems = [
@@ -74,8 +75,6 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
   const billHeaders = ['S.No.', 'Bill Type', 'Billed Amount', 'Claimed Amount', 'Status', 'Clarification'];
   const preHospHeaders = ['S.No.', 'Bill Type', 'Billed Date', 'Billed Amount', 'Claimed Amount', 'Documents'];
 
-  console.log(claimDetail, 'this is claim detail object');
-
   const formData = new FormData();
 
   const handleSendToDoctor = async () => {
@@ -84,15 +83,20 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
     formData.append('RecipientId', String(102199));
     formData.append('ClaimTypeId', String(claimDetail.advanceBasicDetails.claimTypeId));
     formData.append('StatusId', String(5));
-
-    dispatch(submitClaimProcessByHr(formData));
+    await dispatch(submitClaimProcessByHr(formData));
   };
+
+  useEffect(() => {
+    if (submitByHr.success) {
+      // dispatch(getClaimHr({ recipientId: user.EmpCode, pageId: 1 }));
+      window.location.reload();
+    }
+  }, [submitByHr.success, dispatch, user.EmpCode]);
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
       {loading && <Loader />} {/* Conditionally render the Loader component */}
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Hospitalization Claim Details</h1>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <InfoCard title="Patient Info">
           <DisplayField label="Patient Name" value={advanceBasicDetails?.patientName ?? '-'} />
@@ -108,7 +112,6 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
           <DisplayField label="Pay To" value={advanceBasicDetails?.payTo ?? '-'} />
         </InfoCard>
       </div>
-
       <SectionHeader title="Bill Details" subtitle="Includes hospitalization bills" />
       <DisplayTable headers={billHeaders}>
         {billItems.map((item, index) => (
@@ -123,7 +126,6 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
           />
         ))}
       </DisplayTable>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4 text-sm">
         <div className="text-center">
           <p className="text-gray-500">Sub Total</p>
@@ -138,7 +140,6 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
           <p className="text-lg font-bold text-green-600">₹{advanceBasicDetails?.directCliamApprovedAmount ?? 0}</p>
         </div>
       </div>
-
       <SectionHeader title="Pre-Hospitalization" subtitle="30 days before admission" />
       <DisplayTable headers={preHospHeaders}>
         {preHospItems.map((item, index) => (
@@ -153,17 +154,24 @@ const HospitalizationBillView = ({ claimDetail }: { claimDetail: any },) => {
           />
         ))}
       </DisplayTable>
-
       <div className="text-right mt-2">
         <span className="font-semibold text-sm">Total Pre-Hospital: </span>
         <span className="text-lg font-bold">₹{preHospTotal.toFixed(2)}</span>
       </div>
-
       <div className="mt-6">
-       
         <div>
-          <Button className="mt-2 pl-6 pr-6" onClick={handleSendToDoctor}>
-            Send to Doctor
+          <Button className="mt-2 pl-6 pr-6 flex items-center gap-2" onClick={handleSendToDoctor} disabled={submitByHr.loading}>
+            {submitByHr.loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Send to Doctor
+              </>
+            )}
           </Button>
         </div>
       </div>

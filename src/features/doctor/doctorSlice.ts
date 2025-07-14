@@ -15,6 +15,14 @@ interface SubmitClaimState {
   success: boolean;
   error: string | null;
   claimList: any;
+
+  // 🔹 Separate state for submitClaimProcessByHr
+  submitByHr: {
+    loading: boolean;
+    success: boolean;
+    error: string | null;
+    data: any;
+  };
 }
 
 const initialState: SubmitClaimState = {
@@ -22,8 +30,16 @@ const initialState: SubmitClaimState = {
   success: false,
   error: null,
   claimList: null,
+
+  submitByHr: {
+    loading: false,
+    success: false,
+    error: null,
+    data: null,
+  },
 };
 
+// Thunks
 export const submitClaimProcessByHr = createAsyncThunk('claim/submitClaimProcessByHr', async (formData: FormData, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post('/Claim/SubmitClaimProcessByHr', formData, {
@@ -72,7 +88,7 @@ export const getDoctorClaimListData = createAsyncThunk('claim/getDoctorClaimList
   }
 });
 
-// ✅ Unified Slice
+// Slice
 const submitClaimProcessSlice = createSlice({
   name: 'claim',
   initialState,
@@ -82,27 +98,37 @@ const submitClaimProcessSlice = createSlice({
       state.success = false;
       state.error = null;
       state.claimList = null;
+
+      // Reset submitByHr separately
+      state.submitByHr = {
+        loading: false,
+        success: false,
+        error: null,
+        data: null,
+      };
     },
   },
   extraReducers: (builder) => {
-    // handle all four async thunks
+    // 🔹 submitClaimProcessByHr (with separate state)
     builder
       .addCase(submitClaimProcessByHr.pending, (state) => {
-        state.loading = true;
-        state.success = false;
-        state.error = null;
+        state.submitByHr.loading = true;
+        state.submitByHr.success = false;
+        state.submitByHr.error = null;
       })
       .addCase(submitClaimProcessByHr.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.success = true;
-        state.claimList = action.payload;
+        state.submitByHr.loading = false;
+        state.submitByHr.success = true;
+        state.submitByHr.data = action.payload;
       })
       .addCase(submitClaimProcessByHr.rejected, (state, action: PayloadAction<unknown>) => {
-        state.loading = false;
-        state.success = false;
-        state.error = action.payload as string;
-      })
+        state.submitByHr.loading = false;
+        state.submitByHr.success = false;
+        state.submitByHr.error = action.payload as string;
+      });
 
+    // 🔸 Other thunks use shared state
+    builder
       .addCase(submitClaimProcess.pending, (state) => {
         state.loading = true;
         state.success = false;
