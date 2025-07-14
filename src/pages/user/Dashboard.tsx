@@ -10,7 +10,7 @@ const Dashboard = () => {
           <p className="text-gray-500">Sub Heading</p>
         </div>
       </div>
-      <BillClarificationRequestForm onSubmit={(e) => console.log(e)} submitting={false} />
+      {/* <BillClarificationRequestForm onSubmit={(e) => console.log(e)} submitting={false} /> */}
     </div>
   );
 };
