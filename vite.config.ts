@@ -13,7 +13,7 @@ export default defineConfig({
     include: ['zod'],
   },
   server: {
-    port: 3000,
+    port: 3001,
   },
 
   resolve: {
