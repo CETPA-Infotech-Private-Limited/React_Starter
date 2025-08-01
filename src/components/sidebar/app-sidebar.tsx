@@ -12,6 +12,9 @@ import {
   LogOut,
   LayoutDashboard,
   EqualApproximately,
+  Award,
+  Pen,
+  CircleCheckBig,
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
@@ -39,59 +42,22 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       roles: ['user'],
     },
     {
-      title: 'In Patient',
-      icon: CreditCard,
+      title: 'Employee Of Month',
+      icon: Award,
+      url: '/emp-month',
       roles: ['user'],
-      children: [
-        {
-          title: 'Raise Claim',
-          url: '/raise-claim',
-          roles: ['user'],
-        },
-
-        {
-          title: 'Request Advance',
-          url: '/request-advance',
-          roles: ['user'],
-        },
-
-        {
-          title: 'My Claim',
-          url: '/my-claim',
-          roles: ['user'],
-        },
-      ],
-    },
-
-    {
-      title: 'HR Review',
-      icon: Search,
-      roles: ['HR1', 'HR2'],
-      children: [
-        {
-          title: 'Review Claim',
-          url: '/review-claim',
-          roles: ['HR1', 'HR2'],
-        },
-        {
-          title: 'Review Advance Request',
-          url: '/review-approve-advance',
-          roles: ['HR1', 'HR2'],
-        },
-      ],
     },
     {
-      title: 'Banking',
-      url: '/banking',
-      icon: CreditCard,
-      roles: ['Finance'],
+      title: 'Profile Change request',
+      icon: Pen,
+      url: '/profile-update',
+      roles: ['user'],
     },
-
     {
-      title: 'Doctor Review',
-      url: '/doctor-review',
-      icon: EqualApproximately,
-      roles: ['Doctor'],
+      title: 'Employee Approval',
+      icon: CircleCheckBig,
+      url: '/employee-approval',
+      roles: ['user'],
     },
   ];
 

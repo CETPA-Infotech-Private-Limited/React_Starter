@@ -19,16 +19,17 @@ type OptionType = {
   empCode: string;
   designation: string;
   department: string;
+  imageURL: string;
 };
 
-const EmployeeSelect = () => {
+const EmployeeSelect = ({unitfilteredemployees}) => {
   const { user, employee } = useSelector((state: RootState) => ({
     user: state.user,
     employee: state.employee,
   }));
   
 
-  const employees: Employee[] = employee.employees.filter((emp) => emp.unitId === Number(user.unitId));
+  const employees: Employee[] = unitfilteredemployees;
 
   const employeeOptions: OptionType[] = employees.map((emp) => ({
     value: emp.empId,
@@ -37,29 +38,47 @@ const EmployeeSelect = () => {
     empCode: emp.empCode,
     designation: emp.designation,
     department: emp.department,
+    imageURL: emp.imageURL
   }));
 
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([]);
 
-  const selectedEmployees = employees.filter((emp) => selectedOptions.some((opt) => opt.value === emp.empId));
+  // const selectedEmployees = employees.filter((emp) => selectedOptions.some((opt) => opt.value === emp.empId));
 
   return (
     <div>
-      <label className="font-semibold">Select Employees:</label>
+      {/* <label className="font-semibold">Select Employees:</label> */}
 
       <Select
-        className="mt-2"
-        isMulti
+        // className="mt-2"
+        // isMulti
         options={employeeOptions}
         value={selectedOptions}
         onChange={(selected) => setSelectedOptions(selected as OptionType[])}
         placeholder="Select employees..."
         isSearchable
+        // formatOptionLabel={(option) => (
+        //   <div className="flex items-center ">
+        //     <div className="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-full font-bold uppercase mr-4 ">
+        //       {option.imageURL !== null  ?  option.imageURL :option.empName[0].trim()}
+        //     </div>
+        //     <div>
+        //       <div className="text-sm font-medium text-gray-800">{option.empName}</div>
+        //       <div className="text-xs text-gray-500">
+        //         {option.empCode} | {option.designation} | {option.department}
+        //       </div>
+        //     </div>
+        //   </div>
+        // )}
         formatOptionLabel={(option) => (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-full font-bold uppercase">
-              {option.empName[0]}
-            </div>
+          <div className="flex items-center">
+            {option.imageURL ? (
+              <img src={option.imageURL} alt={option.empName} className="w-8 h-8 rounded-full object-cover mr-4 border" />
+            ) : (
+              <div className="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-full font-bold uppercase mr-4">
+                {option.empName[0].trim()}
+              </div>
+            )}
             <div>
               <div className="text-sm font-medium text-gray-800">{option.empName}</div>
               <div className="text-xs text-gray-500">
@@ -80,7 +99,7 @@ const EmployeeSelect = () => {
         }}
       />
 
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <h4 className="font-semibold">Selected Employees:</h4>
         <ul className="list-disc ml-6">
           {selectedEmployees.map((emp) => (
@@ -89,7 +108,7 @@ const EmployeeSelect = () => {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };

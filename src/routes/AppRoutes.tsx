@@ -15,19 +15,21 @@ import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
 import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
-import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
-import UserRoleMapping from '@/pages/admin/UserRoleMapping';
-import DirectRequestTable from '@/pages/user/raiseClaim/DirectRequestTable';
-import HospitalManagement from '@/pages/admin/HospitalManagement';
-import ApproveAdvancePage from '@/pages/hr/approveAdvance/ApproveAdvancePage';
-import BankingPage from '@/pages/finance/BankingPage';
-import MyClaim from '@/pages/user/MyClaim';
-import DoctorReview from '@/pages/doctor/DoctorReviewPage';
-import DoctorReviewPage from '@/pages/doctor/DoctorReviewPage';
-import ApproveClaimAfterDocReview from '@/components/hr2/ApproveClaimAfterDocReview';
-import HRReviewPage from '@/pages/hr/HRReviewPage';
-import RequestAdvance from '@/pages/user/RequestAdvance';
-import ReviewAdvanceRequest from '@/pages/hr/ReviewAdvanceRequest';
+import EmployeeOfTheMonth from '@/pages/user/EmployeeOfTheMonth';
+import ProfileChangeRequests from '@/pages/profilechanges/ProfileChangeRequests';
+// import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
+// import UserRoleMapping from '@/pages/admin/UserRoleMapping';
+// import DirectRequestTable from '@/pages/user/raiseClaim/DirectRequestTable';
+// import HospitalManagement from '@/pages/admin/HospitalManagement';
+// import ApproveAdvancePage from '@/pages/hr/approveAdvance/ApproveAdvancePage';
+// import BankingPage from '@/pages/finance/BankingPage';
+// import MyClaim from '@/pages/user/MyClaim';
+// import DoctorReview from '@/pages/doctor/DoctorReviewPage';
+// import DoctorReviewPage from '@/pages/doctor/DoctorReviewPage';
+// import ApproveClaimAfterDocReview from '@/components/hr2/ApproveClaimAfterDocReview';
+// import HRReviewPage from '@/pages/hr/HRReviewPage';
+// import RequestAdvance from '@/pages/user/RequestAdvance';
+// import ReviewAdvanceRequest from '@/pages/hr/ReviewAdvanceRequest';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -51,14 +53,10 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['user']} />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/raise-claim" element={<DirectRequestTable />} />
-            <Route path="/review-approve-advance" element={<ReviewAdvanceRequest />} />
-            <Route path="/review-claim" element={<HRReviewPage />} />
-            {/* <Route path="/final-hr-review" element={<ApproveClaimAfterDocReview />} /> */}
-            <Route path="/my-claim" element={<MyClaim />} />
-            <Route path="/request-advance" element={<RequestAdvance />} />
-            <Route path="/banking" element={<BankingPage />} />
-            <Route path="/doctor-review" element={<DoctorReviewPage />} />
+            <Route path = "/emp-month" element={<EmployeeOfTheMonth/>}/>
+
+            <Route path="/profile-update" element={<ProfileChangeRequests />} />
+          
           </Route>
         </Route>
 
@@ -66,8 +64,8 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['admin', 'superAdmin', 'user']} />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/manage-admin" element={<AdminManagement />} />
-            <Route path="/manage-hospital" element={<HospitalManagement />} />
-            <Route path="/user-role-mapping" element={<UserRoleMapping />} />
+            {/* <Route path="/manage-hospital" element={<HospitalManagement />} />
+            <Route path="/user-role-mapping" element={<UserRoleMapping />} /> */}
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
