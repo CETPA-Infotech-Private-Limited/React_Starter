@@ -302,8 +302,8 @@ const ProfileChangeRequests = () => {
         <div className="text-2xl font-bold text-gray-800 flex items-center">Profile Change Requests</div>
       </div>
 
-      <Tabs defaultValue="personal-profile" className="w-full">
-        <TabsList className="grid grid-cols-3 w-auto ml-auto">
+      <Tabs defaultValue="personal-profile" >
+        <TabsList >
           <TabsTrigger value="personal-profile" className="flex items-center gap-2">
             <User className="w-4 h-4" />
             Personal Profile

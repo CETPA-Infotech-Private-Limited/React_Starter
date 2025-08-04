@@ -17,6 +17,7 @@ import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
 import EmployeeOfTheMonth from '@/pages/user/EmployeeOfTheMonth';
 import ProfileChangeRequests from '@/pages/profilechanges/ProfileChangeRequests';
+import EmployeeApproval from '@/pages/user/EmployeeApproval';
 // import ReviewClaim from '@/pages/hr/reviewClaim/ReviewClaim';
 // import UserRoleMapping from '@/pages/admin/UserRoleMapping';
 // import DirectRequestTable from '@/pages/user/raiseClaim/DirectRequestTable';
@@ -54,7 +55,7 @@ const AppRoutes = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path = "/emp-month" element={<EmployeeOfTheMonth/>}/>
-
+            <Route path='/employee-approval' element={<EmployeeApproval/> } />
             <Route path="/profile-update" element={<ProfileChangeRequests />} />
           
           </Route>
