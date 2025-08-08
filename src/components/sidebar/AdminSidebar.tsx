@@ -27,13 +27,7 @@ export function AdminSidebar(props: React.ComponentProps<typeof Sidebar>) {
       url: '/user-role-mapping',
       icon: UserRoundCog,
       roles: ['admin', 'superAdmin', 'user'],
-    },
-    {
-      title: 'Manage Hospital',
-      url: '/manage-hospital',
-      icon: Hospital,
-      roles: ['admin', 'superAdmin', 'user'],
-    },
+    }
   ];
 
   const navMainItems = allNavItems.filter((item) => Array.isArray(item.roles) && item.roles.some((role) => Roles.includes(role)));

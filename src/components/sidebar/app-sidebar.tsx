@@ -37,62 +37,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       url: '/dashboard',
       icon: LayoutDashboard,
       roles: ['user'],
-    },
-    {
-      title: 'In Patient',
-      icon: CreditCard,
-      roles: ['user'],
-      children: [
-        {
-          title: 'Raise Claim',
-          url: '/raise-claim',
-          roles: ['user'],
-        },
-
-        {
-          title: 'Request Advance',
-          url: '/request-advance',
-          roles: ['user'],
-        },
-
-        {
-          title: 'My Claim',
-          url: '/my-claim',
-          roles: ['user'],
-        },
-      ],
-    },
-
-    {
-      title: 'HR Review',
-      icon: Search,
-      roles: ['HR1', 'HR2'],
-      children: [
-        {
-          title: 'Review Claim',
-          url: '/review-claim',
-          roles: ['HR1', 'HR2'],
-        },
-        {
-          title: 'Review Advance Request',
-          url: '/review-approve-advance',
-          roles: ['HR1', 'HR2'],
-        },
-      ],
-    },
-    {
-      title: 'Banking',
-      url: '/banking',
-      icon: CreditCard,
-      roles: ['Finance'],
-    },
-
-    {
-      title: 'Doctor Review',
-      url: '/doctor-review',
-      icon: EqualApproximately,
-      roles: ['Doctor'],
-    },
+    }
   ];
 
   const navMainItems = allNavItems.filter((item) => item.roles.some((role) => Roles.includes(role)));

@@ -5,43 +5,23 @@ import { combineReducers } from 'redux';
 import userReducer from '@/features/user/userSlice';
 import applicationsReducer from '@/features/applications/applicationSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
-import allRoleReducer from '@/features/roleManagement/roleSlice';
-import claimReducer from '@/features/user/claim/claimSlice';
+import allRoleReducer from '@/features/roleManagement/roleSlice'; 
 import masterRoleReducer from '@/features/allRole/materRoleListSlice';
-import empRoleListReducer from '@/features/allRole/empRoleListSlice';
-import getAdvanceClaimReducer from '@/features/medicalClaim/getAdvanceClaimSlice';
-import claimHr from '@/features/hr/getClaimRequestSlice';
-import getClaimDetailsReducer from '@/features/medicalClaim/getClaimDetailsSlice';
-import advanceApprovalReducer from '@/features/medicalClaim/advanceApprovalSlice';
-import myClaimsReducer from '@/features/user/claim/myClaimSlice';
-import submitClaimProcessSlice from '@/features/doctor/doctorSlice';
-import approveClaimByFinanceReducer from '@/features/medicalClaim/approveClaimByFinanceSlice';
-import submitReducer from '@/features/hr/submitClaimProcessSlice';
-import doctorApprovalReducer from '@/features/doctor/doctorApprovalSlice';
+import empRoleListReducer from '@/features/allRole/empRoleListSlice'; 
 
 const persistConfig = {
   key: 'root',
   storage: storageSession,
-  whitelist: ['employee', 'user', 'applications', 'allRole', 'claim'],
+  whitelist: ['employee', 'user', 'applications', 'allRole'],
 };
 
 const rootReducer = combineReducers({
   employee: employeeReducer,
   user: userReducer,
   applications: applicationsReducer,
-  roles: allRoleReducer,
-  claim: claimReducer,
+  roles: allRoleReducer, 
   masterRole: masterRoleReducer,
-  empRoleList: empRoleListReducer,
-  getAdvanceClaim: getAdvanceClaimReducer,
-  getClaimHr: claimHr,
-  getClaimDetails: getClaimDetailsReducer,
-  advanceApproval: advanceApprovalReducer,
-  myClaims: myClaimsReducer,
-  submitClaimProcessSlice: submitClaimProcessSlice,
-  approveClaimByFinance: approveClaimByFinanceReducer,
-  submit: submitReducer,
-  doctorApproval: doctorApprovalReducer,
+  empRoleList: empRoleListReducer,  
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
