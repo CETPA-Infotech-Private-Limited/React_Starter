@@ -37,7 +37,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles }) => {
   useEffect(() => {
     if (isAuthenticated && auth.user && !redirectHandled.current) {
       redirectHandled.current = true;
-      dispatch(fetchUserProfile());
+      dispatch(fetchUserProfile(auth?.user?.profile?.UserId));
       {
         employees.length === 0 && dispatch(fetchEmployees());
       }

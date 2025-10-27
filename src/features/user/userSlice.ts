@@ -60,9 +60,9 @@ const initialState: UserState = {
   error: null,
 };
 
-export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (_, { rejectWithValue }) => {
+export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (empCode, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get<ProfileResponse>('/Account/profile');
+    const response = await axiosInstance.get<ProfileResponse>(`https://uatorganization.dfccil.com/api/Organization/GetEmployeDetailsWithEmpCode/${empCode}`);
     const data = response.data;
 
     if (data.error) {
