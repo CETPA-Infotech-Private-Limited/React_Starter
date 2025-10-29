@@ -1,5 +1,5 @@
   import * as React from 'react';
-  import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, Torus, PlaneTakeoff } from 'lucide-react';
+  import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, Torus, PlaneTakeoff, BaggageClaimIcon, BaggageClaim } from 'lucide-react';
   import { useNavigate } from 'react-router';
   import { NavMain } from '@/components/nav-main';
   import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -29,6 +29,12 @@
         title: 'Tour Request',
         url:'/#',
         icon: PlaneTakeoff,
+        roles: ['user']
+      },
+      {
+        title: 'Raise Claim',
+        url:'/raise-claim',
+        icon: BaggageClaim,
         roles: ['user']
       }
     ];

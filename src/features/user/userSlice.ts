@@ -37,6 +37,7 @@ interface ProfileResponse {
       designation: string;
       level: string;
       department: string;
+      empId: number;
     };
   };
   dataLength: number;
@@ -58,6 +59,7 @@ const initialState: UserState = {
   exp: null,
   loading: false,
   error: null,
+  empId:null,
 };
 
 export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (empCode, { rejectWithValue }) => {
@@ -105,6 +107,7 @@ const userSlice = createSlice({
         state.Lavel = data.level;
         const roles = Array.isArray(data.roles) ? data.roles : [];
         state.Roles = roles.includes('user') ? roles : [...roles, 'user'];
+        state.empId = data.empId
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;

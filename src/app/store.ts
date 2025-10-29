@@ -6,6 +6,8 @@ import userReducer from '@/features/user/userSlice';
 import applicationsReducer from '@/features/applications/applicationSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
 import allRoleReducer from '@/features/roleManagement/roleSlice';
+import tourRequest from '@/features/raiseClaim/raiseClaimSlice';
+import raiseClaimReducer from '@/features/raiseClaim/getRaiseClaim'
 
 const persistConfig = {
   key: 'root',
@@ -18,6 +20,8 @@ const rootReducer = combineReducers({
   user: userReducer,
   applications: applicationsReducer,
   roles: allRoleReducer,
+  tour:tourRequest,
+  raiseClaim :raiseClaimReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

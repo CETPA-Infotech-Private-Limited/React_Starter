@@ -15,6 +15,9 @@ import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
 import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
+import RaiseClaim from '@/pages/RaiseClaim/RaiseClaim';
+import ApprovarPage from '@/pages/RaiseClaim/ApproverPage';
+import ApproverPage from '@/pages/RaiseClaim/ApproverPage';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -38,6 +41,9 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['user', 'HR Admin']} />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path='/raise-claim' element={<RaiseClaim/>} />
+            <Route path='/raise-claim-approver' element={<ApproverPage/>} />
+
           </Route>
         </Route>
 

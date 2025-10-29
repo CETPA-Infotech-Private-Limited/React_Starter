@@ -155,7 +155,7 @@ export default function TableList({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => onRowClick && onRowClick(row.original)} // <-- Trigger onRowClick here
-                  className="cursor-pointer hover:bg-gray-300 "
+                  className="cursor-pointer "
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="p-3">
@@ -177,7 +177,7 @@ export default function TableList({
 
       {/* Pagination */}
       <div className="flex flex-row justify-between items-center py-4">
-        <div className="text-sm text-muted-foreground w-1/2">
+        <div className="text-sm  w-1/2">
           {hasCheckboxColumn
             ? `${table.getSelectedRowModel().flatRows.length} of ${totalRows} row(s) selected.`
             : `Showing ${currentRangeStart}-${currentRangeEnd} of ${totalRows}`}
