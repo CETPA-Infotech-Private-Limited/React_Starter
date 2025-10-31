@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axiosInstance from "@/services/axiosInstance";
 import type { RootState } from "@/app/store";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 /* =========================
    Types
@@ -61,6 +62,20 @@ export const getRaiseClaimData = createAsyncThunk<
     }
   }
 );
+
+export const amendTourClaim = createAsyncThunk('user/amendTour', async(payload,{rejectWithValue})=>{
+  try {
+    const response = await axiosInstance.put('TourStatus/UpdateTourReApprovalStatus', payload,{
+     headers:{
+      'Content-Type':'multipart-formdata'
+     }
+    })
+    toast.success('Request submitted successfully.')
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error)
+  }
+})
 
 
 const initialState: RaiseClaimState = {

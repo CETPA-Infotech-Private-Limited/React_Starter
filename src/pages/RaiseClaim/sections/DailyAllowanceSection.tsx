@@ -64,15 +64,12 @@ const DailyAllowanceSection = ({
     <Card className="shadow-lg border border-blue-200 rounded-xl overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-50 border-b border-blue-200 rounded-t-xl flex items-center justify-between">
         <CardTitle className="text-lg flex w-full justify-start items-start font-bold text-blue-900"><label className="flex items-center gap-2">
-          <Checkbox id="inc-da" checked={include} onCheckedChange={(v)=>setInclude(!!v)} />
-          <span className="text-sm text-blue-900">Include Daily Allowance</span>
+          <span className="text-sm text-blue-900">Daily Allowance</span>
         </label></CardTitle>
         
       </CardHeader>
 
-      {!include ? (
-       null
-      ) : (
+     
         <CardContent className="p-6">
           <div className="overflow-x-auto rounded-lg border border-blue-100">
             <Table>
@@ -93,12 +90,12 @@ const DailyAllowanceSection = ({
                 {rows.map((r, idx)=>(
                   <TableRow key={r.id} className="bg-white hover:bg-blue-50">
                     <TableCell className="text-center font-bold">{idx+1}</TableCell>
-                    <TableCell><Input type="date" value={r.date} onChange={e=>recomputeRow(r.id,{date:e.target.value})} /></TableCell>
-                    <TableCell><Input type="time" value={r.sourceTime} onChange={e=>recomputeRow(r.id,{sourceTime:e.target.value})} /></TableCell>
-                    <TableCell><Input type="time" value={r.endTime} onChange={e=>recomputeRow(r.id,{endTime:e.target.value})} /></TableCell>
-                    <TableCell><Input type="number" value={r.slabAmount} onChange={e=>recomputeRow(r.id,{slabAmount:e.target.value})} /></TableCell>
+                    <TableCell><Input readOnly type="date" value={r.date} onChange={e=>recomputeRow(r.id,{date:e.target.value})} /></TableCell>
+                    <TableCell><Input type="time" readOnly value={r.sourceTime} onChange={e=>recomputeRow(r.id,{sourceTime:e.target.value})} /></TableCell>
+                    <TableCell><Input type="time" readOnly value={r.endTime} onChange={e=>recomputeRow(r.id,{endTime:e.target.value})} /></TableCell>
+                    <TableCell><Input type="number" readOnly value={r.slabAmount} onChange={e=>recomputeRow(r.id,{slabAmount:e.target.value})} /></TableCell>
                     <TableCell><Input readOnly value={r.totalHHMM} className="bg-blue-100 cursor-not-allowed" /></TableCell>
-                    <TableCell><Input type="number" value={r.percentAdmissible} onChange={e=>recomputeRow(r.id,{percentAdmissible:e.target.value})} /></TableCell>
+                    <TableCell><Input type="number" readOnly value={r.percentAdmissible} onChange={e=>recomputeRow(r.id,{percentAdmissible:e.target.value})} /></TableCell>
                     <TableCell><Input readOnly value={r.amount} className="bg-blue-100 cursor-not-allowed" /></TableCell>
                     <TableCell>
                       <div className="flex gap-2">
@@ -115,7 +112,7 @@ const DailyAllowanceSection = ({
             <Button className="bg-blue-600 text-white">SUB TOTAL(₹): {subtotalText}</Button>
           </div>
         </CardContent>
-      )}
+      
     </Card>
   );
 };

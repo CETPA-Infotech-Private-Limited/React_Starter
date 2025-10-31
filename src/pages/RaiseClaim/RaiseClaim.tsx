@@ -22,7 +22,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { tourNotAvailed } from "@/features/tourNotAvailed/tourNotAvailedSlice";
+import { getOwnArrangementAmount, tourNotAvailed } from "@/features/tourNotAvailed/tourNotAvailedSlice";
 
 // ⬇️ Your thunk (adjust path if different)
 
@@ -92,8 +92,13 @@ const RaiseClaim = () => {
             onClick={async () => {
               try {
                 const result = await dispatch(getRaiseClaimData(row?.tourId)).unwrap();
+                dispatch(getOwnArrangementAmount())
                 if (result?.statusCode === 200) {
-                  navigate("/raise-claim-approver");
+                  navigate("/raise-claim-approver",
+                     {
+    state: {
+      tourId: row?.tourId,}}
+                  );
                 } else {
                   toast.error("Something went wrong.");
                 }
