@@ -45,6 +45,8 @@ export const tourNotAvailed = createAsyncThunk(
   }
 );
 
+// export const updateTourReApprovalStatus = createAsyncThunk('')
+
 // -------------------- Slice --------------------
 const initialState: TourNotAvailedState = {
   loading: false,
