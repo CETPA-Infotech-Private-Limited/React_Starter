@@ -20,6 +20,12 @@ interface TourRequest {
   sendBackToRemark: string;
 }
 
+interface RaiseClaimResponse {
+  claimId: number;
+  status: string;
+  message: string;
+}
+
 interface TourRequestState {
   loading: boolean;
   error: string | null;
@@ -28,6 +34,11 @@ interface TourRequestState {
     loading: boolean;
     error: string | null;
     data: TourRequest[] | null;
+  };
+  claim: {
+    loading: boolean;
+    error: string | null;
+    data: RaiseClaimResponse | null;
   };
 }
 
@@ -40,9 +51,12 @@ const initialState: TourRequestState = {
     error: null,
     data: null,
   },
+  claim: {
+    loading: false,
+    error: null,
+    data: null,
+  },
 };
-
-
 
 // Async thunk for GET recipient tour requests
 export const fetchTourRequests = createAsyncThunk(
@@ -50,6 +64,23 @@ export const fetchTourRequests = createAsyncThunk(
   async (empId: number, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/TourListing/GetTourRequest/${empId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Async thunk for POST Raise Claim Request
+export const raiseClaimRequest = createAsyncThunk(
+  'tourRequest/raiseClaimRequest',
+  async (formData: any, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/Claim/RaiseClaimRequest', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Fixed the content type to multipart/form-data
+        },
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || error.message);
@@ -71,13 +102,20 @@ const tourRequest = createSlice({
       state.recipientTours.error = null;
       state.recipientTours.data = null;
     },
+    resetClaimState: (state) => {
+      state.claim.loading = false;
+      state.claim.error = null;
+      state.claim.data = null;
+    },
     clearRecipientToursError: (state) => {
       state.recipientTours.error = null;
+    },
+    clearClaimError: (state) => {
+      state.claim.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-     
       // Fetch Recipient Tour Requests cases
       .addCase(fetchTourRequests.pending, (state) => {
         state.recipientTours.loading = true;
@@ -90,6 +128,20 @@ const tourRequest = createSlice({
       .addCase(fetchTourRequests.rejected, (state, action: PayloadAction<any>) => {
         state.recipientTours.loading = false;
         state.recipientTours.error = action.payload;
+      })
+      
+      // Raise Claim Request cases
+      .addCase(raiseClaimRequest.pending, (state) => {
+        state.claim.loading = true;
+        state.claim.error = null;
+      })
+      .addCase(raiseClaimRequest.fulfilled, (state, action: PayloadAction<RaiseClaimResponse>) => {
+        state.claim.loading = false;
+        state.claim.data = action.payload;
+      })
+      .addCase(raiseClaimRequest.rejected, (state, action: PayloadAction<any>) => {
+        state.claim.loading = false;
+        state.claim.error = action.payload;
       });
   },
 });
@@ -97,7 +149,9 @@ const tourRequest = createSlice({
 export const { 
   resetTourRequestState, 
   resetRecipientToursState, 
-  clearRecipientToursError 
+  resetClaimState,
+  clearRecipientToursError,
+  clearClaimError,
 } = tourRequest.actions;
 
 export default tourRequest.reducer;
