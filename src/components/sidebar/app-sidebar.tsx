@@ -16,7 +16,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const Roles = useAppSelector((state: RootState) => state.user.Roles) || [];
   const { state, toggleSidebar } = useSidebar();
 
-  const canAccessAdminDashboard = Roles.some((role) => ['admin', 'superAdmin', 'HR Admin'].includes(role));
+  const canAccessAdminDashboard = Roles.some((role) => ['admin', 'superAdmin'].includes(role));
 
   const allNavItems: NavItem[] = [
     {
