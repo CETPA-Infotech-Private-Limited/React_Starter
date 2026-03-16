@@ -19,9 +19,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ isAdmin }) => {
       <div className="w-full bg-gray-100 flex-1 overflow-hidden">
         <div className="flex flex-row h-full">
           {isAdmin ? <AdminSidebar /> : <AppSidebar />}
-
           <div className="w-full flex flex-col overflow-hidden">
-            <div className="flex items-center mt-2 gap-0 justify-center text-primary text-center rounded-md font-bold text-3xl">{fullName}</div>
+            <div className="hidden md:flex items-center mt-2 gap-0 justify-center text-primary text-center rounded-md font-semibold text-3xl">{fullName}</div>
             <div className="bg-white flex-1 overflow-auto">
               <Outlet />
             </div>
