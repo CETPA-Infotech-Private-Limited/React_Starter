@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux';
 export const useAppName = () => {
   const applications = useSelector((state: any) => state.applications.applications);
   const currentApplication = applications.find((app) => app.id === environment.applicationId) ?? {
-    name: 'App Name',
-    hindiName: 'e-Name',
-    description: 'App Name',
+    name: '',
+    hindiName: '',
+    description: '',
   };
 
   return {
