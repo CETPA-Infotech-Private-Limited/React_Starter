@@ -7,6 +7,8 @@ import applicationsReducer from '@/features/applications/applicationSlice';
 import employeeReducer from '@/features/employee/employeeSlice';
 import allRoleReducer from '@/features/roleManagement/roleSlice';
 import tokenDataReducer from '@/features/tokenData/tokenDataSlice';
+import nature from '@/features/GetCategoriesNature/NatureSlice'
+import poDetails from '@/features/GetPO/POslice';
 
 const persistConfig = {
   key: 'root',
@@ -20,6 +22,8 @@ const rootReducer = combineReducers({
   applications: applicationsReducer,
   roles: allRoleReducer,
   tokenData: tokenDataReducer,
+  nature,
+  poDetails,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

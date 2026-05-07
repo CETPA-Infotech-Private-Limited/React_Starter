@@ -28,6 +28,7 @@ interface ProfileResponse {
     unit: string;
     unitId: number;
     department: string;
+    unitName:string;
     level: string;
     roles: string[];
     ssoUserInfo: {
@@ -60,6 +61,7 @@ const initialState: UserState = {
   loading: false,
   error: null,
   empId:null,
+  unit:null,
 };
 
 export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (empCode, { rejectWithValue }) => {
@@ -105,6 +107,7 @@ const userSlice = createSlice({
         state.unitId = data.unitId.toString();
         state.Department = data.department;
         state.Lavel = data.level;
+        state.Unit = data.unitName;
         const roles = Array.isArray(data.roles) ? data.roles : [];
         state.Roles = roles.includes('user') ? roles : [...roles, 'user'];
         state.empId = data.empId

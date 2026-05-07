@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, Torus, PlaneTakeoff, BaggageClaimIcon, BaggageClaim } from 'lucide-react';
+import { LayoutGrid, LogOut, Hotel, ChevronsLeft, ChevronsRight, FileText, Torus, PlaneTakeoff, BaggageClaimIcon, BaggageClaim, Info } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { NavMain } from '@/components/nav-main';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarRail, SidebarSeparator, useSidebar } from '@/components/ui/sidebar';
@@ -19,14 +19,20 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const canAccessAdminDashboard = Roles.some((role) => ['admin', 'superAdmin'].includes(role));
 
   const allNavItems: NavItem[] = [
+    // {
+    //   title: 'Dashboard',
+    //   url: '/dashboard',
+    //   icon: LayoutGrid,
+    //   roles: ['user'],
+    // },
     {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: LayoutGrid,
+      title: 'Work Information',
+      url: '/categoryform',
+      icon: Info,
       roles: ['user'],
     },
     {
-      title: 'Sample Route',
+      title: 'Report Verification',
       url: '/my-requests',
       icon: FileText,
       roles: ['user'],

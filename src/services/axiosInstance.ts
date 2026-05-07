@@ -76,5 +76,6 @@ const createAxiosInstance = (baseURL: string): AxiosInstance => {
 // Create multiple axios instances with different base URLs
 export const apiInstance = createAxiosInstance(environment.apiUrl);
 export const dmsAxiosInstance = createAxiosInstance(environment.dmsApiUrl);
+export const openApiInstance = createAxiosInstance(environment.openApiUrl);
 
 export default apiInstance;

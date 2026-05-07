@@ -15,6 +15,7 @@ import AppLayout from '@/components/layout/app-layout';
 import AdminManagement from '@/pages/admin/AdminManagement';
 import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
+import CategoryForm from '@/pages/categories/CategoryForm';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -38,6 +39,7 @@ const AppRoutes = () => {
           <Route element={<PrivateRoute allowedRoles={['user', 'HR Admin']} />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/categoryform" element={<CategoryForm />} />
           </Route>
         </Route>
 
