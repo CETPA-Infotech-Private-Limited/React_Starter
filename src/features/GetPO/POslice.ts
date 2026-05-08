@@ -5,43 +5,78 @@ import toast from "react-hot-toast";
 
 // Types
 interface PODetail {
-  id: string;
-  poNumber: string;
-  value: string;
-  vendorName?: string;
-  amount?: number;
-  date?: string;
+  pktblSapDump: number;
+  poNo: string;
+  supplierCode: string;
+  contractNo: string;
+  capexOpex: string;
+  createdBy: string;
+  unit: string;
+  department: string;
+  poOrderValue: number;
+  deliveredValue: number;
+  balanceToBeInvoice: number;
+  currency: string;
+  sapSyncDate: string;
+  podate: string;
+  bankPayment: number;
+  sgst: number;
+  cgst: number;
+  igst: number;
+  tds: number;
+  glaccount: string;
   [key: string]: any;
 }
 
+interface GetPODetailsParams {
+  Unit?: string;
+  Dept?: string;
+}
+
 interface PODetailsState {
-  poList: PODetail[];
+  data: PODetail[];
   loading: boolean;
   error: string | null;
+  message: string | null;
+  success: boolean;
 }
 
 // Initial State
 const initialState: PODetailsState = {
-  poList: [],
+  data: [],
   loading: false,
   error: null,
+  message: null,
+  success: false,
 };
 
 // Async Thunk
-export const getPODetails = createAsyncThunk(
+export const getPODetails = createAsyncThunk<PODetail[], GetPODetailsParams, { rejectValue: string }>(
   'poDetails/getPODetails',
-  async ({ Unit = '0', Dept = '0' }: { unitId?: string; deptId?: string }, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await openApiInstance.get(
-        `/Util/po-details?Unit=${Unit}&Dept=${Dept}`
-      );
+      // Build query string - only add params if they have values
+      const queryParts: string[] = [];
+      
+      if (params.Unit && params.Unit !== '0' && params.Unit !== '') {
+        queryParts.push(`Unit=${params.Unit}`);
+      }
+      if (params.Dept && params.Dept !== '0' && params.Dept !== '') {
+        queryParts.push(`Dept=${params.Dept}`);
+      }
+      
+      const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
+      const url = `/Util/po-details${queryString}`;
+      
+      console.log('PO API URL:', url);
+      
+      const response = await openApiInstance.get(url);
       
       console.log('API Response Status:', response.status);
       console.log('API Response Data:', response.data);
       
       // Check if response is successful
       if (response.status === 200 || response.status === 201) {
-        // Handle different response structures
         let data = response.data;
         
         // If response has data property, use it
@@ -54,17 +89,16 @@ export const getPODetails = createAsyncThunk(
           return data;
         }
         
-        // If response has some other structure with array
+        // If response has result property
         if (data?.result && Array.isArray(data.result)) {
           return data.result;
         }
         
-        // If response has records/data/list property
+        // If response has records property
         if (data?.records && Array.isArray(data.records)) {
           return data.records;
         }
         
-        // If no recognizable array found, return empty array
         console.warn('Unexpected API response structure:', data);
         return [];
       } else {
@@ -76,21 +110,15 @@ export const getPODetails = createAsyncThunk(
     } catch (error: any) {
       console.error('PO Details API Error:', error);
       
-      // Handle different error structures
       let errorMessage = 'Failed to fetch PO details';
       
       if (error.response) {
-        // Server responded with error status
         errorMessage = error.response.data?.message || 
                        error.response.data?.error ||
                        `Server error: ${error.response.status}`;
-        console.error('Error Response:', error.response.data);
       } else if (error.request) {
-        // Request made but no response
         errorMessage = 'No response from server. Please check your connection.';
-        console.error('Error Request:', error.request);
       } else {
-        // Something else happened
         errorMessage = error.message || errorMessage;
       }
       
@@ -106,13 +134,12 @@ const poDetailsSlice = createSlice({
   initialState,
   reducers: {
     clearPOList: (state) => {
-      state.poList = [];
+      state.data = [];
       state.error = null;
     },
     resetPOState: () => initialState,
-    // Add a manual set PO list action for debugging
     setPOList: (state, action) => {
-      state.poList = action.payload;
+      state.data = action.payload;
       state.loading = false;
     },
   },
@@ -121,26 +148,26 @@ const poDetailsSlice = createSlice({
       .addCase(getPODetails.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log('PO Details Loading...');
+        state.success = false;
       })
       .addCase(getPODetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.poList = Array.isArray(action.payload) ? action.payload : [];
+        state.data = Array.isArray(action.payload) ? action.payload : [];
         state.error = null;
-        console.log('PO Details Fulfilled:', state.poList.length, 'items');
+        state.success = true;
       })
       .addCase(getPODetails.rejected, (state, action) => {
         state.loading = false;
-        state.poList = [];
+        state.data = [];
         state.error = action.payload as string;
-        console.error('PO Details Rejected:', action.payload);
+        state.success = false;
       });
   },
 });
 
 export const { clearPOList, resetPOState, setPOList } = poDetailsSlice.actions;
 
-export const selectPOList = (state: { poDetails: PODetailsState }) => state.poDetails.poList;
+export const selectPOList = (state: { poDetails: PODetailsState }) => state.poDetails.data;
 export const selectPOLoading = (state: { poDetails: PODetailsState }) => state.poDetails.loading;
 export const selectPOError = (state: { poDetails: PODetailsState }) => state.poDetails.error;
 

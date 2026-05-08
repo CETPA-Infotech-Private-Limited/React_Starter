@@ -16,6 +16,7 @@ import AdminManagement from '@/pages/admin/AdminManagement';
 import Seo from '@/components/common/Seo';
 import { useAppName } from '@/hooks/useAppName';
 import CategoryForm from '@/pages/categories/CategoryForm';
+import ReportList from '@/pages/reports/Report';
 
 const AppRoutes = () => {
   const dispatch = useAppDispatch();
@@ -40,6 +41,7 @@ const AppRoutes = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/categoryform" element={<CategoryForm />} />
+            <Route path="/reports" element={<ReportList />} />
           </Route>
         </Route>
 

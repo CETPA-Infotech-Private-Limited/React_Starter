@@ -9,6 +9,12 @@ import allRoleReducer from '@/features/roleManagement/roleSlice';
 import tokenDataReducer from '@/features/tokenData/tokenDataSlice';
 import nature from '@/features/GetCategoriesNature/NatureSlice'
 import poDetails from '@/features/GetPO/POslice';
+import submitReport from '@/features/SubmitReport/SubmitReportSlice';
+import pendingReports from '@/features/CVO/GetReportsSlice'; 
+import myDrafts from '@/features/Drafts/MyDraftsSlice';
+import cadreAllotmentReducer from '@/features/CadreApi/CadreSlice';
+import unitReducer from '@/features/dmsApi/GetUnitsSlice'
+
 
 const persistConfig = {
   key: 'root',
@@ -24,6 +30,11 @@ const rootReducer = combineReducers({
   tokenData: tokenDataReducer,
   nature,
   poDetails,
+  submitReport,
+  pendingReports,
+  myDrafts,
+  cadreAllotment: cadreAllotmentReducer,
+  units:unitReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

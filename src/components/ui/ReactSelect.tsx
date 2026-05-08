@@ -5,9 +5,10 @@ import Select, { Props as SelectProps } from 'react-select';
 interface CustomSelectProps extends SelectProps {
   label?: string;
   error?: string;
+  inDialog?: boolean;
 }
 
-export const ReactSelect: React.FC<CustomSelectProps> = ({ label, error, ...props }) => {
+export const ReactSelect: React.FC<CustomSelectProps> = ({ label, error, inDialog = false, ...props }) => {
   const customStyles = {
     control: (base: any, state: any) => ({
       ...base,
@@ -55,14 +56,20 @@ export const ReactSelect: React.FC<CustomSelectProps> = ({ label, error, ...prop
     }),
     menu: (base: any) => ({
       ...base,
-      zIndex: 50,
+      ...(inDialog ? { zIndex: 100000 } : {}),
       boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       border: '1px solid #e2e8f0',
       borderRadius: '6px',
+      backgroundColor: 'white',
+    }),
+    menuPortal: (base: any) => ({
+      ...base,
+      ...(inDialog ? { zIndex: 100000, pointerEvents: 'auto' } : {}),
     }),
     menuList: (base: any) => ({
       ...base,
       padding: '4px',
+      maxHeight: '250px',
     }),
     indicatorSeparator: (base: any) => ({
       ...base,
@@ -90,6 +97,11 @@ export const ReactSelect: React.FC<CustomSelectProps> = ({ label, error, ...prop
       <Select
         styles={customStyles}
         classNamePrefix="react-select"
+        {...(inDialog ? {
+          menuPortalTarget: typeof document !== 'undefined' ? document.body : undefined,
+          menuPosition: 'fixed',
+          menuShouldBlockScroll: false,
+        } : {})}
         {...props}
       />
       {error && (
@@ -97,4 +109,4 @@ export const ReactSelect: React.FC<CustomSelectProps> = ({ label, error, ...prop
       )}
     </div>
   );
-};
+}

@@ -15,6 +15,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
   const Roles = useAppSelector((state: RootState) => state.user.Roles) || [];
   const { state, toggleSidebar } = useSidebar();
+  const user = useAppSelector((state: RootState)=>state.user)
+
+  const CVO = user.Designation === 'CVO'
 
   const canAccessAdminDashboard = Roles.some((role) => ['admin', 'superAdmin'].includes(role));
 
@@ -33,7 +36,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     },
     {
       title: 'Report Verification',
-      url: '/my-requests',
+      url: '/reports',
       icon: FileText,
       roles: ['user'],
     },
