@@ -10,6 +10,7 @@ import LogoutButton from '@/auth/LogoutButton';
 const SiteHeader: React.FC<{ showtoggle?: boolean }> = () => {
   const user = useSelector((state: RootState) => state.user);
   const { toggleSidebar } = useSidebar();
+   const { decoded } = useSelector((state: RootState) => state.tokenData);
 
   return (
     <header className="bg-white shadow-md sticky top-0 w-full z-50 border-b-4 border-red-600 h-auto md:h-[80px] px-4">
@@ -26,7 +27,21 @@ const SiteHeader: React.FC<{ showtoggle?: boolean }> = () => {
         </div>
         <div className=" hidden md:flex  items-center space-x-4">
           <div className="hidden md:block text-gray-800 text-md md:text-lg font-semibold">{user.unique_name}</div>
+            <div>
+              {decoded?.IsD === 'True' && decoded?.IsB !== 'True' && (
+                      <div className="flex items-center gap-1">
+                        <Info className="h-3 w-3 text-red-600" />
+                        <p className="text-xs font-medium text-red-600">Delegated Access Active</p>
+                      </div>
+                    )}
 
+                    {decoded?.IsB === 'True' && decoded?.IsReadOnly === 'True' && (
+                      <div className="flex items-center gap-1">
+                        <Info className="h-3 w-3 text-red-600" />
+                        <p className="text-xs font-medium text-red-600">Audit Access Active</p>
+                      </div>
+                    )}
+            </div>
           <LogoutButton />
         </div>
       </div>
